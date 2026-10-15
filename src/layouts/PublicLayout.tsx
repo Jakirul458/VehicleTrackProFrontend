@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 
 export default function PublicLayout() {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login';
+  const isAuthPage = ['/login', '/signup', '/register'].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,6 +33,12 @@ export default function PublicLayout() {
                 >
                   Login
                 </Link>
+                <Link
+                  to="/signup"
+                  className="rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:border-primary hover:text-primary"
+                >
+                  Start free trial
+                </Link>
               </div>
             </div>
           </div>
@@ -58,7 +64,7 @@ export default function PublicLayout() {
                 <h3 className="font-semibold mb-4">Product</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li><Link to="/about" className="hover:text-primary">Features</Link></li>
-                  <li><Link to="/about" className="hover:text-primary">Pricing</Link></li>
+                  <li><Link to="/#pricing" className="hover:text-primary">Pricing</Link></li>
                   <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
                 </ul>
               </div>

@@ -50,14 +50,12 @@ export default function AboutPage() {
         >
           <h2 className="text-2xl font-semibold mb-4 text-foreground">What We Do</h2>
           <p className="text-muted-foreground mb-4 leading-relaxed">
-            VehicleTrack Pro is a professional vehicle document management system designed for insurance agents, 
-            cyber cafés, vehicle service centers, and document service providers. Our platform helps you track 
-            insurance policies, road tax, PUC certificates, fitness certificates, and permits for all your 
-            customers in one centralized location.
+            VehicleTrack Pro is a document tracking system designed for insurance agents, cyber cafés, and document
+            service providers. It keeps insurance policies, road tax, and PUC records with their expiry dates in one place.
           </p>
           <p className="text-muted-foreground leading-relaxed">
             Never miss a document expiry date again with our intelligent tracking and alert system. 
-            Manage hundreds of customers and thousands of vehicles with ease.
+            Record the customer and vehicle details needed for each document, without maintaining separate customer or vehicle profiles.
           </p>
         </motion.section>
 
@@ -79,8 +77,8 @@ export default function AboutPage() {
             className="grid md:grid-cols-2 gap-6"
           >
             {[
-              { icon: Shield, title: "Document Tracking", desc: "Track insurance, road tax, PUC, fitness, and permits with automatic expiry monitoring.", color: "text-blue-500", bg: "bg-blue-500/10" },
-              { icon: Users, title: "Customer Management", desc: "Organize customer profiles with complete vehicle and document history.", color: "text-purple-500", bg: "bg-purple-500/10" },
+              { icon: Shield, title: "Document Tracking", desc: "Track insurance, road tax, and PUC with expiry monitoring.", color: "text-blue-500", bg: "bg-blue-500/10" },
+              { icon: Users, title: "Agent-managed Access", desc: "Super Admins create and manage agent accounts.", color: "text-purple-500", bg: "bg-purple-500/10" },
               { icon: Zap, title: "Expiry Alerts", desc: "Get notified before documents expire to ensure timely renewals.", color: "text-amber-500", bg: "bg-amber-500/10" },
               { icon: Lock, title: "Secure & Private", desc: "Enterprise-grade security with role-based access control.", color: "text-emerald-500", bg: "bg-emerald-500/10" }
             ].map((feature, idx) => (

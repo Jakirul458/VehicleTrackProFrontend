@@ -42,6 +42,7 @@ apiClient.interceptors.response.use(
 export interface NormalizedApiError {
   status: number;
   message: string;
+  code?: string;
   fieldErrors?: Record<string, string> | undefined;
 }
 
@@ -57,7 +58,17 @@ const STATUS_MESSAGE: Record<number, string> = {
 };
 
 export function normalizeApiError(error: unknown): NormalizedApiError {
-  const axiosError = error as AxiosError<{ message?: string; errors?: Record<string, string> }>;
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    "message" in error &&
+    typeof error.status === "number" &&
+    typeof error.message === "string"
+  ) {
+    return error as NormalizedApiError;
+  }
+  const axiosError = error as AxiosError<{ message?: string; code?: string; errors?: Record<string, string> }>;
   if (axiosError?.isAxiosError) {
     const status = axiosError.response?.status ?? 0;
     return {
@@ -66,6 +77,7 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
         axiosError.response?.data?.message ??
         STATUS_MESSAGE[status] ??
         (status === 0 ? "Cannot reach the server. Check your connection." : "Unexpected error."),
+      ...(axiosError.response?.data?.code ? { code: axiosError.response.data.code } : {}),
       fieldErrors: axiosError.response?.data?.errors,
     };
   }
@@ -76,7 +88,18 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const normalized = normalizeApiError(error);
-    if (normalized.status !== 401) toast.error(normalized.message);
+    if (normalized.code === "ACCOUNT_VALIDITY_EXPIRED") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      if (!["/login", "/signup", "/register"].includes(window.location.pathname)) {
+        window.location.assign("/login?expired=1");
+      }
+    } else if (
+      normalized.status !== 401 &&
+      !["/auth/login", "/auth/register"].includes(error.config?.url ?? "")
+    ) {
+      toast.error(normalized.message);
+    }
     return Promise.reject(normalized);
   },
 );
@@ -101,7 +124,6 @@ export interface ListParams {
   from?: string;
   to?: string;
   agentId?: string;
-  customerId?: string;
 }
 
 /** Standard CRUD service factory for every resource collection. */

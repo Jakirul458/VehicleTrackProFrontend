@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
-import type { User, Role } from '@/types';
-import { authApi } from '@/api';
+import type { User } from '@/types';
+import { authApi, type PublicSignupPayload } from '@/api';
 
 interface AuthContextType {
   user: User | null;
@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  signup: (payload: PublicSignupPayload) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   updateUser: (user: User) => void;
@@ -32,6 +33,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await authApi.login({ email, password });
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    setToken(response.token);
+    setUser(response.user);
+  };
+
+  const signup = async (payload: PublicSignupPayload) => {
+    const response = await authApi.register(payload);
     localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     setToken(response.token);
@@ -78,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         isAuthenticated: !!user,
         login,
+        signup,
         logout,
         checkAuth,
         updateUser,

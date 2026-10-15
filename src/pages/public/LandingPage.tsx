@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Car,
@@ -9,7 +9,6 @@ import {
   Lock,
   ArrowRight,
   CheckCircle,
-  AlertTriangle,
   FileText,
   Coffee,
   Wrench,
@@ -27,8 +26,8 @@ import {
 /* ------------------------------------------------------------------ */
 
 // Fades/slides an element in once it scrolls into view
-function Reveal({ children, delay = 0, className = '' }) {
-  const ref = useRef(null);
+function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -63,8 +62,8 @@ function Reveal({ children, delay = 0, className = '' }) {
 }
 
 // Counts a number up when it becomes visible
-function CountUp({ to, suffix = '', duration = 1600 }) {
-  const ref = useRef(null);
+function CountUp({ to, suffix = '', duration = 1600 }: { to: number; suffix?: string; duration?: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
   const [value, setValue] = useState(0);
 
   useEffect(() => {
@@ -78,13 +77,13 @@ function CountUp({ to, suffix = '', duration = 1600 }) {
       setValue(to);
       return;
     }
-    let raf;
+    let raf: number | undefined;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
         const start = performance.now();
-        const tick = (now) => {
+        const tick = (now: number) => {
           const p = Math.min((now - start) / duration, 1);
           const eased = 1 - Math.pow(1 - p, 3);
           setValue(Math.round(to * eased));
@@ -97,7 +96,7 @@ function CountUp({ to, suffix = '', duration = 1600 }) {
     io.observe(el);
     return () => {
       io.disconnect();
-      cancelAnimationFrame(raf);
+      if (raf !== undefined) cancelAnimationFrame(raf);
     };
   }, [to, duration]);
 
@@ -116,16 +115,16 @@ function CountUp({ to, suffix = '', duration = 1600 }) {
 const features = [
   {
     icon: Car,
-    title: 'Vehicle Management',
-    text: 'Keep registration, chassis number, engine number and ownership details for every vehicle in one place.',
+    title: 'Insurance Tracking',
+    text: 'Keep policy details, payment information and renewal dates together.',
     grad: 'from-indigo-500 to-blue-500',
     glow: 'hover:shadow-indigo-500/30',
     ring: 'group-hover:border-indigo-400/60',
   },
   {
     icon: Shield,
-    title: 'Document Tracking',
-    text: 'Track insurance, road tax, PUC, fitness certificates and permits with automatic expiry dates.',
+    title: 'Tax and PUC Tracking',
+    text: 'Track road tax and PUC details with automatic expiry dates.',
     grad: 'from-emerald-500 to-teal-500',
     glow: 'hover:shadow-emerald-500/30',
     ring: 'group-hover:border-emerald-400/60',
@@ -140,16 +139,16 @@ const features = [
   },
   {
     icon: BarChart3,
-    title: 'Dashboard Analytics',
-    text: 'See live numbers on customers, vehicles and upcoming renewals at a glance.',
+    title: 'Expiry Overview',
+    text: 'See document statuses and upcoming renewals at a glance.',
     grad: 'from-fuchsia-500 to-pink-500',
     glow: 'hover:shadow-fuchsia-500/30',
     ring: 'group-hover:border-fuchsia-400/60',
   },
   {
     icon: Users,
-    title: 'Customer Management',
-    text: 'Organise customer profiles and link each one to their vehicles and documents.',
+    title: 'Start with a free trial',
+    text: 'Sign up and try all document features free for 7 days. Super Admins can also create agent accounts.',
     grad: 'from-cyan-500 to-sky-500',
     glow: 'hover:shadow-cyan-500/30',
     ring: 'group-hover:border-cyan-400/60',
@@ -168,7 +167,7 @@ const audiences = [
   {
     icon: BadgeCheck,
     title: 'Insurance Agents',
-    text: 'Track policy renewals and manage customer vehicle portfolios efficiently.',
+    text: 'Track policy renewals and keep customer details with each record.',
     color: 'text-indigo-600 bg-indigo-100 dark:bg-indigo-500/20 dark:text-indigo-300',
     bar: 'bg-indigo-500',
   },
@@ -211,13 +210,13 @@ const audiences = [
 
 const steps = [
   {
-    title: 'Add your customers and vehicles',
-    text: 'Enter details once. Each vehicle stays linked to its owner.',
+    title: 'Enter document details',
+    text: 'Keep customer and vehicle details with each document record.',
     grad: 'from-indigo-500 to-violet-500',
   },
   {
     title: 'Record the documents',
-    text: 'Add insurance, road tax, PUC, fitness and permit dates.',
+    text: 'Add insurance, road tax, and PUC dates.',
     grad: 'from-pink-500 to-rose-500',
   },
   {
@@ -231,14 +230,10 @@ const docChips = [
   { label: 'Insurance', c: 'bg-indigo-500' },
   { label: 'Road Tax', c: 'bg-emerald-500' },
   { label: 'PUC', c: 'bg-amber-500' },
-  { label: 'Fitness', c: 'bg-pink-500' },
-  { label: 'Permit', c: 'bg-cyan-500' },
-  { label: 'Registration', c: 'bg-violet-500' },
-  { label: 'Driving Licence', c: 'bg-rose-500' },
 ];
 
 const stats = [
-  { to: 6, suffix: '+', label: 'Document types tracked' },
+  { to: 3, suffix: '', label: 'Document types tracked' },
   { to: 30, suffix: ' days', label: 'Advance expiry alerts' },
   { to: 100, suffix: '%', label: 'Records in one place' },
   { to: 24, suffix: '/7', label: 'Access from any device' },
@@ -253,7 +248,6 @@ function PreviewCard() {
     { name: 'Insurance', note: 'Valid till 14 Mar 2027', status: 'Active', dot: 'bg-emerald-400', chip: 'bg-emerald-400/15 text-emerald-300' },
     { name: 'Road Tax', note: 'Valid till 02 Jan 2027', status: 'Active', dot: 'bg-emerald-400', chip: 'bg-emerald-400/15 text-emerald-300' },
     { name: 'PUC', note: 'Expires in 5 days', status: 'Renew soon', dot: 'bg-amber-400', chip: 'bg-amber-400/15 text-amber-300' },
-    { name: 'Fitness', note: 'Expired 3 days ago', status: 'Expired', dot: 'bg-rose-400', chip: 'bg-rose-400/15 text-rose-300' },
   ];
 
   return (
@@ -318,7 +312,7 @@ function PreviewCard() {
 /*  Road check banner: vehicle gets stopped, papers checked, fined      */
 /* ------------------------------------------------------------------ */
 
-function Wheel({ cx }) {
+function Wheel({ cx }: { cx: number }) {
   return (
     <g>
       <circle cx={cx} cy="34" r="8" fill="#0f172a" />
@@ -615,7 +609,7 @@ export default function LandingPage() {
               className="vt-hero-in mx-auto mb-6 max-w-xl text-base text-white/75 sm:text-lg lg:mx-0"
               style={{ animationDelay: '240ms' }}
             >
-              Track insurance, road tax, PUC, fitness, permits and customer vehicle records from one powerful platform.
+              Track insurance, road tax, and PUC expiry dates from one simple platform.
             </p>
 
             <div
@@ -623,10 +617,10 @@ export default function LandingPage() {
               style={{ animationDelay: '360ms' }}
             >
               <Link
-                to="/register"
+                to="/signup"
                 className="vt-gradient-bg group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-orange-400 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-fuchsia-600/30 transition-transform hover:scale-[1.03] focus:outline-none focus-visible:ring-4 focus-visible:ring-fuchsia-300/60"
               >
-                Start Free Trial
+                Start 7-day free trial
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
@@ -641,7 +635,7 @@ export default function LandingPage() {
               className="vt-hero-in mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/70 lg:justify-start"
               style={{ animationDelay: '480ms' }}
             >
-              {['Free trial', 'Works on mobile', 'Role-based access'].map((t) => (
+              {['Insurance, tax and PUC', 'Works on mobile', 'Role-based access'].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <CheckCircle className="h-4 w-4 text-emerald-400" />
                   {t}
@@ -786,6 +780,32 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section id="pricing" className="scroll-mt-8 bg-white px-4 py-16 dark:bg-slate-950">
+        <Reveal className="mx-auto max-w-4xl">
+          <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-8 text-center shadow-xl dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 sm:p-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-700 dark:text-indigo-300">Simple annual pricing</p>
+            <h2 className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">7 days free, then one year for ₹3,650</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-600 dark:text-slate-300">
+              Try Insurance, Road Tax and PUC tracking free for 7 days. To continue after your trial, contact admin to purchase the annual plan and extend your account validity.
+            </p>
+            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link
+                to="/signup"
+                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
+              >
+                Start free trial
+              </Link>
+              <a
+                href="tel:6294527072"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-800 transition hover:border-indigo-500 hover:text-indigo-700 dark:border-slate-700 dark:text-white"
+              >
+                Contact admin: 6294527072
+              </a>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
       {/* ============================ CTA ============================ */}
       <section className="px-4 py-14">
         <Reveal>
@@ -800,7 +820,7 @@ export default function LandingPage() {
               Join professionals managing vehicle documents smarter with VehicleTrack Pro.
             </p>
             <Link
-              to="/register"
+              to="/signup"
               className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-base font-semibold text-fuchsia-700 shadow-lg transition-transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
             >
               Start Your Free Trial

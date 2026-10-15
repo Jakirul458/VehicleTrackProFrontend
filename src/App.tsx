@@ -13,7 +13,7 @@ import LandingPage from './pages/public/LandingPage'
 import AboutPage from './pages/public/AboutPage'
 import ContactPage from './pages/public/ContactPage'
 import LoginPage from './pages/auth/LoginPage'
-import RegisterPage from './pages/auth/RegisterPage'
+import SignupPage from './pages/auth/SignupPage'
 import NotFoundPage from './pages/errors/NotFoundPage'
 import ForbiddenPage from './pages/errors/ForbiddenPage'
 
@@ -47,18 +47,18 @@ const queryClient = new QueryClient({
 
 const PAGE_SEO: Record<string, { title: string; description: string; keywords?: string }> = {
   '/': {
-    title: 'VehicleTrack Pro | Vehicle Document & Renewal Management',
-    description: 'Track vehicle insurance, road tax and PUC expiry dates, manage customers, and send renewal reminders with VehicleTrack Pro.',
-    keywords: 'vehicle document management, insurance renewal reminder, road tax tracking, PUC expiry reminder, vehicle management software India',
+    title: 'VehicleTrack Pro | Insurance, Tax & PUC Management',
+    description: 'Track insurance, road tax and PUC expiry dates, and send renewal reminders with VehicleTrack Pro.',
+    keywords: 'insurance renewal reminder, road tax tracking, PUC expiry reminder, vehicle document management India',
   },
   '/about': {
     title: 'About VehicleTrack Pro | Vehicle Document Management',
-    description: 'Learn how VehicleTrack Pro helps insurance agents, cyber cafes and vehicle service providers manage customer records and document renewals.',
+    description: 'Learn how VehicleTrack Pro helps agents and vehicle service providers track insurance, road tax and PUC renewals.',
     keywords: 'about VehicleTrack Pro, vehicle service software, insurance agent software',
   },
   '/contact': {
     title: 'Contact VehicleTrack Pro | Support & Enquiries',
-    description: 'Contact VehicleTrack Pro for product information, account support and questions about vehicle document and renewal management.',
+    description: 'Contact VehicleTrack Pro for product information, account support and questions about insurance, tax and PUC document management.',
   },
 }
 
@@ -71,10 +71,14 @@ function SeoManager() {
     const isPrivateOrAuth = !page
     const title = page?.title ?? (pathname === '/login'
       ? 'Sign in | VehicleTrack Pro'
-      : pathname === '/register'
-        ? 'Start your free trial | VehicleTrack Pro'
-        : 'VehicleTrack Pro')
-    const description = page?.description ?? 'Sign in to or create a VehicleTrack Pro account.'
+      : ['/signup', '/register'].includes(pathname)
+        ? 'Start your 7-day free trial | VehicleTrack Pro'
+      : 'VehicleTrack Pro')
+    const description = page?.description ?? (
+      ['/signup', '/register'].includes(pathname)
+        ? 'Create an account and try Insurance, Tax and PUC tracking free for 7 days.'
+        : 'Sign in to your VehicleTrack Pro account.'
+    )
     const siteUrl = new URL(import.meta.env.VITE_SITE_URL || window.location.origin).origin
     const canonicalUrl = `${siteUrl}${pathname === '/' ? '/' : pathname}`
 
@@ -136,7 +140,8 @@ function App() {
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route path="login" element={<LoginPage />} />
-              <Route path="register" element={<RegisterPage />} />
+              <Route path="signup" element={<SignupPage />} />
+              <Route path="register" element={<SignupPage />} />
             </Route>
 
             {/* Admin routes */}

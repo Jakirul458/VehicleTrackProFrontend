@@ -38,7 +38,7 @@ The frontend uses JWT tokens stored in localStorage for authentication. The toke
 6. Optionally set `VITE_GOOGLE_SITE_VERIFICATION` and `VITE_BING_SITE_VERIFICATION` to the verification values provided by Google Search Console and Bing Webmaster Tools. These are public verification tokens, not secrets.
 7. Deploy. `VITE_API_URL`, `VITE_SITE_URL`, and verification values are read during the build, so redeploy after changing them.
 
-The build generates static route HTML and page-specific titles, descriptions, canonical URLs, and social sharing metadata for the public About and Contact pages (so crawlers and link previews receive them without running JavaScript). It also generates `sitemap.xml` for the public Home, About, and Contact pages and adds its absolute URL to `robots.txt`. Login and registration are marked noindex; agent and admin routes are excluded from indexing.
+The build generates static route HTML and page-specific titles, descriptions, canonical URLs, and social sharing metadata for the public About and Contact pages (so crawlers and link previews receive them without running JavaScript). It also generates `sitemap.xml` for the public Home, About, and Contact pages and adds its absolute URL to `robots.txt`. Login and signup pages are marked noindex; agent and admin routes are excluded from indexing.
 
 After the production deployment is live, add the exact production URL/domain as a property in Google Search Console and Bing Webmaster Tools, verify ownership (DNS verification is preferred for a custom domain), then submit `https://YOUR_DOMAIN/sitemap.xml`. In Search Console, inspect the homepage and request indexing. Crawling and indexing are controlled by the search engines and can take days or weeks; inclusion or ranking for every search term cannot be guaranteed.
 
@@ -69,6 +69,7 @@ The app uses JWT-based authentication:
 - About page
 - Contact page with form
 - Login page
+- Public agent signup with a seven-day trial
 
 ### Admin Pages (Super Admin only)
 - Dashboard with platform statistics
@@ -78,7 +79,8 @@ The app uses JWT-based authentication:
 
 ### Agent Pages
 - Dashboard with statistics
-- Customer management (CRUD with agent isolation)
-- Vehicle management with document tracking
+- Insurance, tax, and PUC record management
 - Reports
 - Profile settings
+
+Agents can sign up for a seven-day trial or be created by the Super Admin. The annual plan is ₹4,999; after a trial or account validity expires, contact admin at 6294527072 for purchase and a validity extension.

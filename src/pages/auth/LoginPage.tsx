@@ -104,10 +104,11 @@
 
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Truck, CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { normalizeApiError, type NormalizedApiError } from '@/api/client';
 
 // ⚠️ Demo button er jonno credentials — nijer demo account diye change koro
 const DEMO_ACCOUNTS = {
@@ -116,7 +117,7 @@ const DEMO_ACCOUNTS = {
 };
 
 const FEATURES = [
-  'Insurance, tax, DL, fitness, permit & RC in one place',
+  'Insurance, tax and PUC records in one place',
   'Colour-coded expiry alerts',
   'One-tap WhatsApp reminders',
 ];
@@ -128,11 +129,15 @@ export default function LoginPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<NormalizedApiError | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const trialExpired = new URLSearchParams(location.search).get('expired') === '1';
 
   const doLogin = async (email: string, password: string) => {
     setIsSubmitting(true);
+    setLoginError(null);
     try {
       await login(email, password);
       toast.success('Login successful!');
@@ -143,7 +148,7 @@ export default function LoginPage() {
         navigate('/agent/dashboard', { replace: true });
       }
     } catch (error) {
-      toast.error('Invalid email or password');
+      setLoginError(normalizeApiError(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -282,16 +287,29 @@ export default function LoginPage() {
 
           <div className="vt-rise" style={{ animationDelay: '.1s' }}>
             <h1 className="text-[32px] font-extrabold tracking-tight text-slate-900">Welcome back</h1>
-            <p className="mt-2 text-sm text-slate-500">Sign in with your email or mobile number.</p>
+            <p className="mt-2 text-sm text-slate-500">Sign in with your email address.</p>
           </div>
+
+          {(trialExpired || loginError) && (
+            <div role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+              <p>
+                {loginError?.message ?? 'Your free trial or account validity has ended. Contact admin at 6294527072 to purchase the 1-year plan for ₹4,999 and extend your access.'}
+              </p>
+              {(trialExpired || loginError?.code === 'ACCOUNT_VALIDITY_EXPIRED') && (
+                <a href="tel:6294527072" className="mt-2 inline-block font-semibold underline">
+                  Call admin: 6294527072
+                </a>
+              )}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div className="vt-rise" style={{ animationDelay: '.2s' }}>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-800">
-                Email or mobile
+                Email address
               </label>
               <input
-                type="text"
+                type="email"
                 id="email"
                 required
                 autoComplete="username"
@@ -382,14 +400,10 @@ export default function LoginPage() {
             className="vt-rise mt-8 text-center text-sm text-slate-500"
             style={{ animationDelay: '.6s' }}
           >
-            New here?{' '}
-            <button
-              type="button"
-              onClick={() => navigate('/register')}
-              className="font-medium text-sky-700 hover:text-sky-900 hover:underline"
-            >
-              Start free trial
-            </button>
+            New to VehicleTrack Pro?{' '}
+            <Link to="/signup" className="font-semibold text-sky-700 hover:underline">
+              Start your 7-day free trial
+            </Link>
           </p>
         </div>
       </div>

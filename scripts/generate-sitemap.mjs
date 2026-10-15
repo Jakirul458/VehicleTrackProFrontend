@@ -63,8 +63,8 @@ const routePages = [
   {
     path: "/about",
     file: "about.html",
-    title: "About VehicleTrack Pro | Vehicle Document Management",
-    description: "Learn how VehicleTrack Pro helps insurance agents, cyber cafes and vehicle service providers manage customer records and document renewals.",
+    title: "About VehicleTrack Pro | Insurance, Tax & PUC Management",
+    description: "Learn how VehicleTrack Pro helps agents and vehicle service providers track insurance, road tax and PUC renewals.",
     keywords: "about VehicleTrack Pro, vehicle service software, insurance agent software",
     indexable: true,
   },
@@ -72,7 +72,7 @@ const routePages = [
     path: "/contact",
     file: "contact.html",
     title: "Contact VehicleTrack Pro | Support & Enquiries",
-    description: "Contact VehicleTrack Pro for product information, account support and questions about vehicle document and renewal management.",
+    description: "Contact VehicleTrack Pro for product information, account support and questions about insurance, tax and PUC document management.",
     indexable: true,
   },
   {
@@ -83,10 +83,17 @@ const routePages = [
     indexable: false,
   },
   {
+    path: "/signup",
+    file: "signup.html",
+    title: "Start your 7-day free trial | VehicleTrack Pro",
+    description: "Create an account and try Insurance, Tax and PUC tracking free for 7 days.",
+    indexable: false,
+  },
+  {
     path: "/register",
     file: "register.html",
-    title: "Start your free trial | VehicleTrack Pro",
-    description: "Create a VehicleTrack Pro account and start managing vehicle document renewals.",
+    title: "Start your 7-day free trial | VehicleTrack Pro",
+    description: "Create an account and try Insurance, Tax and PUC tracking free for 7 days.",
     indexable: false,
   },
 ];
