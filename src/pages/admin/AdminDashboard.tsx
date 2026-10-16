@@ -111,19 +111,18 @@
 //   );
 // }
 
-
-
-
-
-
-
-
-
-
-
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { AlertTriangle, CheckCircle, Clock, FileWarning, Receipt, ShieldCheck, FileText, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  FileWarning,
+  Receipt,
+  ShieldCheck,
+  FileText,
+  Users,
+} from "lucide-react";
 import { reportApi } from "@/api";
 import type { DashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
@@ -257,7 +256,11 @@ const dashboardStyles = `
 `;
 
 export default function AdminDashboard() {
-  const { data: stats, isLoading, isError } = useQuery<DashboardStats>({
+  const {
+    data: stats,
+    isLoading,
+    isError,
+  } = useQuery<DashboardStats>({
     queryKey: ["admin-document-dashboard"],
     queryFn: reportApi.adminDashboard,
     refetchOnWindowFocus: false,
@@ -283,7 +286,10 @@ export default function AdminDashboard() {
       <h1 className="dash-fade-up mb-2 bg-gradient-to-r from-primary to-sky-500 bg-clip-text text-3xl font-bold text-transparent">
         Dashboard
       </h1>
-      <p className="dash-fade-up mb-8 text-sm text-muted-foreground" style={{ animationDelay: "80ms" }}>
+      <p
+        className="dash-fade-up mb-8 text-sm text-muted-foreground"
+        style={{ animationDelay: "80ms" }}
+      >
         Platform-wide document expiry overview. Select a status to see matching records.
       </p>
 
@@ -304,7 +310,11 @@ export default function AdminDashboard() {
           </span>
           <span className="text-sm text-muted-foreground">Total agents</span>
           <span className="ml-auto text-3xl font-bold text-primary">
-            {isLoading ? <span className="inline-block h-8 w-12 animate-pulse rounded bg-muted" /> : stats?.totalAgents ?? 0}
+            {isLoading ? (
+              <span className="inline-block h-8 w-12 animate-pulse rounded bg-muted" />
+            ) : (
+              (stats?.totalAgents ?? 0)
+            )}
           </span>
         </div>
       </div>
@@ -349,7 +359,10 @@ export default function AdminDashboard() {
                       <span className={`absolute inset-y-0 left-0 w-1 ${theme.bar}`} />
 
                       <div className="relative mb-3 flex items-center justify-between gap-2">
-                        <StatusBadge status={DASHBOARD_STATUS[record.status].status} label={record.label} />
+                        <StatusBadge
+                          status={DASHBOARD_STATUS[record.status].status}
+                          label={record.label}
+                        />
                         <span
                           className={`flex size-7 items-center justify-center rounded-full transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 ${theme.iconWrap}`}
                         >

@@ -80,6 +80,7 @@ The app uses JWT-based authentication:
 ### Agent Pages
 - Dashboard with statistics
 - Insurance, tax, and PUC record management
+- Expiry reminders with prefilled Bengali WhatsApp messages and click-to-call actions
 - Reports
 - Profile settings
 

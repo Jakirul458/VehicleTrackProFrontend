@@ -359,19 +359,6 @@
 //   );
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Check, Download, MessageCircle, Pencil, Phone, Plus, Search, Trash2 } from "lucide-react";
@@ -389,7 +376,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DataTable, downloadCsv, PageHeader, Panel, type Column } from "@/components/common";
 import { daysLeft, formatCurrency, formatDate, formatDaysLeft } from "@/lib/expiry";
 import { MODULES, type ModuleDef, type Row } from "./modules";
@@ -405,7 +398,15 @@ const STATUSES: StatusFilter[] = ["ALL", "ACTIVE", "DUE", "SOON", "URGENT", "EXP
  */
 const STATUS_STYLE: Record<
   RecordStatus | "ALL",
-  { pill: string; dot: string; text: string; chipActive: string; chipIdle: string; card: string; bar: string }
+  {
+    pill: string;
+    dot: string;
+    text: string;
+    chipActive: string;
+    chipIdle: string;
+    card: string;
+    bar: string;
+  }
 > = {
   ALL: {
     pill: "bg-primary/10 text-primary ring-primary/20",
@@ -515,17 +516,29 @@ function filterLabel(item: StatusFilter): string {
 function StatusPill({ status }: { status: RecordStatus }) {
   const style = STATUS_STYLE[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${style.pill}`}>
-      <span className={`size-1.5 rounded-full ${style.dot} ${status === "EXPIRED" ? "mod-pulse-dot" : ""}`} />
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${style.pill}`}
+    >
+      <span
+        className={`size-1.5 rounded-full ${style.dot} ${status === "EXPIRED" ? "mod-pulse-dot" : ""}`}
+      />
       {statusLabel(status)}
     </span>
   );
 }
 
-function reminderMessage(moduleKey: ModuleDef["key"], row: Row, agentName: string, agentBusiness: string, agentMobile: string) {
+function reminderMessage(
+  moduleKey: ModuleDef["key"],
+  row: Row,
+  agentName: string,
+  agentBusiness: string,
+  agentMobile: string,
+) {
   const vehicle = String(row["vehicleNumber"] || "আপনার গাড়ি");
   const expiry = row["expiryDate"]
-    ? new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", year: "numeric" }).format(new Date(String(row["expiryDate"])))
+    ? new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", year: "numeric" }).format(
+        new Date(String(row["expiryDate"])),
+      )
     : "শীঘ্রই";
   const greeting = "নমস্কার, 🙏";
   const signature = `${agentBusiness || agentName || "আপনার এজেন্ট"}${agentMobile ? `\nমোবাইল: ${agentMobile}` : ""}`;
@@ -587,7 +600,10 @@ function csvValue(def: ModuleDef, row: Row, key: string): string | number {
   }
   const value = row[key];
   if (key === "startDate" || key === "expiryDate") return formatDate(value as string | undefined);
-  if (typeof value === "number" && ["premium", "portalPaid", "customerPaid", "commission", "amount"].includes(key)) {
+  if (
+    typeof value === "number" &&
+    ["premium", "portalPaid", "customerPaid", "commission", "amount"].includes(key)
+  ) {
     return formatCurrency(value);
   }
   return typeof value === "string" || typeof value === "number" ? value : "";
@@ -619,18 +635,31 @@ export function DocumentModulePage({
   useEffect(() => {
     let active = true;
     setLoading(true);
-    void def.api.list(agentId ? { agentId } : undefined).then((records) => {
-      if (active) setRows(records);
-    }).catch(() => {
-      if (active) setRows([]);
-    }).finally(() => {
-      if (active) setLoading(false);
-    });
-    return () => { active = false; };
+    void def.api
+      .list(agentId ? { agentId } : undefined)
+      .then((records) => {
+        if (active) setRows(records);
+      })
+      .catch(() => {
+        if (active) setRows([]);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [def, agentId]);
 
   const counts = useMemo(() => {
-    const result: Record<StatusFilter, number> = { ALL: rows.length, ACTIVE: 0, DUE: 0, SOON: 0, URGENT: 0, EXPIRED: 0 };
+    const result: Record<StatusFilter, number> = {
+      ALL: rows.length,
+      ACTIVE: 0,
+      DUE: 0,
+      SOON: 0,
+      URGENT: 0,
+      EXPIRED: 0,
+    };
     for (const row of rows) {
       const key = recordStatus(row["expiryDate"] as string | undefined);
       if (key !== "INCOMPLETE") result[key] += 1;
@@ -641,8 +670,16 @@ export function DocumentModulePage({
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
     return rows.filter((row) => {
-      if (status !== "ALL" && recordStatus(row["expiryDate"] as string | undefined) !== status) return false;
-      return !query || Object.values(row).some((value) => String(value ?? "").toLowerCase().includes(query));
+      if (status !== "ALL" && recordStatus(row["expiryDate"] as string | undefined) !== status)
+        return false;
+      return (
+        !query ||
+        Object.values(row).some((value) =>
+          String(value ?? "")
+            .toLowerCase()
+            .includes(query),
+        )
+      );
     });
   }, [rows, search, status]);
 
@@ -684,7 +721,9 @@ export function DocumentModulePage({
 
   const columns = getColumns(def);
   const exportRows = filtered.map((row) =>
-    Object.fromEntries(def.columns.map((column) => [column.header, csvValue(def, row, column.key)])),
+    Object.fromEntries(
+      def.columns.map((column) => [column.header, csvValue(def, row, column.key)]),
+    ),
   );
 
   return (
@@ -692,7 +731,11 @@ export function DocumentModulePage({
       <style>{moduleStyles}</style>
       <PageHeader
         title={def.title}
-        description={admin ? `${def.description} ${agentId ? "Read-only agent records." : "Read-only records across all agents."}` : def.description}
+        description={
+          admin
+            ? `${def.description} ${agentId ? "Read-only agent records." : "Read-only records across all agents."}`
+            : def.description
+        }
         actions={
           <>
             <Button variant="outline" onClick={() => downloadCsv(`${def.key}.csv`, exportRows)}>
@@ -721,9 +764,15 @@ export function DocumentModulePage({
               className={`mod-fade-up group relative overflow-hidden rounded-xl border bg-gradient-to-br via-card to-card p-3 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${style.card} ${selected ? "ring-2 ring-offset-1 ring-offset-background " + (item === "ALL" ? "ring-primary" : "ring-current " + style.text) : ""}`}
             >
               <span className={`absolute inset-y-0 left-0 w-1 ${style.bar}`} />
-              <span className={`block text-xs font-semibold uppercase tracking-wide ${style.text}`}>{filterLabel(item)}</span>
+              <span className={`block text-xs font-semibold uppercase tracking-wide ${style.text}`}>
+                {filterLabel(item)}
+              </span>
               <span className={`mt-1 block text-2xl font-bold tabular-nums ${style.text}`}>
-                {loading ? <span className="inline-block h-7 w-8 animate-pulse rounded bg-muted" /> : counts[item]}
+                {loading ? (
+                  <span className="inline-block h-7 w-8 animate-pulse rounded bg-muted" />
+                ) : (
+                  counts[item]
+                )}
               </span>
             </button>
           );
@@ -752,7 +801,9 @@ export function DocumentModulePage({
                 }`}
               >
                 {filterLabel(item)}
-                <span className="rounded-full bg-black/10 px-1.5 text-[10px] tabular-nums dark:bg-white/15">{counts[item]}</span>
+                <span className="rounded-full bg-black/10 px-1.5 text-[10px] tabular-nums dark:bg-white/15">
+                  {counts[item]}
+                </span>
               </button>
             ))}
           </div>
@@ -774,7 +825,13 @@ export function DocumentModulePage({
                         aria-label={`Call ${String(row["customerName"] || "customer")}`}
                         asChild
                       >
-                        <a href={row["mobile"] ? `tel:${String(row["mobile"]).replace(/[^\d+]/g, "")}` : undefined}>
+                        <a
+                          href={
+                            row["mobile"]
+                              ? `tel:${String(row["mobile"]).replace(/[^\d+]/g, "")}`
+                              : undefined
+                          }
+                        >
                           <Phone className="size-4" />
                         </a>
                       </Button>
@@ -786,7 +843,17 @@ export function DocumentModulePage({
                         asChild
                       >
                         <a
-                          href={row["mobile"] ? `https://wa.me/${String(row["mobile"]).replace(/\D/g, "").replace(/^0/, "").replace(/^(\d{10})$/, "91$1")}?text=${encodeURIComponent(reminderMessage(moduleKey, row, user?.fullName ?? "", user?.businessName ?? "", user?.mobile ?? ""))}` : undefined}
+                          href={
+                            row["mobile"]
+                              ? `https://wa.me/${String(row["mobile"])
+                                  .replace(/\D/g, "")
+                                  .replace(/^0/, "")
+                                  .replace(
+                                    /^(\d{10})$/,
+                                    "91$1",
+                                  )}?text=${encodeURIComponent(reminderMessage(moduleKey, row, user?.fullName ?? "", user?.businessName ?? "", user?.mobile ?? ""))}`
+                              : undefined
+                          }
                           target="_blank"
                           rel="noreferrer"
                         >
@@ -804,10 +871,15 @@ export function DocumentModulePage({
                         disabled={Boolean(row["reminderDoneAt"])}
                         aria-label={`Mark ${def.singular} reminder done`}
                         onClick={() => {
-                          void def.api.markReminderDone(row.id).then((updated) => {
-                            setRows((previous) => previous.map((item) => item.id === updated.id ? updated : item));
-                            toast.success("Reminder marked as handled.");
-                          }).catch(() => undefined);
+                          void def.api
+                            .markReminderDone(row.id)
+                            .then((updated) => {
+                              setRows((previous) =>
+                                previous.map((item) => (item.id === updated.id ? updated : item)),
+                              );
+                              toast.success("Reminder marked as handled.");
+                            })
+                            .catch(() => undefined);
                         }}
                       >
                         <Check className="size-4" /> {row["reminderDoneAt"] ? "Done" : "Mark done"}
@@ -845,16 +917,21 @@ export function DocumentModulePage({
           <DialogHeader>
             <DialogTitle>{current ? `Edit ${def.singular}` : `Add ${def.singular}`}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={(event) => {
-            event.preventDefault();
-            void save(new FormData(event.currentTarget));
-          }}>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void save(new FormData(event.currentTarget));
+            }}
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               {def.fields.map((field) => {
                 const raw = current?.[field.name];
-                const value = field.type === "date" && raw
-                  ? String(raw).slice(0, 10)
-                  : raw === undefined || raw === null ? "" : String(raw);
+                const value =
+                  field.type === "date" && raw
+                    ? String(raw).slice(0, 10)
+                    : raw === undefined || raw === null
+                      ? ""
+                      : String(raw);
                 return (
                   <div key={field.name} className="space-y-1.5">
                     <Label htmlFor={field.name}>{field.label}</Label>
@@ -866,7 +943,11 @@ export function DocumentModulePage({
                         className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                       >
                         <option value="">Select {field.label.toLowerCase()}</option>
-                        {field.options?.map((option) => <option key={option} value={option}>{option}</option>)}
+                        {field.options?.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
                       </select>
                     ) : (
                       <Input
@@ -883,8 +964,12 @@ export function DocumentModulePage({
               })}
             </div>
             <DialogFooter className="mt-6">
-              <Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-              <Button type="submit" disabled={loading}>Save</Button>
+              <Button type="button" variant="outline" onClick={() => setEditing(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                Save
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -895,7 +980,9 @@ export function DocumentModulePage({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this record?</AlertDialogTitle>
             <AlertDialogDescription>
-              The record for {String(deleting?.["customerName"] || deleting?.["vehicleNumber"] || "this vehicle")} will be moved to trash.
+              The record for{" "}
+              {String(deleting?.["customerName"] || deleting?.["vehicleNumber"] || "this vehicle")}{" "}
+              will be moved to trash.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -904,11 +991,14 @@ export function DocumentModulePage({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (!deleting) return;
-                void def.api.remove(deleting.id).then(() => {
-                  setRows((previous) => previous.filter((row) => row.id !== deleting.id));
-                  toast.success("Record deleted.");
-                  setDeleting(null);
-                }).catch(() => undefined);
+                void def.api
+                  .remove(deleting.id)
+                  .then(() => {
+                    setRows((previous) => previous.filter((row) => row.id !== deleting.id));
+                    toast.success("Record deleted.");
+                    setDeleting(null);
+                  })
+                  .catch(() => undefined);
               }}
             >
               Delete

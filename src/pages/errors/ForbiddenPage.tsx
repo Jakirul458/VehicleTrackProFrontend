@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { Shield, Home } from 'lucide-react';
+import { Link } from "react-router-dom";
+import { Shield, Home } from "lucide-react";
 
 export default function ForbiddenPage() {
   return (
@@ -13,7 +13,8 @@ export default function ForbiddenPage() {
         <h1 className="text-4xl font-bold mb-2">Access Denied</h1>
         <h2 className="text-2xl font-semibold mb-2">403 Forbidden</h2>
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+          You don't have permission to access this page. Please contact your administrator if you
+          believe this is an error.
         </p>
         <Link
           to="/"

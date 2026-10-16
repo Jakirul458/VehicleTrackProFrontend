@@ -15,7 +15,7 @@ export const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,7 +23,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor to handle auth errors
@@ -31,9 +31,9 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   },
@@ -68,7 +68,11 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
   ) {
     return error as NormalizedApiError;
   }
-  const axiosError = error as AxiosError<{ message?: string; code?: string; errors?: Record<string, string> }>;
+  const axiosError = error as AxiosError<{
+    message?: string;
+    code?: string;
+    errors?: Record<string, string>;
+  }>;
   if (axiosError?.isAxiosError) {
     const status = axiosError.response?.status ?? 0;
     return {

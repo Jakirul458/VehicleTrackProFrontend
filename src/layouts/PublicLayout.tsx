@@ -1,9 +1,8 @@
-import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation } from "react-router-dom";
 
 export default function PublicLayout() {
   const location = useLocation();
-  const isAuthPage = ['/login', '/signup', '/register'].includes(location.pathname);
+  const isAuthPage = ["/login", "/signup", "/register"].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,10 +20,16 @@ export default function PublicLayout() {
                 <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
                   Home
                 </Link>
-                <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link
+                  to="/about"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
                   About
                 </Link>
-                <Link to="/contact" className="text-sm font-medium hover:text-primary transition-colors">
+                <Link
+                  to="/contact"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                >
                   Contact
                 </Link>
                 <Link
@@ -57,29 +62,58 @@ export default function PublicLayout() {
                   <span className="font-bold text-lg">VehicleTrack Pro</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Professional vehicle document management system for insurance agents and service providers.
+                  Professional vehicle document management system for insurance agents and service
+                  providers.
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">Product</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/about" className="hover:text-primary">Features</Link></li>
-                  <li><Link to="/#pricing" className="hover:text-primary">Pricing</Link></li>
-                  <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
+                  <li>
+                    <Link to="/about" className="hover:text-primary">
+                      Features
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/#pricing" className="hover:text-primary">
+                      Pricing
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/contact" className="hover:text-primary">
+                      Contact
+                    </Link>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">Company</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/about" className="hover:text-primary">About Us</Link></li>
-                  <li><Link to="/contact" className="hover:text-primary">Support</Link></li>
+                  <li>
+                    <Link to="/about" className="hover:text-primary">
+                      About Us
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/contact" className="hover:text-primary">
+                      Support
+                    </Link>
+                  </li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-semibold mb-4">Legal</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><Link to="/about" className="hover:text-primary">Privacy Policy</Link></li>
-                  <li><Link to="/about" className="hover:text-primary">Terms of Service</Link></li>
+                  <li>
+                    <Link to="/about" className="hover:text-primary">
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/about" className="hover:text-primary">
+                      Terms of Service
+                    </Link>
+                  </li>
                 </ul>
               </div>
             </div>

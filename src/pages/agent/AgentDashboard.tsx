@@ -104,21 +104,17 @@
 //   );
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { AlertTriangle, CheckCircle, Clock, FileWarning, ShieldCheck, Receipt, FileText } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  FileWarning,
+  ShieldCheck,
+  Receipt,
+  FileText,
+} from "lucide-react";
 import { reportApi } from "@/api";
 import type { AgentDashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
@@ -252,7 +248,11 @@ const dashboardStyles = `
 `;
 
 export default function AgentDashboard() {
-  const { data: stats, isLoading, isError } = useQuery<AgentDashboardStats>({
+  const {
+    data: stats,
+    isLoading,
+    isError,
+  } = useQuery<AgentDashboardStats>({
     queryKey: ["agent-dashboard"],
     queryFn: reportApi.agentDashboard,
     refetchOnWindowFocus: false,
@@ -278,7 +278,10 @@ export default function AgentDashboard() {
       <h1 className="dash-fade-up mb-2 bg-gradient-to-r from-primary to-sky-500 bg-clip-text text-3xl font-bold text-transparent">
         Dashboard
       </h1>
-      <p className="dash-fade-up mb-8 text-sm text-muted-foreground" style={{ animationDelay: "80ms" }}>
+      <p
+        className="dash-fade-up mb-8 text-sm text-muted-foreground"
+        style={{ animationDelay: "80ms" }}
+      >
         Select a status to open the matching document records.
       </p>
 
@@ -328,7 +331,10 @@ export default function AgentDashboard() {
                       <span className={`absolute inset-y-0 left-0 w-1 ${theme.bar}`} />
 
                       <div className="relative mb-3 flex items-center justify-between gap-2">
-                        <StatusBadge status={DASHBOARD_STATUS[record.status].status} label={record.label} />
+                        <StatusBadge
+                          status={DASHBOARD_STATUS[record.status].status}
+                          label={record.label}
+                        />
                         <span
                           className={`flex size-7 items-center justify-center rounded-full transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 ${theme.iconWrap}`}
                         >

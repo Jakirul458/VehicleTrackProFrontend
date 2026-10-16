@@ -1,4 +1,12 @@
-import { BadgeCheck, FileText, Gauge, LayoutDashboard, Receipt, ShieldCheck, Users } from "lucide-react";
+import {
+  BadgeCheck,
+  FileText,
+  Gauge,
+  LayoutDashboard,
+  Receipt,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
 export interface NavItem {
   label: string;
@@ -14,9 +22,7 @@ export interface NavGroup {
 export const AGENT_NAV: NavGroup[] = [
   {
     label: "Overview",
-    items: [
-      { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
-    ],
+    items: [{ label: "Dashboard", to: "/dashboard", icon: LayoutDashboard }],
   },
   {
     label: "Documents",
@@ -31,9 +37,7 @@ export const AGENT_NAV: NavGroup[] = [
 export const ADMIN_NAV: NavGroup[] = [
   {
     label: "Overview",
-    items: [
-      { label: "Dashboard", to: "/admin/dashboard", icon: Gauge },
-    ],
+    items: [{ label: "Dashboard", to: "/admin/dashboard", icon: Gauge }],
   },
   {
     label: "Documents",

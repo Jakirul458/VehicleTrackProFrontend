@@ -1,10 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
-import { adminApi } from '@/api';
-import type { ActivityLog } from '@/types';
+import { useQuery } from "@tanstack/react-query";
+import { adminApi } from "@/api";
+import type { ActivityLog } from "@/types";
 
 export default function AdminActivity() {
-  const { data: activities, isLoading } = useQuery<ActivityLog[]>({
-    queryKey: ['admin-activity'],
+  const {
+    data: activityResult,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["admin-activity"],
     queryFn: () => adminApi.activity.list(),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -22,7 +26,27 @@ export default function AdminActivity() {
     <div>
       <h1 className="text-3xl font-bold mb-8">Activity Log</h1>
       <div className="bg-card border rounded-lg p-6">
-        <p className="text-muted-foreground">Activity log will display all administrative events.</p>
+        {isError ? (
+          <p className="text-destructive">Activity log could not be loaded.</p>
+        ) : activityResult?.data.length ? (
+          <ul className="divide-y">
+            {activityResult.data.map((activity: ActivityLog) => (
+              <li key={activity.id} className="py-4 first:pt-0 last:pb-0">
+                <p className="font-medium">
+                  {activity.action.replace(/_/g, " ")} {activity.entity.toLowerCase()}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {activity.metadata?.["agentName"]
+                    ? `${String(activity.metadata["agentName"])} · `
+                    : ""}
+                  {new Date(activity.createdAt).toLocaleString("en-IN")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground">No administrative activity has been recorded.</p>
+        )}
       </div>
     </div>
   );

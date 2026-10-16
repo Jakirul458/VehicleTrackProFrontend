@@ -13,7 +13,6 @@
 //   const { login } = useAuth();
 //   const navigate = useNavigate();
 
-
 //   const handleSubmit = async (e: React.FormEvent) => {
 //     e.preventDefault();
 //     setIsSubmitting(true);
@@ -98,34 +97,29 @@
 //   );
 // }
 
-
-
-
-
-
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { Truck, CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { normalizeApiError, type NormalizedApiError } from '@/api/client';
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { Truck, CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { normalizeApiError, type NormalizedApiError } from "@/api/client";
 
 // ⚠️ Demo button er jonno credentials — nijer demo account diye change koro
 const DEMO_ACCOUNTS = {
-  agent: { email: 'agent@demo.com', password: 'agent123' },
-  admin: { email: 'admin@demo.com', password: 'admin123' },
+  agent: { email: "agent@demo.com", password: "agent123" },
+  admin: { email: "admin@demo.com", password: "admin123" },
 };
 
 const FEATURES = [
-  'Insurance, tax and PUC records in one place',
-  'Colour-coded expiry alerts',
-  'One-tap WhatsApp reminders',
+  "Insurance, tax and PUC records in one place",
+  "Colour-coded expiry alerts",
+  "One-tap WhatsApp reminders",
 ];
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -133,19 +127,19 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const trialExpired = new URLSearchParams(location.search).get('expired') === '1';
+  const trialExpired = new URLSearchParams(location.search).get("expired") === "1";
 
   const doLogin = async (email: string, password: string) => {
     setIsSubmitting(true);
     setLoginError(null);
     try {
       await login(email, password);
-      toast.success('Login successful!');
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      if (user.role === 'SUPER_ADMIN') {
-        navigate('/admin/dashboard', { replace: true });
+      toast.success("Login successful!");
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.role === "SUPER_ADMIN") {
+        navigate("/admin/dashboard", { replace: true });
       } else {
-        navigate('/agent/dashboard', { replace: true });
+        navigate("/agent/dashboard", { replace: true });
       }
     } catch (error) {
       setLoginError(normalizeApiError(error));
@@ -159,7 +153,7 @@ export default function LoginPage() {
     await doLogin(formData.email, formData.password);
   };
 
-  const handleDemo = async (type: 'agent' | 'admin') => {
+  const handleDemo = async (type: "agent" | "admin") => {
     const creds = DEMO_ACCOUNTS[type];
     setFormData(creds);
     await doLogin(creds.email, creds.password);
@@ -218,13 +212,16 @@ export default function LoginPage() {
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
           style={{
             backgroundImage:
-              'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-            backgroundSize: '44px 44px',
+              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
           }}
         />
 
         {/* logo */}
-        <div className="vt-rise relative z-10 flex items-center gap-3" style={{ animationDelay: '.05s' }}>
+        <div
+          className="vt-rise relative z-10 flex items-center gap-3"
+          style={{ animationDelay: ".05s" }}
+        >
           <div className="vt-logo flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 shadow-lg">
             <Truck className="h-5 w-5 text-white" />
           </div>
@@ -235,7 +232,7 @@ export default function LoginPage() {
         <div className="relative z-10">
           <h2
             className="vt-rise text-4xl xl:text-5xl font-extrabold leading-[1.1] tracking-tight"
-            style={{ animationDelay: '.15s' }}
+            style={{ animationDelay: ".15s" }}
           >
             <span className="vt-grad-text">Track Every Vehicle.</span>
             <br />
@@ -265,7 +262,10 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="vt-rise relative z-10 text-sm text-slate-400" style={{ animationDelay: '.8s' }}>
+        <p
+          className="vt-rise relative z-10 text-sm text-slate-400"
+          style={{ animationDelay: ".8s" }}
+        >
           Built for insurance agents, cyber cafés and RTO service providers.
         </p>
       </div>
@@ -285,17 +285,23 @@ export default function LoginPage() {
             <span className="text-lg font-extrabold text-slate-900">VehicleTrack Pro</span>
           </div>
 
-          <div className="vt-rise" style={{ animationDelay: '.1s' }}>
-            <h1 className="text-[32px] font-extrabold tracking-tight text-slate-900">Welcome back</h1>
+          <div className="vt-rise" style={{ animationDelay: ".1s" }}>
+            <h1 className="text-[32px] font-extrabold tracking-tight text-slate-900">
+              Welcome back
+            </h1>
             <p className="mt-2 text-sm text-slate-500">Sign in with your email address.</p>
           </div>
 
           {(trialExpired || loginError) && (
-            <div role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            <div
+              role="alert"
+              className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+            >
               <p>
-                {loginError?.message ?? 'Your free trial or account validity has ended. Contact admin at 6294527072 to purchase the 1-year plan for ₹4,999 and extend your access.'}
+                {loginError?.message ??
+                  "Your free trial or account validity has ended. Contact admin at 6294527072 to purchase the 1-year plan for ₹4,999 and extend your access."}
               </p>
-              {(trialExpired || loginError?.code === 'ACCOUNT_VALIDITY_EXPIRED') && (
+              {(trialExpired || loginError?.code === "ACCOUNT_VALIDITY_EXPIRED") && (
                 <a href="tel:6294527072" className="mt-2 inline-block font-semibold underline">
                   Call admin: 6294527072
                 </a>
@@ -304,7 +310,7 @@ export default function LoginPage() {
           )}
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <div className="vt-rise" style={{ animationDelay: '.2s' }}>
+            <div className="vt-rise" style={{ animationDelay: ".2s" }}>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-800">
                 Email address
               </label>
@@ -319,14 +325,16 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="vt-rise" style={{ animationDelay: '.3s' }}>
+            <div className="vt-rise" style={{ animationDelay: ".3s" }}>
               <div className="mb-1.5 flex items-center justify-between">
                 <label htmlFor="password" className="block text-sm font-medium text-slate-800">
                   Password
                 </label>
                 <button
                   type="button"
-                  onClick={() => toast.info('Please contact your administrator to reset your password.')}
+                  onClick={() =>
+                    toast.info("Please contact your administrator to reset your password.")
+                  }
                   className="text-xs font-medium text-sky-700 hover:text-sky-900 hover:underline"
                 >
                   Forgot password?
@@ -334,7 +342,7 @@ export default function LoginPage() {
               </div>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   required
                   autoComplete="current-password"
@@ -344,7 +352,7 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
                 >
@@ -353,7 +361,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="vt-rise" style={{ animationDelay: '.4s' }}>
+            <div className="vt-rise" style={{ animationDelay: ".4s" }}>
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -364,7 +372,7 @@ export default function LoginPage() {
                     <Loader2 className="h-4 w-4 animate-spin" /> Signing in...
                   </>
                 ) : (
-                  'Sign in'
+                  "Sign in"
                 )}
               </button>
             </div>
@@ -373,14 +381,14 @@ export default function LoginPage() {
           {/* Preview demo */}
           <div
             className="vt-rise mt-6 rounded-xl border border-dashed border-sky-300/70 bg-white/50 p-4 backdrop-blur-sm"
-            style={{ animationDelay: '.5s' }}
+            style={{ animationDelay: ".5s" }}
           >
             <p className="mb-3 text-xs font-semibold tracking-wide text-slate-500">PREVIEW DEMO</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 disabled={isSubmitting}
-                onClick={() => handleDemo('agent')}
+                onClick={() => handleDemo("agent")}
                 className="h-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-400 hover:text-sky-700 hover:shadow-md disabled:opacity-50"
               >
                 Agent
@@ -388,7 +396,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 disabled={isSubmitting}
-                onClick={() => handleDemo('admin')}
+                onClick={() => handleDemo("admin")}
                 className="h-10 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-800 shadow-sm transition-all hover:-translate-y-0.5 hover:border-violet-400 hover:text-violet-700 hover:shadow-md disabled:opacity-50"
               >
                 Super Admin
@@ -398,9 +406,9 @@ export default function LoginPage() {
 
           <p
             className="vt-rise mt-8 text-center text-sm text-slate-500"
-            style={{ animationDelay: '.6s' }}
+            style={{ animationDelay: ".6s" }}
           >
-            New to VehicleTrack Pro?{' '}
+            New to VehicleTrack Pro?{" "}
             <Link to="/signup" className="font-semibold text-sky-700 hover:underline">
               Start your 7-day free trial
             </Link>

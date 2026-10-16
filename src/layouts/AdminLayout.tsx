@@ -1,19 +1,19 @@
-import { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
-  Activity, 
+import { useState } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  Activity,
   Shield,
   Receipt,
   FileText,
   LogOut,
   Menu,
   X,
-  User as UserIcon
-} from 'lucide-react';
+  User as UserIcon,
+} from "lucide-react";
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,17 +23,17 @@ export default function AdminLayout() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const menuItems = [
-    { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/agents', label: 'Agents', icon: Users },
-    { path: '/admin/insurance', label: 'Insurance', icon: Shield },
-    { path: '/admin/tax', label: 'Tax', icon: Receipt },
-    { path: '/admin/puc', label: 'PUC', icon: FileText },
-    { path: '/admin/activity', label: 'Activity', icon: Activity },
-    { path: '/admin/settings', label: 'Settings', icon: Settings },
+    { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/admin/agents", label: "Agents", icon: Users },
+    { path: "/admin/insurance", label: "Insurance", icon: Shield },
+    { path: "/admin/tax", label: "Tax", icon: Receipt },
+    { path: "/admin/puc", label: "PUC", icon: FileText },
+    { path: "/admin/activity", label: "Activity", icon: Activity },
+    { path: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -49,7 +49,7 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-card border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
@@ -71,15 +71,16 @@ export default function AdminLayout() {
           <nav className="flex-1 p-4 space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+              const isActive =
+                location.pathname === item.path || location.pathname.startsWith(item.path + "/");
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -123,9 +124,7 @@ export default function AdminLayout() {
             </button>
             <div className="flex-1" />
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-muted-foreground">
-                Super Admin Panel
-              </div>
+              <div className="text-sm text-muted-foreground">Super Admin Panel</div>
             </div>
           </div>
         </header>

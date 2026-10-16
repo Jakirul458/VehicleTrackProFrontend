@@ -1,41 +1,43 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { adminApi } from '@/api';
-import type { Agent } from '@/types';
-import { Plus, Edit, Trash2, Shield, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import { daysLeft } from '@/lib/expiry';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { adminApi } from "@/api";
+import type { Agent } from "@/types";
+import { Plus, Edit, Trash2, Shield, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { daysLeft } from "@/lib/expiry";
 
 function validityText(date?: string) {
-  if (!date) return { label: 'Not set', color: 'text-muted-foreground' };
+  if (!date) return { label: "Not set", color: "text-muted-foreground" };
   const remaining = daysLeft(date);
-  if (remaining === null) return { label: 'Not set', color: 'text-muted-foreground' };
-  if (remaining < 0) return { label: 'Expired', color: 'text-status-expired' };
-  if (remaining <= 7) return { label: 'Urgent', color: 'text-status-urgent' };
-  if (remaining <= 30) return { label: 'Due soon', color: 'text-status-due' };
-  return { label: 'Active', color: 'text-status-active' };
+  if (remaining === null) return { label: "Not set", color: "text-muted-foreground" };
+  if (remaining < 0) return { label: "Expired", color: "text-status-expired" };
+  if (remaining <= 7) return { label: "Urgent", color: "text-status-urgent" };
+  if (remaining <= 30) return { label: "Due soon", color: "text-status-due" };
+  return { label: "Active", color: "text-status-active" };
 }
 
 export default function AgentsList() {
   const queryClient = useQueryClient();
   const { data: agents, isLoading } = useQuery<Agent[]>({
-    queryKey: ['agents'],
+    queryKey: ["agents"],
     queryFn: () => adminApi.agents.list(),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete agent ${name}? This is a destructive operation.`)) {
+    if (
+      !confirm(`Are you sure you want to delete agent ${name}? This is a destructive operation.`)
+    ) {
       return;
     }
     try {
       await adminApi.agents.delete(id);
-      toast.success('Agent deleted successfully');
+      toast.success("Agent deleted successfully");
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['agents'] });
+      queryClient.invalidateQueries({ queryKey: ["agents"] });
     } catch (error) {
-      toast.error('Failed to delete agent');
+      toast.error("Failed to delete agent");
     }
   };
 
@@ -80,18 +82,18 @@ export default function AgentsList() {
                   <td className="px-6 py-4">
                     <div className="font-medium">{agent.fullName}</div>
                   </td>
-                  <td className="px-6 py-4 text-muted-foreground">{agent.businessName || '-'}</td>
+                  <td className="px-6 py-4 text-muted-foreground">{agent.businessName || "-"}</td>
                   <td className="px-6 py-4 text-muted-foreground">{agent.email}</td>
                   <td className="px-6 py-4 text-muted-foreground">{agent.mobile}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                        agent.status === 'ACTIVE'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                        agent.status === "ACTIVE"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {agent.status === 'ACTIVE' ? (
+                      {agent.status === "ACTIVE" ? (
                         <Shield className="h-3 w-3" />
                       ) : (
                         <AlertCircle className="h-3 w-3" />
@@ -99,7 +101,9 @@ export default function AgentsList() {
                       {agent.status}
                     </span>
                   </td>
-                  <td className={`px-6 py-4 font-semibold ${validityText(agent.trialEndDate).color}`}>
+                  <td
+                    className={`px-6 py-4 font-semibold ${validityText(agent.trialEndDate).color}`}
+                  >
                     {validityText(agent.trialEndDate).label}
                   </td>
                   <td className="px-6 py-4">

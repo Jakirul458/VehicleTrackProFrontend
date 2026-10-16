@@ -32,8 +32,16 @@ const vehicleFields: FieldDef[] = [
   { name: "engineNumber", label: "Engine no.", type: "text" },
 ];
 const dateColumns = [
-  { key: "startDate", header: "Start", render: (row: Row) => formatDate(row["startDate"] as string) },
-  { key: "expiryDate", header: "End", render: (row: Row) => formatDate(row["expiryDate"] as string) },
+  {
+    key: "startDate",
+    header: "Start",
+    render: (row: Row) => formatDate(row["startDate"] as string),
+  },
+  {
+    key: "expiryDate",
+    header: "End",
+    render: (row: Row) => formatDate(row["expiryDate"] as string),
+  },
   { key: "daysLeft", header: "Days left" },
 ];
 const statusColumn = { key: "status", header: "Status" };
@@ -56,19 +64,40 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       { key: "policyNumber", header: "Policy no." },
       { key: "insuranceCompany", header: "Company" },
       { key: "policyType", header: "Type" },
-      { key: "premium", header: "Premium", render: (row) => formatCurrency(row["premium"] as number) },
+      {
+        key: "premium",
+        header: "Premium",
+        render: (row) => formatCurrency(row["premium"] as number),
+      },
       ...dateColumns,
       statusColumn,
       ...addressColumns,
-      { key: "portalPaid", header: "Portal paid", render: (row) => formatCurrency(row["portalPaid"] as number) },
-      { key: "customerPaid", header: "Customer paid", render: (row) => formatCurrency(row["customerPaid"] as number) },
-      { key: "commission", header: "Commission", render: (row) => formatCurrency(row["commission"] as number) },
+      {
+        key: "portalPaid",
+        header: "Portal paid",
+        render: (row) => formatCurrency(row["portalPaid"] as number),
+      },
+      {
+        key: "customerPaid",
+        header: "Customer paid",
+        render: (row) => formatCurrency(row["customerPaid"] as number),
+      },
+      {
+        key: "commission",
+        header: "Commission",
+        render: (row) => formatCurrency(row["commission"] as number),
+      },
     ],
     fields: [
       ...customerFields,
       { name: "policyNumber", label: "Policy no.", type: "text" },
       { name: "insuranceCompany", label: "Company", type: "text" },
-      { name: "policyType", label: "Type", type: "select", options: ["Comprehensive", "Third Party", "Own Damage"] },
+      {
+        name: "policyType",
+        label: "Type",
+        type: "select",
+        options: ["Comprehensive", "Third Party", "Own Damage"],
+      },
       { name: "premium", label: "Premium (₹)", type: "number" },
       { name: "startDate", label: "Policy start", type: "date" },
       { name: "expiryDate", label: "Policy expiry", type: "date" },
@@ -94,8 +123,16 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       ...dateColumns,
       statusColumn,
       ...addressColumns,
-      { key: "amount", header: "Tax amount", render: (row) => formatCurrency(row["amount"] as number) },
-      { key: "customerPaid", header: "Customer paid", render: (row) => formatCurrency(row["customerPaid"] as number) },
+      {
+        key: "amount",
+        header: "Tax amount",
+        render: (row) => formatCurrency(row["amount"] as number),
+      },
+      {
+        key: "customerPaid",
+        header: "Customer paid",
+        render: (row) => formatCurrency(row["customerPaid"] as number),
+      },
     ],
     fields: [
       ...vehicleFields,

@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Shield, 
-  FileText, 
-  Receipt, 
+import { useState } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import {
+  LayoutDashboard,
+  Shield,
+  FileText,
+  Receipt,
+  BellRing,
   User as UserIcon,
   LogOut,
   Menu,
-  X
-} from 'lucide-react';
+  X,
+} from "lucide-react";
 
 export default function AgentLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -20,15 +21,16 @@ export default function AgentLayout() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const menuItems = [
-    { path: '/agent/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/agent/insurance', label: 'Insurance', icon: Shield },
-    { path: '/agent/tax', label: 'Tax', icon: Receipt },
-    { path: '/agent/puc', label: 'PUC', icon: FileText },
-    { path: '/agent/profile', label: 'Profile', icon: UserIcon },
+    { path: "/agent/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/agent/insurance", label: "Insurance", icon: Shield },
+    { path: "/agent/tax", label: "Tax", icon: Receipt },
+    { path: "/agent/puc", label: "PUC", icon: FileText },
+    { path: "/agent/reminders", label: "Reminders", icon: BellRing },
+    { path: "/agent/profile", label: "Profile", icon: UserIcon },
   ];
 
   return (
@@ -44,7 +46,7 @@ export default function AgentLayout() {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-card border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
@@ -66,15 +68,16 @@ export default function AgentLayout() {
           <nav className="flex-1 p-4 space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+              const isActive =
+                location.pathname === item.path || location.pathname.startsWith(item.path + "/");
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -91,7 +94,9 @@ export default function AgentLayout() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{user?.fullName}</p>
-                <p className="text-xs text-muted-foreground truncate">{user?.businessName || 'Agent'}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user?.businessName || "Agent"}
+                </p>
               </div>
             </div>
             <button
@@ -118,9 +123,7 @@ export default function AgentLayout() {
             </button>
             <div className="flex-1" />
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-muted-foreground">
-                Agent Panel
-              </div>
+              <div className="text-sm text-muted-foreground">Agent Panel</div>
             </div>
           </div>
         </header>

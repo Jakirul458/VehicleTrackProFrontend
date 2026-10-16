@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { contactApi } from '@/api';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { contactApi } from "@/api";
+import { toast } from "sonner";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -18,10 +18,10 @@ export default function ContactPage() {
     setIsSubmitting(true);
     try {
       await contactApi.send(formData);
-      toast.success('Message sent successfully!');
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      toast.success("Message sent successfully!");
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (error) {
-      toast.error('Failed to send message. Please try again.');
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -31,7 +31,7 @@ export default function ContactPage() {
     <div className="min-h-screen py-20 px-4">
       <div className="container mx-auto max-w-6xl">
         <h1 className="text-4xl font-bold mb-8 text-center">Contact VehicleTrack Pro</h1>
-        
+
         <div className="grid md:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-card p-6 border rounded-lg">
@@ -113,7 +113,7 @@ export default function ContactPage() {
                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-4 w-4" />
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                {isSubmitting ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>
@@ -150,9 +150,11 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Office</h3>
                     <p className="text-muted-foreground">
-                      VehicleTrack Pro Headquarters<br />
+                      VehicleTrack Pro Headquarters
+                      <br />
                       Tech Park, Sector 5<br />
-                      Bangalore, Karnataka 560001<br />
+                      Bangalore, Karnataka 560001
+                      <br />
                       India
                     </p>
                   </div>
@@ -163,8 +165,8 @@ export default function ContactPage() {
             <div className="bg-muted/50 p-6 rounded-lg border">
               <h3 className="font-semibold mb-2">Support Information</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                For technical support, account issues, or feature requests, please include 
-                your account details in your message for faster assistance.
+                For technical support, account issues, or feature requests, please include your
+                account details in your message for faster assistance.
               </p>
               <p className="text-sm text-muted-foreground">
                 Our team typically responds within 24-48 hours during business days.

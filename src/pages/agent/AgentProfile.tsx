@@ -9,7 +9,10 @@ export default function AgentProfile() {
   const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
-    void authApi.me().then(updateUser).catch(() => undefined);
+    void authApi
+      .me()
+      .then(updateUser)
+      .catch(() => undefined);
   }, [updateUser]);
 
   async function saveProfile(event: React.FormEvent<HTMLFormElement>) {
@@ -78,7 +81,11 @@ export default function AgentProfile() {
     <div>
       <h1 className="mb-8 text-3xl font-bold">Profile</h1>
       <div className="grid gap-6 lg:grid-cols-2">
-        <form key={user?.updatedAt ?? user?.fullName} onSubmit={(event) => void saveProfile(event)} className="space-y-5 rounded-lg border bg-card p-6">
+        <form
+          key={user?.updatedAt ?? user?.fullName}
+          onSubmit={(event) => void saveProfile(event)}
+          className="space-y-5 rounded-lg border bg-card p-6"
+        >
           <h2 className="text-xl font-semibold">Profile details</h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {fields.map(([name, label, value]) => (
@@ -94,12 +101,19 @@ export default function AgentProfile() {
               </label>
             ))}
           </div>
-          <button type="submit" disabled={savingProfile} className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={savingProfile}
+            className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
+          >
             {savingProfile ? "Saving..." : "Save profile"}
           </button>
         </form>
 
-        <form onSubmit={(event) => void changePassword(event)} className="space-y-5 rounded-lg border bg-card p-6">
+        <form
+          onSubmit={(event) => void changePassword(event)}
+          className="space-y-5 rounded-lg border bg-card p-6"
+        >
           <h2 className="text-xl font-semibold">Change password</h2>
           {[
             ["currentPassword", "Current password"],
@@ -118,7 +132,11 @@ export default function AgentProfile() {
               />
             </label>
           ))}
-          <button type="submit" disabled={changingPassword} className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50">
+          <button
+            type="submit"
+            disabled={changingPassword}
+            className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
+          >
             {changingPassword ? "Updating..." : "Change password"}
           </button>
         </form>

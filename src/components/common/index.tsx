@@ -19,9 +19,18 @@ export const DASHBOARD_STATUS = {
   SOON: { status: "DUE_SOON", textClass: "text-status-due" },
   URGENT: { status: "URGENT", textClass: "text-status-urgent" },
   EXPIRED: { status: "EXPIRED", textClass: "text-status-expired" },
-} satisfies Record<"ACTIVE" | "DUE" | "SOON" | "URGENT" | "EXPIRED", { status: ExpiryStatus; textClass: string }>;
+} satisfies Record<
+  "ACTIVE" | "DUE" | "SOON" | "URGENT" | "EXPIRED",
+  { status: ExpiryStatus; textClass: string }
+>;
 
-export function StatusBadge({ status, label }: { status: ExpiryStatus; label?: string | undefined }) {
+export function StatusBadge({
+  status,
+  label,
+}: {
+  status: ExpiryStatus;
+  label?: string | undefined;
+}) {
   return (
     <span
       className={cn(
@@ -88,7 +97,9 @@ export function StatCard({
     <div className="rounded-xl border border-border bg-card p-4 shadow-card">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {label}
+          </p>
           <p className={cn("mt-2 font-display text-2xl font-bold", valueClass)}>
             {typeof value === "number" ? value.toLocaleString("en-IN") : value}
           </p>
@@ -161,14 +172,18 @@ export function DataTable<T extends { id: string }>({
   actions?: ((row: T) => ReactNode) | undefined;
   emptyTitle?: string;
 }) {
-  if (rows.length === 0) return <EmptyState title={emptyTitle} description="Try adjusting your search or filters." />;
+  if (rows.length === 0)
+    return <EmptyState title={emptyTitle} description="Try adjusting your search or filters." />;
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
             {columns.map((c) => (
-              <th key={c.key} className={cn("whitespace-nowrap px-4 py-3 font-semibold", c.className)}>
+              <th
+                key={c.key}
+                className={cn("whitespace-nowrap px-4 py-3 font-semibold", c.className)}
+              >
                 {c.header}
               </th>
             ))}
@@ -177,13 +192,18 @@ export function DataTable<T extends { id: string }>({
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id} className="border-b border-border/60 transition-colors last:border-0 hover:bg-muted/50">
+            <tr
+              key={row.id}
+              className="border-b border-border/60 transition-colors last:border-0 hover:bg-muted/50"
+            >
               {columns.map((c) => (
                 <td key={c.key} className={cn("whitespace-nowrap px-4 py-3", c.className)}>
                   {c.render(row)}
                 </td>
               ))}
-              {actions && <td className="whitespace-nowrap px-4 py-3 text-right">{actions(row)}</td>}
+              {actions && (
+                <td className="whitespace-nowrap px-4 py-3 text-right">{actions(row)}</td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -196,7 +216,10 @@ export function downloadCsv(filename: string, rows: Record<string, unknown>[]) {
   if (rows.length === 0) return;
   const headers = Object.keys(rows[0]!);
   const escape = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-  const csv = [headers.join(","), ...rows.map((r) => headers.map((h) => escape(r[h])).join(","))].join("\n");
+  const csv = [
+    headers.join(","),
+    ...rows.map((r) => headers.map((h) => escape(r[h])).join(",")),
+  ].join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
   const a = document.createElement("a");
   a.href = url;

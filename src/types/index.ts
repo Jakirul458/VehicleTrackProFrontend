@@ -86,6 +86,23 @@ export interface Tax extends DocumentRecord {
 
 export type Puc = DocumentRecord;
 
+export type ReminderType = "insurance" | "tax" | "puc";
+
+export interface ExpiryReminder {
+  id: string;
+  type: ReminderType;
+  customerName?: string;
+  mobile?: string;
+  vehicleNumber?: string;
+  expiryDate: string;
+  daysLeft: number;
+}
+
+export interface RemindersResponse {
+  warningDays: number;
+  items: ExpiryReminder[];
+}
+
 export interface ActivityLog {
   id: string;
   actorId: string;

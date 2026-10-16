@@ -18,14 +18,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    void authApi.me().then((currentUser) => {
-      if (active) setUser(currentUser);
-    }).catch(() => {
-      if (active) setUser(null);
-    }).finally(() => {
-      if (active) setIsLoading(false);
-    });
-    return () => { active = false; };
+    void authApi
+      .me()
+      .then((currentUser) => {
+        if (active) setUser(currentUser);
+      })
+      .catch(() => {
+        if (active) setUser(null);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const value = useMemo<AuthContextValue>(
