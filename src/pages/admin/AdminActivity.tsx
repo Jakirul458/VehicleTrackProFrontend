@@ -1,15 +1,19 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { adminApi } from "@/api";
 import type { ActivityLog } from "@/types";
+import { TablePagination } from "@/components/common";
 
 export default function AdminActivity() {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const {
     data: activityResult,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["admin-activity"],
-    queryFn: () => adminApi.activity.list(),
+    queryKey: ["admin-activity", page, limit],
+    queryFn: () => adminApi.activity.list({ page, limit }),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
@@ -36,6 +40,9 @@ export default function AdminActivity() {
                   {activity.action.replace(/_/g, " ")} {activity.entity.toLowerCase()}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
+                  {typeof activity.actorId === "object" && activity.actorId?.fullName
+                    ? `${activity.actorId.fullName} · `
+                    : ""}
                   {activity.metadata?.["agentName"]
                     ? `${String(activity.metadata["agentName"])} · `
                     : ""}
@@ -46,6 +53,18 @@ export default function AdminActivity() {
           </ul>
         ) : (
           <p className="text-muted-foreground">No administrative activity has been recorded.</p>
+        )}
+        {!isError && activityResult && (
+          <TablePagination
+            page={activityResult.pagination.page}
+            limit={activityResult.pagination.limit}
+            total={activityResult.pagination.total}
+            onPageChange={setPage}
+            onLimitChange={(newLimit) => {
+              setLimit(newLimit);
+              setPage(1);
+            }}
+          />
         )}
       </div>
     </div>

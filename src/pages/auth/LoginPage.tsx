@@ -103,6 +103,14 @@ import { useAuth } from "@/context/AuthContext";
 import { Truck, CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { normalizeApiError, type NormalizedApiError } from "@/api/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // ⚠️ Demo button er jonno credentials — nijer demo account diye change koro
 const DEMO_ACCOUNTS = {
@@ -292,23 +300,6 @@ export default function LoginPage() {
             <p className="mt-2 text-sm text-slate-500">Sign in with your email address.</p>
           </div>
 
-          {(trialExpired || loginError) && (
-            <div
-              role="alert"
-              className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
-            >
-              <p>
-                {loginError?.message ??
-                  "Your free trial or account validity has ended. Contact admin at 6294527072 to purchase the 1-year plan for ₹4,999 and extend your access."}
-              </p>
-              {(trialExpired || loginError?.code === "ACCOUNT_VALIDITY_EXPIRED") && (
-                <a href="tel:6294527072" className="mt-2 inline-block font-semibold underline">
-                  Call admin: 6294527072
-                </a>
-              )}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div className="vt-rise" style={{ animationDelay: ".2s" }}>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-800">
@@ -379,7 +370,7 @@ export default function LoginPage() {
           </form>
 
           {/* Preview demo */}
-          <div
+          {/* <div
             className="vt-rise mt-6 rounded-xl border border-dashed border-sky-300/70 bg-white/50 p-4 backdrop-blur-sm"
             style={{ animationDelay: ".5s" }}
           >
@@ -402,7 +393,7 @@ export default function LoginPage() {
                 Super Admin
               </button>
             </div>
-          </div>
+          </div> */}
 
           <p
             className="vt-rise mt-8 text-center text-sm text-slate-500"
@@ -415,6 +406,63 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+      <Dialog
+        open={trialExpired || Boolean(loginError)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setLoginError(null);
+            if (trialExpired) navigate("/login", { replace: true });
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {trialExpired || loginError?.code === "ACCOUNT_VALIDITY_EXPIRED"
+                ? "Your account validity has expired"
+                : loginError?.code === "ACCOUNT_SUSPENDED"
+                  ? "Your account is suspended"
+                  : "We couldn't sign you in"}
+            </DialogTitle>
+            <DialogDescription>
+              {trialExpired
+                ? "আপনার account-এর validity শেষ হয়ে গেছে। Access ফিরে পেতে payment করে plan renew করুন।"
+                : loginError?.code === "ACCOUNT_VALIDITY_EXPIRED"
+                  ? "আপনার account-এর validity শেষ হয়ে গেছে। Access ফিরে পেতে payment করে plan renew করুন।"
+                  : loginError?.code === "ACCOUNT_SUSPENDED"
+                    ? "আপনার account suspend করা হয়েছে। সাহায্যের জন্য administrator-এর সাথে যোগাযোগ করুন।"
+                    : loginError?.code === "INVALID_CREDENTIALS" || loginError?.status === 422
+                      ? "Email address বা password সঠিক নয়। তথ্য যাচাই করে আবার চেষ্টা করুন অথবা administrator-এর সাথে যোগাযোগ করুন।"
+                      : loginError?.message}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            {trialExpired || loginError?.code === "ACCOUNT_VALIDITY_EXPIRED" ? (
+              <>
+                <Link
+                  to="/contact"
+                  className="inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-medium"
+                >
+                  Contact admin
+                </Link>
+                <Link
+                  to="/renewal"
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+                >
+                  Renew now · নবায়ন করুন
+                </Link>
+              </>
+            ) : (
+              <Link
+                to="/contact"
+                className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+              >
+                Contact admin
+              </Link>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

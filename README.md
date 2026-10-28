@@ -84,4 +84,4 @@ The app uses JWT-based authentication:
 - Reports
 - Profile settings
 
-Agents can sign up for a seven-day trial or be created by the Super Admin. The annual plan is ₹4,999; after a trial or account validity expires, contact admin at 6294527072 for purchase and a validity extension.
+Agents can sign up for a seven-day trial or be created by the Super Admin. Super Admins configure monthly/yearly/lifetime prices and the QR, bank/UPI, WhatsApp, and email payment instructions from `/admin/settings`. After a trial or account validity expires, the login dialog links to the renewal page; confirm the payment slip before extending validity.

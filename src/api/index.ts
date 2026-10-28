@@ -8,6 +8,10 @@ import type {
   Tax,
   Puc,
   RemindersResponse,
+  PlatformSettings,
+  AgentFinancialSummary,
+  PaymentRecord,
+  PaymentRecordsResponse,
 } from "@/types";
 
 export { apiClient, request, createResourceApi } from "./client";
@@ -30,7 +34,7 @@ export const adminApi = {
       request<{
         data: Agent[];
         pagination: { page: number; limit: number; total: number; pages: number };
-      }>(apiClient.get("/admin/agents", { params })).then((result) => result.data),
+      }>(apiClient.get("/admin/agents", { params })),
     get: (id: string) => request<Agent>(apiClient.get(`/admin/agents/${id}`)),
     create: (payload: CreateAgentInput) => request<Agent>(apiClient.post("/admin/agents", payload)),
     update: (id: string, payload: Partial<CreateAgentInput>) =>
@@ -39,6 +43,10 @@ export const adminApi = {
       request<Agent>(apiClient.patch(`/admin/agents/${id}/status`, { status })),
     updateValidity: (id: string, trialEndDate: string) =>
       request<Agent>(apiClient.patch(`/admin/agents/${id}/validity`, { trialEndDate })),
+    resetPassword: (id: string, newPassword: string) =>
+      request<{ success: boolean }>(
+        apiClient.patch(`/admin/agents/${id}/password`, { newPassword }),
+      ),
     delete: (id: string) => request<{ success: boolean }>(apiClient.delete(`/admin/agents/${id}`)),
   },
   activity: {
@@ -47,6 +55,11 @@ export const adminApi = {
         data: ActivityLog[];
         pagination: { page: number; limit: number; total: number; pages: number };
       }>(apiClient.get("/admin/activity", { params })),
+  },
+  settings: {
+    get: () => request<PlatformSettings>(apiClient.get("/admin/settings")),
+    update: (settings: PlatformSettings) =>
+      request<PlatformSettings>(apiClient.put("/admin/settings", settings)),
   },
   dashboard: () => request<DashboardStats>(apiClient.get("/admin/dashboard")),
 };
@@ -66,7 +79,13 @@ export interface CreateAgentInput {
 
 export const reportApi = {
   agentDashboard: () => request<AgentDashboardStats>(apiClient.get("/reports/dashboard")),
+  agentFinances: () => request<AgentFinancialSummary>(apiClient.get("/reports/agent-finances")),
+  payments: () => request<PaymentRecordsResponse>(apiClient.get("/reports/payments")),
   adminDashboard: () => request<DashboardStats>(apiClient.get("/reports/admin-dashboard")),
+};
+
+export const paymentApi = {
+  settings: () => request<PlatformSettings>(apiClient.get("/settings/payment")),
 };
 
 export const remindersApi = {

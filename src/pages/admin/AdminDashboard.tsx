@@ -123,8 +123,8 @@ import {
   FileText,
   Users,
 } from "lucide-react";
-import { reportApi } from "@/api";
-import type { DashboardStats } from "@/types";
+import { adminApi, reportApi } from "@/api";
+import type { ActivityLog, DashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
 
 const modules = [
@@ -266,7 +266,12 @@ export default function AdminDashboard() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-
+  const { data: agentActivity } = useQuery({
+    queryKey: ["admin-agent-activity-preview"],
+    queryFn: () => adminApi.activity.list({ actorRole: "AGENT", page: 1, limit: 10 }),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
   return (
     <div className="relative isolate overflow-hidden rounded-2xl p-1">
       <style>{dashboardStyles}</style>
@@ -318,6 +323,55 @@ export default function AdminDashboard() {
           </span>
         </div>
       </div>
+
+      <section className="mb-8 rounded-xl border bg-card p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-semibold">Recent agent activity</h2>
+            <p className="text-sm text-muted-foreground">
+              Latest agent sign-ins and record changes.
+            </p>
+          </div>
+          <Link to="/admin/activity" className="text-sm font-medium text-primary hover:underline">
+            View all activity
+          </Link>
+        </div>
+        {agentActivity?.data.length ? (
+          <ul className="divide-y">
+            {agentActivity.data.map((activity: ActivityLog) => {
+              const actor =
+                typeof activity.actorId === "object" ? activity.actorId?.fullName : undefined;
+              const metaAgent = activity.metadata?.["agentName"];
+              const subject = typeof metaAgent === "string" ? metaAgent : actor || "Agent";
+              const detail = [
+                activity.metadata?.["customerName"],
+                activity.metadata?.["vehicleNumber"],
+              ]
+                .filter((value) => typeof value === "string" && value)
+                .join(" · ");
+              return (
+                <li
+                  key={activity.id}
+                  className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <p className="text-sm">
+                    <span className="font-medium">{subject}</span>
+                    {" · "}
+                    {activity.action.replace(/_/g, " ").toLowerCase()}{" "}
+                    {activity.entity.toLowerCase()}
+                    {detail ? ` · ${detail}` : ""}
+                  </p>
+                  <time className="text-xs text-muted-foreground">
+                    {new Date(activity.createdAt).toLocaleString("en-IN")}
+                  </time>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground">No agent activity has been recorded yet.</p>
+        )}
+      </section>
 
       <div className="space-y-8">
         {modules.map((module, moduleIndex) => {

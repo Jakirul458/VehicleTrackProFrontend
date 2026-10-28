@@ -12,6 +12,7 @@ import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import LandingPage from "./pages/public/LandingPage";
 import AboutPage from "./pages/public/AboutPage";
 import ContactPage from "./pages/public/ContactPage";
+import RenewalPaymentPage from "./pages/public/RenewalPaymentPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import NotFoundPage from "./pages/errors/NotFoundPage";
@@ -34,6 +35,7 @@ import RemindersPage from "./pages/agent/RemindersPage";
 import AgentReports from "./pages/agent/AgentReports";
 import AgentProfile from "./pages/agent/AgentProfile";
 import { DocumentModulePage } from "./components/documents/DocumentModulePage";
+import PaymentsPage from "./pages/agent/PaymentsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -161,6 +163,7 @@ function App() {
               <Route index element={<LandingPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
+              <Route path="renewal" element={<RenewalPaymentPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="signup" element={<SignupPage />} />
               <Route path="register" element={<SignupPage />} />
@@ -187,6 +190,7 @@ function App() {
               />
               <Route path="tax" element={<DocumentModulePage moduleKey="tax" admin />} />
               <Route path="puc" element={<DocumentModulePage moduleKey="puc" admin />} />
+              <Route path="payments" element={<PaymentsPage />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="activity" element={<AdminActivity />} />
             </Route>
@@ -205,6 +209,7 @@ function App() {
               <Route path="insurance" element={<InsuranceList />} />
               <Route path="tax" element={<TaxList />} />
               <Route path="puc" element={<PucList />} />
+              <Route path="payments" element={<PaymentsPage />} />
               <Route path="reminders" element={<RemindersPage />} />
               <Route path="reports" element={<AgentReports />} />
               <Route path="profile" element={<AgentProfile />} />

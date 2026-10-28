@@ -384,7 +384,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DataTable, downloadCsv, PageHeader, Panel, type Column } from "@/components/common";
-import { daysLeft, formatCurrency, formatDate, formatDaysLeft } from "@/lib/expiry";
+import { daysLeft, formatCurrency, formatDate, formatDateTime, formatDaysLeft } from "@/lib/expiry";
 import { MODULES, type ModuleDef, type Row } from "./modules";
 import { useAuth } from "@/context/AuthContext";
 
@@ -562,9 +562,63 @@ function getInitialStatus(search: string): StatusFilter {
 }
 
 function getColumns(def: ModuleDef): Column<Row>[] {
-  return def.columns.map((column) => ({
+  const headerPalettes: Record<ModuleDef["key"], string[]> = {
+    insurance: [
+      "bg-sky-700 text-white",
+      "bg-blue-700 text-white",
+      "bg-indigo-700 text-white",
+      "bg-cyan-700 text-white",
+      "bg-teal-700 text-white",
+      "bg-slate-700 text-white",
+    ],
+    tax: [
+      "bg-violet-700 text-white",
+      "bg-purple-700 text-white",
+      "bg-fuchsia-700 text-white",
+      "bg-indigo-700 text-white",
+      "bg-blue-700 text-white",
+      "bg-slate-700 text-white",
+    ],
+    puc: [
+      "bg-emerald-700 text-white",
+      "bg-green-700 text-white",
+      "bg-teal-700 text-white",
+      "bg-cyan-700 text-white",
+      "bg-lime-700 text-white",
+      "bg-slate-700 text-white",
+    ],
+  };
+  const cellPalette: Record<ModuleDef["key"], string[]> = {
+    insurance: [
+      "bg-sky-500/5",
+      "bg-blue-500/5",
+      "bg-indigo-500/5",
+      "bg-cyan-500/5",
+      "bg-teal-500/5",
+      "bg-slate-500/5",
+    ],
+    tax: [
+      "bg-violet-500/5",
+      "bg-purple-500/5",
+      "bg-fuchsia-500/5",
+      "bg-indigo-500/5",
+      "bg-blue-500/5",
+      "bg-slate-500/5",
+    ],
+    puc: [
+      "bg-emerald-500/5",
+      "bg-green-500/5",
+      "bg-teal-500/5",
+      "bg-cyan-500/5",
+      "bg-lime-500/5",
+      "bg-slate-500/5",
+    ],
+  };
+  return def.columns.map((column, index) => ({
     key: column.key,
     header: column.header,
+    headerClassName: headerPalettes[def.key][index % headerPalettes[def.key].length],
+    className: cellPalette[def.key][index % cellPalette[def.key].length],
     render: (row) => {
       const status = recordStatus(row["expiryDate"] as string | undefined);
       if (column.key === "daysLeft") {
@@ -599,7 +653,9 @@ function csvValue(def: ModuleDef, row: Row, key: string): string | number {
     if (typeof rendered === "string" || typeof rendered === "number") return rendered;
   }
   const value = row[key];
-  if (key === "startDate" || key === "expiryDate") return formatDate(value as string | undefined);
+  if (key === "startDate" || key === "expiryDate" || key === "paymentDate")
+    return formatDate(value as string | undefined);
+  if (key === "createdAt") return formatDateTime(value as string | undefined);
   if (
     typeof value === "number" &&
     ["premium", "portalPaid", "customerPaid", "commission", "amount"].includes(key)
@@ -719,7 +775,14 @@ export function DocumentModulePage({
     }
   }
 
-  const columns = getColumns(def);
+  const columns = [
+    ...getColumns(def),
+    {
+      key: "createdAt",
+      header: "Created",
+      render: (row: Row) => formatDateTime(row["createdAt"] as string),
+    },
+  ];
   const exportRows = filtered.map((row) =>
     Object.fromEntries(
       def.columns.map((column) => [column.header, csvValue(def, row, column.key)]),
@@ -809,7 +872,7 @@ export function DocumentModulePage({
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border shadow-sm [&_table]:w-full [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-primary/5 [&_tbody_tr:nth-child(even)]:bg-muted/30 [&_thead]:bg-gradient-to-r [&_thead]:from-primary/10 [&_thead]:via-muted/60 [&_thead]:to-muted/30 [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-foreground/70">
+        <div className="overflow-hidden rounded-xl border shadow-sm [&_table]:w-full [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-primary/10 [&_thead]:bg-muted [&_th]:text-xs [&_th]:font-semibold [&_th]:uppercase [&_th]:tracking-wide [&_th:last-child]:bg-slate-700 [&_th:last-child]:text-white">
           <DataTable
             columns={columns}
             rows={filtered}

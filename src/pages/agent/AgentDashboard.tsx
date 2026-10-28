@@ -258,7 +258,6 @@ export default function AgentDashboard() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-
   return (
     <div className="relative isolate overflow-hidden rounded-2xl p-1">
       <style>{dashboardStyles}</style>

@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { adminApi } from "@/api";
 import type { Agent } from "@/types";
 import { Plus, Edit, Trash2, Shield, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { daysLeft } from "@/lib/expiry";
+import { daysLeft, formatDateTime } from "@/lib/expiry";
+import { TablePagination } from "@/components/common";
 
 function validityText(date?: string) {
   if (!date) return { label: "Not set", color: "text-muted-foreground" };
@@ -18,9 +20,11 @@ function validityText(date?: string) {
 
 export default function AgentsList() {
   const queryClient = useQueryClient();
-  const { data: agents, isLoading } = useQuery<Agent[]>({
-    queryKey: ["agents"],
-    queryFn: () => adminApi.agents.list(),
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const { data: result, isLoading } = useQuery({
+    queryKey: ["agents", page, limit],
+    queryFn: () => adminApi.agents.list({ page, limit }),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
@@ -72,12 +76,13 @@ export default function AgentsList() {
               <th className="px-6 py-3 text-left text-sm font-medium">Phone</th>
               <th className="px-6 py-3 text-left text-sm font-medium">Status</th>
               <th className="px-6 py-3 text-left text-sm font-medium">Validity</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Created</th>
               <th className="px-6 py-3 text-left text-sm font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {agents && agents.length > 0 ? (
-              agents.map((agent) => (
+            {result?.data.length ? (
+              result.data.map((agent: Agent) => (
                 <tr key={agent.id} className="border-t">
                   <td className="px-6 py-4">
                     <div className="font-medium">{agent.fullName}</div>
@@ -105,6 +110,9 @@ export default function AgentsList() {
                     className={`px-6 py-4 font-semibold ${validityText(agent.trialEndDate).color}`}
                   >
                     {validityText(agent.trialEndDate).label}
+                  </td>
+                  <td className="px-6 py-4 text-muted-foreground">
+                    {formatDateTime(agent.createdAt)}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
@@ -135,13 +143,23 @@ export default function AgentsList() {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                <td colSpan={8} className="px-6 py-12 text-center text-muted-foreground">
                   No agents found. Create your first agent to get started.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        <TablePagination
+          page={result?.pagination.page ?? page}
+          limit={result?.pagination.limit ?? limit}
+          total={result?.pagination.total ?? 0}
+          onPageChange={setPage}
+          onLimitChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+          }}
+        />
       </div>
     </div>
   );

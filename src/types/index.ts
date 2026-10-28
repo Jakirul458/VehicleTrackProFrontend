@@ -64,6 +64,7 @@ export interface DocumentRecord {
   remarks?: string;
   createdAt: string;
   updatedAt: string;
+  paymentDate?: string;
 }
 
 export interface Insurance extends DocumentRecord {
@@ -80,11 +81,41 @@ export interface Tax extends DocumentRecord {
   taxType?: "Road Tax" | "Green Tax" | "Professional Tax";
   taxPeriod?: "Quarterly" | "Half-yearly" | "Yearly" | "Lifetime";
   amount?: number;
+  portalPaid?: number;
   customerPaid?: number;
   paymentStatus?: "PAID" | "PENDING";
 }
 
-export type Puc = DocumentRecord;
+export interface Puc extends DocumentRecord {
+  amount?: number;
+  portalPaid?: number;
+  customerPaid?: number;
+}
+
+export interface PaymentRecord {
+  id: string;
+  agentId: string;
+  agentName?: string;
+  type: "Insurance" | "Tax" | "PUC";
+  customerName?: string;
+  mobile?: string;
+  vehicleNumber?: string;
+  paymentDate: string;
+  documentAmount: number;
+  customerPaid: number;
+  portalPaid: number;
+  commission: number;
+}
+
+export interface PaymentAgent {
+  id: string;
+  name: string;
+}
+
+export interface PaymentRecordsResponse {
+  records: PaymentRecord[];
+  agents: PaymentAgent[];
+}
 
 export type ReminderType = "insurance" | "tax" | "puc";
 
@@ -105,7 +136,7 @@ export interface RemindersResponse {
 
 export interface ActivityLog {
   id: string;
-  actorId: string;
+  actorId: string | { fullName?: string; email?: string } | null;
   actorRole: Role;
   action: string;
   entity: string;
@@ -113,6 +144,34 @@ export interface ActivityLog {
   metadata?: Record<string, unknown>;
   ipAddress?: string;
   createdAt: string;
+}
+
+export interface PlatformSettings {
+  supportWhatsapp: string;
+  supportEmail: string;
+  qrCodeUrl: string;
+  upiId: string;
+  bankAccountName: string;
+  bankName: string;
+  bankAccountNumber: string;
+  bankIfsc: string;
+  bankBranch: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  lifetimePrice: number;
+}
+
+export interface FinancialPeriodSummary {
+  paidToPortal: number;
+  commissionEarned: number;
+  collectedFromCustomers: number;
+  records: number;
+}
+
+export interface AgentFinancialSummary {
+  monthly: FinancialPeriodSummary;
+  yearly: FinancialPeriodSummary;
+  lifetime: FinancialPeriodSummary;
 }
 
 export interface DashboardStats {

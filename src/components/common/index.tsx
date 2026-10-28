@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { STATUS_LABEL } from "@/lib/expiry";
 import type { ExpiryStatus } from "@/types";
 
@@ -159,6 +160,7 @@ export interface Column<T> {
   header: string;
   render: (row: T) => ReactNode;
   className?: string;
+  headerClassName?: string;
 }
 
 export function DataTable<T extends { id: string }>({
@@ -172,42 +174,151 @@ export function DataTable<T extends { id: string }>({
   actions?: ((row: T) => ReactNode) | undefined;
   emptyTitle?: string;
 }) {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const pages = Math.max(1, Math.ceil(rows.length / limit));
+  const visibleRows = rows.slice((page - 1) * limit, page * limit);
+
+  useEffect(() => {
+    setPage((current) => Math.min(current, pages));
+  }, [pages]);
+
   if (rows.length === 0)
     return <EmptyState title={emptyTitle} description="Try adjusting your search or filters." />;
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-            {columns.map((c) => (
-              <th
-                key={c.key}
-                className={cn("whitespace-nowrap px-4 py-3 font-semibold", c.className)}
-              >
-                {c.header}
-              </th>
-            ))}
-            {actions && <th className="px-4 py-3 text-right font-semibold">Actions</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.id}
-              className="border-b border-border/60 transition-colors last:border-0 hover:bg-muted/50"
-            >
+    <div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
               {columns.map((c) => (
-                <td key={c.key} className={cn("whitespace-nowrap px-4 py-3", c.className)}>
-                  {c.render(row)}
-                </td>
+                <th
+                  key={c.key}
+                  className={cn(
+                    "whitespace-nowrap px-4 py-3 font-semibold",
+                    c.className,
+                    c.headerClassName,
+                  )}
+                >
+                  {c.header}
+                </th>
               ))}
-              {actions && (
-                <td className="whitespace-nowrap px-4 py-3 text-right">{actions(row)}</td>
-              )}
+              {actions && <th className="px-4 py-3 text-right font-semibold">Actions</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {visibleRows.map((row) => (
+              <tr
+                key={row.id}
+                className="border-b border-border/60 transition-colors last:border-0 hover:bg-muted/50"
+              >
+                {columns.map((c) => (
+                  <td key={c.key} className={cn("whitespace-nowrap px-4 py-3", c.className)}>
+                    {c.render(row)}
+                  </td>
+                ))}
+                {actions && (
+                  <td className="whitespace-nowrap px-4 py-3 text-right">{actions(row)}</td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <TablePagination
+        page={page}
+        limit={limit}
+        total={rows.length}
+        onPageChange={setPage}
+        onLimitChange={(newLimit) => {
+          setLimit(newLimit);
+          setPage(1);
+        }}
+      />
+    </div>
+  );
+}
+
+export function TablePagination({
+  page,
+  limit,
+  total,
+  onPageChange,
+  onLimitChange,
+}: {
+  page: number;
+  limit: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
+}) {
+  const pages = Math.ceil(total / limit);
+  if (!pages) return null;
+  const pageNumbers =
+    pages <= 7
+      ? Array.from({ length: pages }, (_, index) => index + 1)
+      : page <= 4
+        ? [1, 2, 3, 4, 5, -1, pages]
+        : page >= pages - 3
+          ? [1, -1, pages - 4, pages - 3, pages - 2, pages - 1, pages]
+          : [1, -1, page - 1, page, page + 1, -1, pages];
+  return (
+    <div className="flex flex-col gap-3 border-t px-3 py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-2">
+        <span>
+          Showing {Math.min((page - 1) * limit + 1, total)}–{Math.min(page * limit, total)} of{" "}
+          {total}
+        </span>
+        <label className="flex items-center gap-2">
+          <span className="sr-only">Rows per page</span>
+          <select
+            aria-label="Rows per page"
+            className="h-8 rounded-md border bg-background px-2"
+            value={limit}
+            onChange={(event) => onLimitChange(Number(event.target.value))}
+          >
+            <option value={10}>10 / page</option>
+            <option value={20}>20 / page</option>
+          </select>
+        </label>
+      </div>
+      <nav aria-label="Table pages" className="flex items-center gap-1">
+        <button
+          type="button"
+          aria-label="Previous page"
+          disabled={page <= 1}
+          onClick={() => onPageChange(page - 1)}
+          className="inline-flex h-8 items-center gap-1 rounded-md border px-2 disabled:opacity-40"
+        >
+          <ChevronLeft className="size-4" /> Previous
+        </button>
+        {pageNumbers.map((number, index) =>
+          number === -1 ? (
+            <span key={`ellipsis-${index}`} className="px-1" aria-hidden="true">
+              …
+            </span>
+          ) : (
+            <button
+              key={number}
+              type="button"
+              aria-current={page === number ? "page" : undefined}
+              onClick={() => onPageChange(number)}
+              className={`h-8 min-w-8 rounded-md border px-2 ${page === number ? "border-primary bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+            >
+              {number}
+            </button>
+          ),
+        )}
+        <button
+          type="button"
+          aria-label="Next page"
+          disabled={page >= pages}
+          onClick={() => onPageChange(page + 1)}
+          className="inline-flex h-8 items-center gap-1 rounded-md border px-2 disabled:opacity-40"
+        >
+          Next <ChevronRight className="size-4" />
+        </button>
+      </nav>
     </div>
   );
 }

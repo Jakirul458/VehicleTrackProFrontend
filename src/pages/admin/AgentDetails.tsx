@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { adminApi } from "@/api";
 import type { Agent } from "@/types";
-import { ArrowLeft, CalendarDays, Shield, ShieldAlert } from "lucide-react";
+import { ArrowLeft, CalendarDays, KeyRound, Shield, ShieldAlert } from "lucide-react";
 import { DocumentModulePage } from "@/components/documents/DocumentModulePage";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ export default function AgentDetails() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const [updating, setUpdating] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]["key"]>("insurance");
   const { data: agent, isLoading } = useQuery<Agent>({
     queryKey: ["agent", id],
@@ -85,6 +86,24 @@ export default function AgentDetails() {
         queryClient.invalidateQueries({ queryKey: ["agents"] }),
       ]);
       toast.success("Agent validity date updated.");
+    } catch {
+      return;
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function resetAgentPassword(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (newPassword.length < 6) {
+      toast.error("Password must contain at least 6 characters.");
+      return;
+    }
+    setUpdating(true);
+    try {
+      await adminApi.agents.resetPassword(currentAgent.id, newPassword);
+      setNewPassword("");
+      toast.success("Agent password reset successfully.");
     } catch {
       return;
     } finally {
@@ -190,6 +209,36 @@ export default function AgentDetails() {
           </div>
         </form>
       </section>
+
+      <form
+        onSubmit={(event) => void resetAgentPassword(event)}
+        className="mb-8 rounded-lg border bg-card p-6"
+      >
+        <h2 className="mb-2 font-semibold">Reset agent password</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Set a temporary password for the agent. The agent does not need to provide their current
+          password.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <input
+            type="password"
+            autoComplete="new-password"
+            minLength={6}
+            required
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            placeholder="New password (at least 6 characters)"
+            className="h-10 min-w-64 flex-1 rounded-md border bg-background px-3"
+          />
+          <button
+            type="submit"
+            disabled={updating}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          >
+            <KeyRound className="size-4" /> Reset password
+          </button>
+        </div>
+      </form>
 
       <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Agent documents">
         {tabs.map((tab) => (

@@ -30,7 +30,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url ?? "";
+    const isAuthenticationRequest = [
+      "/auth/login",
+      "/auth/superadmin",
+      "/auth/register",
+      "/auth/setup-super-admin",
+    ].some((path) => requestUrl.includes(path));
+    if (error.response?.status === 401 && !isAuthenticationRequest) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
@@ -100,7 +107,9 @@ apiClient.interceptors.response.use(
       }
     } else if (
       normalized.status !== 401 &&
-      !["/auth/login", "/auth/register"].includes(error.config?.url ?? "")
+      !["/auth/login", "/auth/superadmin", "/auth/register", "/auth/setup-super-admin"].some(
+        (path) => (error.config?.url ?? "").includes(path),
+      )
     ) {
       toast.error(normalized.message);
     }
@@ -128,6 +137,9 @@ export interface ListParams {
   from?: string;
   to?: string;
   agentId?: string;
+  actorId?: string;
+  actorRole?: "SUPER_ADMIN" | "AGENT";
+  entity?: string;
 }
 
 /** Standard CRUD service factory for every resource collection. */

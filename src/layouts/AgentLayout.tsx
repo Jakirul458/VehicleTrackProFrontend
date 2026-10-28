@@ -6,6 +6,7 @@ import {
   Shield,
   FileText,
   Receipt,
+  Wallet,
   BellRing,
   User as UserIcon,
   LogOut,
@@ -29,6 +30,7 @@ export default function AgentLayout() {
     { path: "/agent/insurance", label: "Insurance", icon: Shield },
     { path: "/agent/tax", label: "Tax", icon: Receipt },
     { path: "/agent/puc", label: "PUC", icon: FileText },
+    { path: "/agent/payments", label: "Payments", icon: Wallet },
     { path: "/agent/reminders", label: "Reminders", icon: BellRing },
     { path: "/agent/profile", label: "Profile", icon: UserIcon },
   ];

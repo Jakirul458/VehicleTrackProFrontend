@@ -8,6 +8,7 @@ import {
   Activity,
   Shield,
   Receipt,
+  Wallet,
   FileText,
   LogOut,
   Menu,
@@ -32,6 +33,7 @@ export default function AdminLayout() {
     { path: "/admin/insurance", label: "Insurance", icon: Shield },
     { path: "/admin/tax", label: "Tax", icon: Receipt },
     { path: "/admin/puc", label: "PUC", icon: FileText },
+    { path: "/admin/payments", label: "Payments", icon: Wallet },
     { path: "/admin/activity", label: "Activity", icon: Activity },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];

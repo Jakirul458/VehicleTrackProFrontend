@@ -70,6 +70,11 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
         render: (row) => formatCurrency(row["premium"] as number),
       },
       ...dateColumns,
+      {
+        key: "paymentDate",
+        header: "Paid on",
+        render: (row) => formatDate(row["paymentDate"] as string),
+      },
       statusColumn,
       ...addressColumns,
       {
@@ -106,6 +111,7 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       { name: "portalPaid", label: "Portal paid (₹)", type: "number" },
       { name: "customerPaid", label: "Customer paid (₹)", type: "number" },
       { name: "commission", label: "Commission (₹)", type: "number" },
+      { name: "paymentDate", label: "Payment date", type: "date" },
     ],
   },
   tax: {
@@ -121,12 +127,22 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       { key: "chassisNumber", header: "Chassis no." },
       { key: "engineNumber", header: "Engine no." },
       ...dateColumns,
+      {
+        key: "paymentDate",
+        header: "Paid on",
+        render: (row) => formatDate(row["paymentDate"] as string),
+      },
       statusColumn,
       ...addressColumns,
       {
         key: "amount",
         header: "Tax amount",
         render: (row) => formatCurrency(row["amount"] as number),
+      },
+      {
+        key: "portalPaid",
+        header: "Portal paid",
+        render: (row) => formatCurrency(row["portalPaid"] as number),
       },
       {
         key: "customerPaid",
@@ -141,7 +157,15 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       { name: "address", label: "Address", type: "text" },
       { name: "remarks", label: "Remarks", type: "text" },
       { name: "amount", label: "Tax amount (₹)", type: "number" },
+      { name: "portalPaid", label: "Portal paid (₹)", type: "number" },
       { name: "customerPaid", label: "Customer paid (₹)", type: "number" },
+      {
+        name: "paymentStatus",
+        label: "Portal payment status",
+        type: "select",
+        options: ["PAID", "PENDING"],
+      },
+      { name: "paymentDate", label: "Payment date", type: "date" },
     ],
   },
   puc: {
@@ -157,13 +181,37 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       { key: "chassisNumber", header: "Chassis no." },
       { key: "engineNumber", header: "Engine no." },
       ...dateColumns,
+      {
+        key: "paymentDate",
+        header: "Paid on",
+        render: (row) => formatDate(row["paymentDate"] as string),
+      },
       statusColumn,
       ...addressColumns,
+      {
+        key: "amount",
+        header: "PUC amount",
+        render: (row) => formatCurrency(row["amount"] as number),
+      },
+      {
+        key: "portalPaid",
+        header: "Portal paid",
+        render: (row) => formatCurrency(row["portalPaid"] as number),
+      },
+      {
+        key: "customerPaid",
+        header: "Customer paid",
+        render: (row) => formatCurrency(row["customerPaid"] as number),
+      },
     ],
     fields: [
       ...vehicleFields,
       { name: "startDate", label: "Start", type: "date" },
       { name: "expiryDate", label: "End", type: "date" },
+      { name: "amount", label: "PUC amount (₹)", type: "number" },
+      { name: "portalPaid", label: "Portal paid (₹)", type: "number" },
+      { name: "customerPaid", label: "Customer paid (₹)", type: "number" },
+      { name: "paymentDate", label: "Payment date", type: "date" },
       { name: "address", label: "Address", type: "text" },
       { name: "remarks", label: "Remarks", type: "text" },
     ],
