@@ -288,7 +288,7 @@ export default function LoginPage() {
           <p className="mt-8 text-center text-sm text-slate-500">
             New to VehicleTrack Pro?{" "}
             <Link to="/signup" className="font-semibold text-sky-700 hover:underline">
-              Start your 7-day free trial
+              Start your one-month free trial
             </Link>
           </p>
 

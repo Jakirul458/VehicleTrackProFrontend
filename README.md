@@ -69,7 +69,7 @@ The app uses JWT-based authentication:
 - About page
 - Contact page with form
 - Login page
-- Public agent signup with a seven-day trial
+- Public agent signup with a one-month trial
 
 ### Admin Pages (Super Admin only)
 - Dashboard with platform statistics
@@ -84,4 +84,4 @@ The app uses JWT-based authentication:
 - Reports
 - Profile settings
 
-Agents can sign up for a seven-day trial or be created by the Super Admin. Super Admins configure monthly/yearly/lifetime prices and the QR, bank/UPI, WhatsApp, and email payment instructions from `/admin/settings`. After a trial or account validity expires, the login dialog links to the renewal page; confirm the payment slip before extending validity.
+Agents can sign up for a one-month trial or be created by the Super Admin. Super Admins configure monthly/yearly/lifetime prices and the QR, bank/UPI, WhatsApp, and email payment instructions from `/admin/settings`. After a trial or account validity expires, the login dialog links to the renewal page; confirm the payment slip before extending validity.

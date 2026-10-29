@@ -173,7 +173,7 @@ const features = [
   {
     icon: Users,
     title: "Start with a free trial",
-    text: "Sign up and try all document features free for 7 days. Super Admins can also create agent accounts.",
+    text: "Sign up and try all document features free for one month. Super Admins can also create agent accounts.",
     grad: "from-cyan-500 to-sky-500",
     glow: "hover:shadow-cyan-500/30",
     ring: "group-hover:border-cyan-400/60",
@@ -675,7 +675,7 @@ export default function LandingPage() {
                 to="/signup"
                 className="vt-gradient-bg group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-orange-400 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-fuchsia-600/30 transition-transform hover:scale-[1.03] focus:outline-none focus-visible:ring-4 focus-visible:ring-fuchsia-300/60"
               >
-                Start 7-day free trial
+                Start one-month free trial
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
@@ -851,10 +851,10 @@ export default function LandingPage() {
               Simple annual pricing
             </p>
             <h2 className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">
-              7 days free, then one year for ₹3,650
+              One month free, then one year for ₹3,650
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-600 dark:text-slate-300">
-              Try Insurance, Road Tax and PUC tracking free for 7 days. To continue after your
+              Try Insurance, Road Tax and PUC tracking free for one month. To continue after your
               trial, contact admin to purchase the annual plan and extend your account validity.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">

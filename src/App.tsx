@@ -81,12 +81,12 @@ function SeoManager() {
       (pathname === "/login"
         ? "Sign in | VehicleTrack Pro"
         : ["/signup", "/register"].includes(pathname)
-          ? "Start your 7-day free trial | VehicleTrack Pro"
+          ? "Start your one-month free trial | VehicleTrack Pro"
           : "VehicleTrack Pro");
     const description =
       page?.description ??
       (["/signup", "/register"].includes(pathname)
-        ? "Create an account and try Insurance, Tax and PUC tracking free for 7 days."
+        ? "Create an account and try Insurance, Tax and PUC tracking free for one month."
         : "Sign in to your VehicleTrack Pro account.");
     const siteUrl = new URL(import.meta.env.VITE_SITE_URL || window.location.origin).origin;
     const canonicalUrl = `${siteUrl}${pathname === "/" ? "/" : pathname}`;

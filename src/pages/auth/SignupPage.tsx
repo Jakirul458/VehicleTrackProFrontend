@@ -47,7 +47,7 @@ export default function SignupPage() {
           <Truck className="h-5 w-5 text-primary" />
           VehicleTrack Pro
         </Link>
-        <h1 className="text-2xl font-bold text-slate-900">Start your 7-day free trial</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Start your one-month free trial</h1>
         <p className="mt-2 text-sm text-slate-600">
           Create an account to try Insurance, Tax and PUC tracking. No payment is needed to sign up.
         </p>
