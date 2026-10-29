@@ -156,7 +156,7 @@ export default function SignupPage() {
           </Link>
         </p>
         <p className="mt-3 text-center text-xs text-slate-500">
-          After the trial, the annual plan is ₹4,999. Contact{" "}
+          After the trial, the annual plan is ₹3,650. Contact{" "}
           <a href="tel:6294527072" className="font-medium text-primary hover:underline">
             6294527072
           </a>{" "}

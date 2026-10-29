@@ -1,7 +1,12 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { contactApi } from "@/api";
+import { Mail, Phone, MapPin, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+
+// Web3Forms access key
+const WEB3FORMS_ACCESS_KEY = "e960a4c6-cee5-42d6-95f7-1d7ad29cb908";
+
+// WhatsApp number: country code soho, + ba space chhara (India = 91)
+const WHATSAPP_NUMBER = "919876543210"; // <-- nijer number diye replace koro
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -17,14 +22,50 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await contactApi.send(formData);
-      toast.success("Message sent successfully!");
-      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Message sent successfully!");
+        setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      } else {
+        toast.error("Failed to send message. Please try again.");
+      }
     } catch (error) {
+      console.error("Error:", error);
       toast.error("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // WhatsApp e message pathano
+  const handleWhatsApp = () => {
+    const text =
+      `Hello VehicleTrack Pro,\n\n` +
+      `Name: ${formData.name || "-"}\n` +
+      `Email: ${formData.email || "-"}\n` +
+      `Phone: ${formData.phone || "-"}\n` +
+      `Subject: ${formData.subject || "-"}\n\n` +
+      `Message: ${formData.message || "-"}`;
+
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -76,7 +117,7 @@ export default function ContactPage() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="+91 98765 43210"
+                  placeholder="Your phone number"
                 />
               </div>
               <div>
@@ -107,14 +148,26 @@ export default function ContactPage() {
                   placeholder="Tell us more about your inquiry..."
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send className="h-4 w-4" />
-                {isSubmitting ? "Sending..." : "Send Message"}
-              </button>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Send className="h-4 w-4" />
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleWhatsApp}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Send via WhatsApp
+                </button>
+              </div>
             </form>
           </div>
 
@@ -129,8 +182,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">support@vehicletrackpro.com</p>
-                    <p className="text-muted-foreground">info@vehicletrackpro.com</p>
+                    <p className="text-muted-foreground">jakirulsk312@gmail.com</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -139,8 +191,24 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">+91 98765 43210</p>
+                    <p className="text-muted-foreground">+91 62945 27072</p>
                     <p className="text-muted-foreground">Mon-Fri, 9AM-6PM IST</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="h-10 w-10 rounded-lg bg-green-600/10 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">WhatsApp</h3>
+                    <a
+                      href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-green-600 hover:underline"
+                    >
+                      Chat with us on WhatsApp
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -152,8 +220,8 @@ export default function ContactPage() {
                     <p className="text-muted-foreground">
                       VehicleTrack Pro Headquarters
                       <br />
-                      Tech Park, Sector 5<br />
-                      Bangalore, Karnataka 560001
+                      Mukundabag, Kiriteswari<br />
+                      Murshidabad, West Bengal 742104
                       <br />
                       India
                     </p>
