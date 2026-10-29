@@ -27,7 +27,7 @@ const DOCUMENT_LABELS: Record<ReminderType, string> = {
 function formatExpiryDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "শীঘ্রই";
-  return new Intl.DateTimeFormat("bn-BD", {
+  return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -57,35 +57,37 @@ function makeMessage(
   agentMobile: string,
 ) {
   const business = businessName || agentName || "আপনার এজেন্ট";
+  const customer = row.customerName === "Name not provided" ? "গ্রাহক" : row.customerName;
   const vehicle = row.vehicleNumber || "আপনার গাড়ি";
   const expiry = formatExpiryDate(reminder.expiryDate);
-  const signature = `${agentName || business}${agentMobile ? `\nযোগাযোগ: ${agentMobile}` : ""}`;
+  const contact = agentMobile ? `📞 যোগাযোগ: ${agentMobile}` : "";
+  const signature = [contact, business].filter(Boolean).join("\n");
 
   if (reminder.type === "insurance") {
-    return `নমস্কার! ${business} থেকে জানানো হচ্ছে, আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হবে।
+    return `⚠️ INSURANCE RENEWAL ALERT
 
-রাস্তায় গাড়ি চালানোর সময় বৈধ ইনস্যুরেন্স না থাকার কারণে সম্ভাব্য জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয় মূল্যে ইনস্যুরেন্স রিনিউ করিয়ে নিন।
+Hello ${customer}!
 
-ইনস্যুরেন্স রিনিউ করার জন্য আজই যোগাযোগ করুন।
+আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
 
 ${signature}`;
   }
 
   if (reminder.type === "tax") {
-    return `নমস্কার! ${business} থেকে জানানো হচ্ছে, আপনার গাড়ি ${vehicle}-এর রোড ট্যাক্স জমা দেওয়ার নির্ধারিত তারিখ ${expiry}।
+    return `⚠️ TAX RENEWAL ALERT
 
-রোড ট্যাক্স সময়মতো জমা না দিলে রাস্তায় গাড়ি চালানোর সময় সম্ভাব্য জরিমানা ও আইনি সমস্যা হতে পারে। তাই জরিমানার ঝুঁকি এড়াতে নির্ধারিত সময়ের মধ্যে সাশ্রয় মূল্যে রোড ট্যাক্স জমা করে নিন।
+Hello ${customer}!
 
-রোড ট্যাক্স সংক্রান্ত পরিষেবার জন্য আজই যোগাযোগ করুন।
+আপনার গাড়ি ${vehicle}-এর রোড ট্যাক্স জমা দেওয়ার মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রোড ট্যাক্স জমা করুন।
 
 ${signature}`;
   }
 
-  return `নমস্কার! ${business} থেকে জানানো হচ্ছে, আপনার গাড়ি ${vehicle}-এর PUC (ধোঁয়া পরীক্ষা) সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হবে।
+  return `⚠️ PUC RENEWAL ALERT
 
-রাস্তায় গাড়ি চালানোর সময় বৈধ PUC সার্টিফিকেট না থাকার কারণে সম্ভাব্য জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয় মূল্যে ধোঁয়া পরীক্ষা করিয়ে PUC সার্টিফিকেট নবীকরণ করে নিন।
+Hello ${customer}!
 
-PUC সংক্রান্ত পরিষেবার জন্য আজই যোগাযোগ করুন।
+আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
 
 ${signature}`;
 }

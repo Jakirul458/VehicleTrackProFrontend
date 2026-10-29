@@ -58,7 +58,7 @@ const STATUS_MESSAGE: Record<number, string> = {
   401: "Your session has expired. Please sign in again.",
   403: "You don't have permission to do that.",
   404: "We couldn't find what you were looking for.",
-  409: "That record already exists.",
+  409: "That email or mobile number may already be in use. Check the details or sign in to your existing account.",
   422: "Some fields need attention.",
   429: "Too many attempts. Please wait a moment and retry.",
   500: "Something went wrong on the server. Please try again.",

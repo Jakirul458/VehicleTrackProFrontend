@@ -534,22 +534,46 @@ function reminderMessage(
   agentBusiness: string,
   agentMobile: string,
 ) {
+  const customer = String(row["customerName"] || "গ্রাহক");
   const vehicle = String(row["vehicleNumber"] || "আপনার গাড়ি");
   const expiry = row["expiryDate"]
-    ? new Intl.DateTimeFormat("bn-BD", { day: "numeric", month: "long", year: "numeric" }).format(
-        new Date(String(row["expiryDate"])),
-      )
+    ? new Intl.DateTimeFormat("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(String(row["expiryDate"])))
     : "শীঘ্রই";
-  const greeting = "নমস্কার, 🙏";
-  const signature = `${agentBusiness || agentName || "আপনার এজেন্ট"}${agentMobile ? `\nমোবাইল: ${agentMobile}` : ""}`;
+  const business = agentBusiness || agentName || "আপনার এজেন্ট";
+  const signature = [agentMobile ? `📞 যোগাযোগ: ${agentMobile}` : "", business]
+    .filter(Boolean)
+    .join("\n");
 
   if (moduleKey === "insurance") {
-    return `${greeting}\n\nআমি ${agentBusiness || agentName || "RIMON VEHICLE POINT"} থেকে বলছি।\n\nআপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হতে চলেছে।\n\nসময়মতো ইনস্যুরেন্স নবীকরণ করে নিন, যাতে মেয়াদ উত্তীর্ণ হওয়ার কারণে সমস্যায় পড়তে না হয়।\n\nইনস্যুরেন্স রিনিউ করার জন্য যোগাযোগ করুন। জরিমানা এড়াতে এখনই যোগাযোগ করুন।\n\n${signature}`;
+    return `⚠️ INSURANCE RENEWAL ALERT
+
+Hello ${customer}!
+
+আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
+
+${signature}`;
   }
   if (moduleKey === "tax") {
-    return `${greeting}\n\nআমি ${agentBusiness || agentName || "RIMON VEHICLE POINT"} থেকে বলছি।\n\nআপনার গাড়ি ${vehicle}-এর রোড ট্যাক্সের মেয়াদ ${expiry} তারিখে শেষ হতে চলেছে।\n\nসময়মতো রোড ট্যাক্স পরিশোধ/নবীকরণ করে নিন, যাতে মেয়াদ উত্তীর্ণ হওয়ার কারণে জরিমানা বা সমস্যায় পড়তে না হয়।\n\nরোড ট্যাক্সের জন্য এখনই যোগাযোগ করুন।\n\n${signature}`;
+    return `⚠️ TAX RENEWAL ALERT
+
+Hello ${customer}!
+
+আপনার গাড়ি ${vehicle}-এর রোড ট্যাক্স জমা দেওয়ার মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রোড ট্যাক্স জমা করুন।
+
+${signature}`;
   }
-  return `${greeting}\n\nআমি ${agentBusiness || agentName || "RIMON VEHICLE POINT"} থেকে বলছি।\n\nআপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হতে চলেছে।\n\nসময়মতো পলিউশন পরীক্ষা করিয়ে PUC নবীকরণ করে নিন, যাতে মেয়াদ উত্তীর্ণ সার্টিফিকেটের কারণে সমস্যায় পড়তে না হয়।\n\nPUC রিনিউ করার জন্য এখনই যোগাযোগ করুন।\n\n${signature}`;
+  return `⚠️ PUC RENEWAL ALERT
+
+Hello ${customer}!
+
+আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
+
+${signature}`;
 }
 
 function validStatus(value: string | null): value is StatusFilter {

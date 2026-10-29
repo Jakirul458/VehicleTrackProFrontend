@@ -24,6 +24,7 @@ interface AgentPaymentSummary extends PaymentAgent {
   documentAmount: number;
   portalPaid: number;
   commission: number;
+  profit: number;
   records: number;
 }
 
@@ -126,6 +127,13 @@ function getColumns(isAdmin: boolean): Column<PaymentRecord>[] {
       className: "bg-violet-500/5 text-right",
       render: (row) => formatCurrency(row.commission),
     },
+    {
+      key: "profit",
+      header: "Profit",
+      headerClassName: "bg-green-700 text-white",
+      className: "bg-green-500/5 text-right font-semibold",
+      render: (row) => formatCurrency(row.profit),
+    },
   ];
 }
 
@@ -206,8 +214,9 @@ export default function PaymentsPage() {
           customerPaid: summary.customerPaid + row.customerPaid,
           portalPaid: summary.portalPaid + row.portalPaid,
           commission: summary.commission + row.commission,
+          profit: summary.profit + row.profit,
         }),
-        { documentAmount: 0, customerPaid: 0, portalPaid: 0, commission: 0 },
+        { documentAmount: 0, customerPaid: 0, portalPaid: 0, commission: 0, profit: 0 },
       ),
     [periodAndKindRecords],
   );
@@ -222,6 +231,7 @@ export default function PaymentsPage() {
           documentAmount: 0,
           portalPaid: 0,
           commission: 0,
+          profit: 0,
           records: 0,
         },
       ]),
@@ -233,6 +243,7 @@ export default function PaymentsPage() {
       summary.documentAmount += record.documentAmount;
       summary.portalPaid += record.portalPaid;
       summary.commission += record.commission;
+      summary.profit += record.profit;
       summary.records += 1;
     }
     return Array.from(summaries.values()).sort((a, b) => b.business - a.business);
@@ -249,6 +260,7 @@ export default function PaymentsPage() {
     "Customer paid": row.customerPaid,
     "Paid to portal": row.portalPaid,
     Commission: row.commission,
+    Profit: row.profit,
   }));
 
   return (
@@ -325,7 +337,7 @@ export default function PaymentsPage() {
         </p>
       )}
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard
           label="Premium"
           value={loading ? "…" : formatCurrency(totals.documentAmount)}
@@ -348,6 +360,13 @@ export default function PaymentsPage() {
           value={loading ? "…" : formatCurrency(totals.commission)}
           icon={Wallet}
           tone="primary"
+        />
+        <StatCard
+          label="Profit"
+          value={loading ? "…" : formatCurrency(totals.profit)}
+          icon={Wallet}
+          tone="active"
+          hint="Insurance: Customer paid + Commission − Portal paid · Tax/PUC: Customer paid − Portal paid"
         />
       </div>
 
@@ -397,6 +416,13 @@ export default function PaymentsPage() {
                     headerClassName: "bg-violet-700 text-white",
                     className: "bg-violet-500/5 text-right",
                     render: (row) => formatCurrency(row.commission),
+                  },
+                  {
+                    key: "profit",
+                    header: "Profit",
+                    headerClassName: "bg-green-700 text-white",
+                    className: "bg-green-500/5 text-right font-semibold",
+                    render: (row) => formatCurrency(row.profit),
                   },
                   {
                     key: "records",

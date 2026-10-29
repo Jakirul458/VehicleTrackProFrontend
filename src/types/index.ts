@@ -105,6 +105,7 @@ export interface PaymentRecord {
   customerPaid: number;
   portalPaid: number;
   commission: number;
+  profit: number;
 }
 
 export interface PaymentAgent {
@@ -165,6 +166,7 @@ export interface FinancialPeriodSummary {
   paidToPortal: number;
   commissionEarned: number;
   collectedFromCustomers: number;
+  profit: number;
   records: number;
 }
 

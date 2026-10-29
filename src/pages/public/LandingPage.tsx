@@ -19,6 +19,7 @@ import {
   Siren,
   FileSearch,
   Receipt,
+  MessageCircle,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -152,6 +153,14 @@ const features = [
     grad: "from-amber-500 to-orange-500",
     glow: "hover:shadow-amber-500/30",
     ring: "group-hover:border-amber-400/60",
+  },
+  {
+    icon: MessageCircle,
+    title: "One-tap WhatsApp reminders",
+    text: "Open a personalized, ready-to-send WhatsApp reminder when a document is due, and follow up on time.",
+    grad: "from-green-500 to-emerald-500",
+    glow: "hover:shadow-green-500/30",
+    ring: "group-hover:border-green-400/60",
   },
   {
     icon: BarChart3,
@@ -738,7 +747,10 @@ export default function LandingPage() {
       </section>
 
       {/* ======================== FEATURES ======================== */}
-      <section className="relative bg-slate-50 px-4 py-14 dark:bg-slate-900/60">
+      <section
+        id="features"
+        className="scroll-mt-20 relative bg-slate-50 px-4 py-12 sm:py-14 lg:py-16 dark:bg-slate-900/60"
+      >
         <div className="container mx-auto max-w-6xl">
           <Reveal className="mx-auto mb-9 max-w-2xl text-center">
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Powerful Features</h2>
@@ -749,7 +761,11 @@ export default function LandingPage() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 3) * 100}>
+              <Reveal
+                key={f.title}
+                delay={(i % 3) * 100}
+                className={i === features.length - 1 ? "lg:col-start-2" : ""}
+              >
                 <div
                   className={`group h-full rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${f.glow} ${f.ring} dark:border-slate-800 dark:bg-slate-900`}
                 >

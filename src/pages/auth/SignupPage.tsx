@@ -57,7 +57,11 @@ export default function SignupPage() {
             role="alert"
             className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800"
           >
-            <p>{error.message}</p>
+            <p>
+              {error.status === 409
+                ? "This email or mobile number is already registered. Sign in to your existing account or use different contact details."
+                : error.message}
+            </p>
             {error.code === "ACCOUNT_VALIDITY_EXPIRED" && (
               <a href="tel:6294527072" className="mt-2 inline-block font-semibold underline">
                 Call admin: 6294527072

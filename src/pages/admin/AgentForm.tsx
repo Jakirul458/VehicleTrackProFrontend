@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { adminApi } from "@/api";
+import { normalizeApiError } from "@/api/client";
 import type { Agent } from "@/types";
 import { toast } from "sonner";
 
@@ -64,11 +65,12 @@ export default function AgentForm() {
       await queryClient.invalidateQueries({ queryKey: ["agents"] });
       navigate("/admin/agents");
     } catch (error) {
-      const message =
-        error && typeof error === "object" && "message" in error
-          ? String(error.message)
-          : `Failed to ${isEdit ? "update" : "create"} agent.`;
-      toast.error(message);
+      const normalizedError = normalizeApiError(error);
+      toast.error(
+        normalizedError.status === 409
+          ? "This email or phone number is already in use by another account. Check the details and try again."
+          : normalizedError.message,
+      );
     } finally {
       setIsSubmitting(false);
     }
