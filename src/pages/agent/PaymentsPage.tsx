@@ -165,7 +165,7 @@ export default function PaymentsPage({ agentId }: { agentId?: string }) {
   const [agents, setAgents] = useState<PaymentAgent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [period, setPeriod] = useState<Period>("monthly");
+  const [period, setPeriod] = useState<Period>("all");
   const [kind, setKind] = useState<PaymentKind>("All");
   const [selectedAgentId, setSelectedAgentId] = useState("");
   const [search, setSearch] = useState("");
