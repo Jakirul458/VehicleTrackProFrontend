@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Download, Search, Wallet } from "lucide-react";
+import { Link } from "react-router-dom";
 import { reportApi } from "@/api";
 import { normalizeApiError } from "@/api/client";
 import {
@@ -54,7 +55,7 @@ const PAYMENT_KIND_STYLE: Record<PaymentKind, { selected: string; badge: string 
   },
 };
 
-function getColumns(isAdmin: boolean): Column<PaymentRecord>[] {
+function getColumns(showAgent: boolean): Column<PaymentRecord>[] {
   return [
     {
       key: "paymentDate",
@@ -76,14 +77,24 @@ function getColumns(isAdmin: boolean): Column<PaymentRecord>[] {
         </span>
       ),
     },
-    ...(isAdmin
+    ...(showAgent
       ? [
           {
             key: "agentName",
             header: "Agent",
             headerClassName: "bg-slate-700 text-white",
             className: "bg-slate-500/5",
-            render: (row: PaymentRecord) => row.agentName || "—",
+            render: (row: PaymentRecord) =>
+              row.agentName ? (
+                <Link
+                  to={`/admin/agents/${row.agentId}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {row.agentName}
+                </Link>
+              ) : (
+                "—"
+              ),
           },
         ]
       : []),
@@ -146,15 +157,17 @@ function isInPeriod(paymentDate: string, period: Period, now: Date): boolean {
     : date.getFullYear() === now.getFullYear();
 }
 
-export default function PaymentsPage() {
+export default function PaymentsPage({ agentId }: { agentId?: string }) {
   const { user } = useAuth();
   const isAdmin = user?.role === "SUPER_ADMIN";
+  const isAgentProfile = Boolean(agentId);
   const [records, setRecords] = useState<PaymentRecord[]>([]);
   const [agents, setAgents] = useState<PaymentAgent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<Period>("monthly");
   const [kind, setKind] = useState<PaymentKind>("All");
+  const [selectedAgentId, setSelectedAgentId] = useState("");
   const [search, setSearch] = useState("");
   const now = useMemo(() => new Date(), []);
 
@@ -190,9 +203,16 @@ export default function PaymentsPage() {
     [records, period, kind, now],
   );
 
+  const visibleRecords = useMemo(() => {
+    const filterAgentId = agentId || selectedAgentId;
+    return filterAgentId
+      ? periodAndKindRecords.filter((record) => record.agentId === filterAgentId)
+      : periodAndKindRecords;
+  }, [agentId, selectedAgentId, periodAndKindRecords]);
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return periodAndKindRecords.filter((record) => {
+    return visibleRecords.filter((record) => {
       if (!query) return true;
       return [
         record.type,
@@ -204,11 +224,11 @@ export default function PaymentsPage() {
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query));
     });
-  }, [periodAndKindRecords, search, isAdmin]);
+  }, [visibleRecords, search, isAdmin]);
 
   const totals = useMemo(
     () =>
-      periodAndKindRecords.reduce(
+      visibleRecords.reduce(
         (summary, row) => ({
           documentAmount: summary.documentAmount + row.documentAmount,
           customerPaid: summary.customerPaid + row.customerPaid,
@@ -218,7 +238,7 @@ export default function PaymentsPage() {
         }),
         { documentAmount: 0, customerPaid: 0, portalPaid: 0, commission: 0, profit: 0 },
       ),
-    [periodAndKindRecords],
+    [visibleRecords],
   );
 
   const agentSummaries = useMemo<AgentPaymentSummary[]>(() => {
@@ -337,6 +357,27 @@ export default function PaymentsPage() {
         </p>
       )}
 
+      {isAdmin && !isAgentProfile && (
+        <div className="mb-5 max-w-sm">
+          <label htmlFor="payments-agent-filter" className="mb-1.5 block text-sm font-medium">
+            Filter by agent
+          </label>
+          <select
+            id="payments-agent-filter"
+            value={selectedAgentId}
+            onChange={(event) => setSelectedAgentId(event.target.value)}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="">All agents</option>
+            {agents.map((agent) => (
+              <option key={agent.id} value={agent.id}>
+                {agent.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <StatCard
           label="Premium"
@@ -370,7 +411,7 @@ export default function PaymentsPage() {
         />
       </div>
 
-      {isAdmin && (
+      {isAdmin && !isAgentProfile && (
         <Panel
           title="Agent-wise business"
           description="Customer payments received by each agent for the selected period and payment type."
@@ -387,7 +428,14 @@ export default function PaymentsPage() {
                     header: "Agent",
                     headerClassName: "bg-slate-700 text-white",
                     className: "bg-slate-500/5",
-                    render: (row) => row.name,
+                    render: (row) => (
+                      <Link
+                        to={`/admin/agents/${row.id}`}
+                        className="font-medium text-primary hover:underline"
+                      >
+                        {row.name}
+                      </Link>
+                    ),
                   },
                   {
                     key: "business",
@@ -471,7 +519,7 @@ export default function PaymentsPage() {
             <p className="p-6 text-sm text-muted-foreground">Loading payment records…</p>
           ) : (
             <DataTable
-              columns={getColumns(isAdmin)}
+              columns={getColumns(isAdmin && !isAgentProfile)}
               rows={filtered}
               emptyTitle="No payments found"
             />

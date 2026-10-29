@@ -92,7 +92,12 @@ export default function AgentsList() {
                     return (
                       <tr key={agent.id} className="border-b border-border/60 last:border-0">
                         <td className="whitespace-nowrap bg-sky-500/5 px-4 py-3 font-medium">
-                          {agent.fullName}
+                          <Link
+                            to={`/admin/agents/${agent.id}`}
+                            className="text-primary hover:underline"
+                          >
+                            {agent.fullName}
+                          </Link>
                         </td>
                         <td className="whitespace-nowrap bg-blue-500/5 px-4 py-3 text-muted-foreground">
                           {agent.businessName || "—"}

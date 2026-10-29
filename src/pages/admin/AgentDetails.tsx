@@ -5,12 +5,14 @@ import { adminApi } from "@/api";
 import type { Agent } from "@/types";
 import { ArrowLeft, CalendarDays, KeyRound, Shield, ShieldAlert } from "lucide-react";
 import { DocumentModulePage } from "@/components/documents/DocumentModulePage";
+import PaymentsPage from "@/pages/agent/PaymentsPage";
 import { toast } from "sonner";
 
 const tabs = [
   { key: "insurance", label: "Insurance" },
   { key: "tax", label: "Tax" },
   { key: "puc", label: "PUC" },
+  { key: "payments", label: "Payments" },
 ] as const;
 
 export default function AgentDetails() {
@@ -240,7 +242,7 @@ export default function AgentDetails() {
         </div>
       </form>
 
-      <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Agent documents">
+      <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Agent profile">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -258,7 +260,11 @@ export default function AgentDetails() {
           </button>
         ))}
       </div>
-      <DocumentModulePage key={`${id}-${activeTab}`} moduleKey={activeTab} admin agentId={id} />
+      {activeTab === "payments" ? (
+        <PaymentsPage key={`${id}-payments`} agentId={id} />
+      ) : (
+        <DocumentModulePage key={`${id}-${activeTab}`} moduleKey={activeTab} admin agentId={id} />
+      )}
     </div>
   );
 }
