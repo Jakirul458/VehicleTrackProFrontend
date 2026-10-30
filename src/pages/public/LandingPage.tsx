@@ -796,8 +796,8 @@ export default function LandingPage() {
               One month to make renewals feel simpler
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-600 dark:text-slate-300">
-              Try insurance, road tax and PUC tracking free for one month. After your trial, choose
-              an available plan and get help with account renewal from our team.
+              Try insurance, road tax and PUC tracking free for one month. Choose an annual plan for
+              one service, a discounted combo, or all three modules together.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
@@ -806,12 +806,12 @@ export default function LandingPage() {
               >
                 Start free trial
               </Link>
-              <a
-                href="tel:+916294527072"
+              <Link
+                to="/pricing"
                 className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-800 transition hover:border-cyan-600 hover:text-cyan-800 dark:border-slate-700 dark:text-white"
               >
-                Talk to our team
-              </a>
+                View annual pricing
+              </Link>
             </div>
           </div>
         </Reveal>

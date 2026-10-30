@@ -12,6 +12,7 @@ import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import LandingPage from "./pages/public/LandingPage";
 import AboutPage from "./pages/public/AboutPage";
 import ContactPage from "./pages/public/ContactPage";
+import PricingPage from "./pages/public/PricingPage";
 import RenewalPaymentPage from "./pages/public/RenewalPaymentPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
@@ -66,6 +67,12 @@ const PAGE_SEO: Record<string, { title: string; description: string; keywords?: 
     title: "Contact VehicleTrack Pro | Support & Enquiries",
     description:
       "Contact VehicleTrack Pro for product information, account support and questions about insurance, tax and PUC document management.",
+  },
+  "/pricing": {
+    title: "Pricing | VehicleTrack Pro",
+    description:
+      "Compare annual Insurance, Road Tax and PUC subscription plans, including discounted service combinations.",
+    keywords: "VehicleTrack Pro pricing, insurance tax PUC subscription plans",
   },
 };
 
@@ -163,6 +170,7 @@ function App() {
               <Route index element={<LandingPage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
+              <Route path="pricing" element={<PricingPage />} />
               <Route path="renewal" element={<RenewalPaymentPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="signup" element={<SignupPage />} />

@@ -41,16 +41,10 @@ export default function PublicLayout() {
                   Features
                 </Link>
                 <Link
-                  to="/about"
+                  to="/pricing"
                   className="text-sm font-semibold text-slate-600 transition-colors hover:text-cyan-700"
                 >
-                  About
-                </Link>
-                <Link
-                  to="/contact"
-                  className="text-sm font-semibold text-slate-600 transition-colors hover:text-cyan-700"
-                >
-                  Contact
+                  Pricing
                 </Link>
                 <Link
                   to="/login"
@@ -98,18 +92,11 @@ export default function PublicLayout() {
                   Features
                 </Link>
                 <Link
-                  to="/about"
+                  to="/pricing"
                   className="rounded-xl px-3 py-2.5 text-sm font-semibold hover:bg-cyan-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  About
-                </Link>
-                <Link
-                  to="/contact"
-                  className="rounded-xl px-3 py-2.5 text-sm font-semibold hover:bg-cyan-50"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Contact
+                  Pricing
                 </Link>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   <Link
@@ -158,7 +145,7 @@ export default function PublicLayout() {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/#pricing" className="transition-colors hover:text-teal-300">
+                    <Link to="/pricing" className="transition-colors hover:text-teal-300">
                       Pricing
                     </Link>
                   </li>

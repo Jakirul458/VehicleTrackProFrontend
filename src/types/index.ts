@@ -194,6 +194,13 @@ export interface PlatformSettings {
   monthlyPrice: number;
   yearlyPrice: number;
   lifetimePrice: number;
+  insuranceOnlyPrice: number;
+  roadTaxOnlyPrice: number;
+  pucOnlyPrice: number;
+  taxPucPrice: number;
+  insuranceTaxPrice: number;
+  insurancePucPrice: number;
+  allModulesPrice: number;
 }
 
 export interface FinancialPeriodSummary {

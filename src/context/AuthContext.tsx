@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string, location?: LoginLocation) => {
     const response = await authApi.login({ email, password, ...(location ? { location } : {}) });
+    sessionStorage.removeItem("agent-validity-prompt-dismissed");
     sessionStorage.setItem("token", response.token);
     localStorage.setItem("user", JSON.stringify(response.user));
     setToken(response.token);
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (payload: PublicSignupPayload) => {
     const response = await authApi.register(payload);
+    sessionStorage.removeItem("agent-validity-prompt-dismissed");
     sessionStorage.setItem("token", response.token);
     localStorage.setItem("user", JSON.stringify(response.user));
     setToken(response.token);
@@ -57,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Logout error:", error);
     } finally {
       sessionStorage.removeItem("token");
+      sessionStorage.removeItem("agent-validity-prompt-dismissed");
       localStorage.removeItem("user");
       setToken(null);
       setUser(null);

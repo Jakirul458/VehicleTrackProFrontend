@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminApi } from "@/api";
 import type { PlatformSettings } from "@/types";
+import { subscriptionPlans } from "@/constants/pricing";
 
 const emptySettings: PlatformSettings = {
   supportWhatsapp: "",
@@ -17,6 +18,13 @@ const emptySettings: PlatformSettings = {
   monthlyPrice: 0,
   yearlyPrice: 4999,
   lifetimePrice: 0,
+  insuranceOnlyPrice: 1999,
+  roadTaxOnlyPrice: 999,
+  pucOnlyPrice: 999,
+  taxPucPrice: 1799,
+  insuranceTaxPrice: 2799,
+  insurancePucPrice: 2799,
+  allModulesPrice: 3600,
 };
 
 const textFields: { key: keyof PlatformSettings; label: string; type?: string }[] = [
@@ -100,17 +108,14 @@ export default function AdminSettings() {
           }}
         >
           <section className="space-y-4 rounded-lg border bg-card p-6">
-            <h2 className="text-lg font-semibold">Renewal plans</h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {(
-                [
-                  ["monthlyPrice", "Monthly price"],
-                  ["yearlyPrice", "Yearly price"],
-                  ["lifetimePrice", "Lifetime price"],
-                ] as const
-              ).map(([key, label]) => (
+            <h2 className="text-lg font-semibold">Annual subscription prices</h2>
+            <p className="text-sm text-muted-foreground">
+              These prices appear on the public Pricing page and the agent renewal page.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {subscriptionPlans.map(({ key, label }) => (
                 <label key={key} className="space-y-1.5 text-sm font-medium">
-                  {label} (₹)
+                  {label} / year (₹)
                   <input
                     type="number"
                     min="0"

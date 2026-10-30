@@ -14,7 +14,7 @@ if (!configuredUrl) {
 const siteUrl = new URL(
   configuredUrl.startsWith("http") ? configuredUrl : `https://${configuredUrl}`,
 ).origin;
-const publicPaths = ["/", "/about", "/contact"];
+const publicPaths = ["/", "/about", "/contact", "/pricing"];
 const escapeXml = (value) =>
   value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 const sitemap = [
@@ -84,6 +84,15 @@ const routePages = [
     title: "Contact VehicleTrack Pro | Support & Enquiries",
     description:
       "Contact VehicleTrack Pro for product information, account support and questions about insurance, tax and PUC document management.",
+    indexable: true,
+  },
+  {
+    path: "/pricing",
+    file: "pricing.html",
+    title: "Pricing | VehicleTrack Pro",
+    description:
+      "Compare annual Insurance, Road Tax and PUC subscription plans, including discounted service combinations.",
+    keywords: "VehicleTrack Pro pricing, insurance tax PUC subscription plans",
     indexable: true,
   },
   {

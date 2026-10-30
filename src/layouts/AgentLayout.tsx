@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { daysLeft } from "@/lib/expiry";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   LayoutDashboard,
   Shield,
@@ -19,6 +28,17 @@ export default function AgentLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const validityDays = daysLeft(user?.trialEndDate);
+  const shouldShowValidityPrompt =
+    user?.role === "AGENT" && validityDays !== null && validityDays >= 0 && validityDays <= 7;
+  const [validityPromptDismissed, setValidityPromptDismissed] = useState(
+    () => sessionStorage.getItem("agent-validity-prompt-dismissed") === "1",
+  );
+
+  const dismissValidityPrompt = () => {
+    sessionStorage.setItem("agent-validity-prompt-dismissed", "1");
+    setValidityPromptDismissed(true);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -43,6 +63,40 @@ export default function AgentLayout() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Dialog
+        open={shouldShowValidityPrompt && !validityPromptDismissed}
+        onOpenChange={(open) => {
+          if (!open) dismissValidityPrompt();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>আপনার subscription-এর মেয়াদ শেষ হতে চলেছে</DialogTitle>
+            <DialogDescription>
+              {validityDays === 0
+                ? "আপনার access আজ শেষ হবে। কাজ চালিয়ে যেতে renewal plan বেছে নিন।"
+                : `আপনার access-এর আর ${validityDays} দিন বাকি। validity extend করতে subscription renew করুন।`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={dismissValidityPrompt}
+              className="rounded-md border px-4 py-2 text-sm font-medium"
+            >
+              পরে মনে করাবেন
+            </button>
+            <Link
+              to="/renewal"
+              onClick={dismissValidityPrompt}
+              className="rounded-md bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground"
+            >
+              Renewal / Payment
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div

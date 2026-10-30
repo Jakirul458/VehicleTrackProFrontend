@@ -1,22 +1,20 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Mail, MessageCircle, Upload } from "lucide-react";
 import { paymentApi } from "@/api";
 import { toast } from "sonner";
-import type { PlatformSettings } from "@/types";
-
-type Plan = "monthly" | "yearly" | "lifetime";
-
-const plans: { key: Plan; label: string; priceKey: keyof PlatformSettings }[] = [
-  { key: "monthly", label: "Monthly", priceKey: "monthlyPrice" },
-  { key: "yearly", label: "Yearly", priceKey: "yearlyPrice" },
-  { key: "lifetime", label: "Lifetime", priceKey: "lifetimePrice" },
-];
+import { subscriptionPlans, isPricingKey } from "@/constants/pricing";
+import type { PricingKey } from "@/constants/pricing";
 
 export default function RenewalPaymentPage() {
-  const [plan, setPlan] = useState<Plan>("yearly");
-  const [accountEmail, setAccountEmail] = useState("");
+  const [searchParams] = useSearchParams();
+  const [plan, setPlan] = useState<PricingKey>(() =>
+    (() => {
+      const requestedPlan = searchParams.get("plan");
+      return isPricingKey(requestedPlan) ? requestedPlan : "allModulesPrice";
+    })(),
+  );
   const [slip, setSlip] = useState<File | null>(null);
   const {
     data: settings,
@@ -27,8 +25,8 @@ export default function RenewalPaymentPage() {
     queryFn: paymentApi.settings,
   });
 
-  const selected = plans.find((item) => item.key === plan)!;
-  const price = settings?.[selected.priceKey] as number | undefined;
+  const selected = subscriptionPlans.find((item) => item.key === plan)!;
+  const price = settings?.[selected.key];
   const user = (() => {
     try {
       return JSON.parse(localStorage.getItem("user") ?? "{}") as {
@@ -39,8 +37,7 @@ export default function RenewalPaymentPage() {
       return {};
     }
   })();
-  const email = accountEmail || user.email || "";
-  const requestMessage = `Hello, I would like to renew my VehicleTrack Pro account.\nPlan: ${selected.label}\nAmount: ${price ? `₹${price}` : "Please confirm"}\nAccount email: ${email || "Please provide"}${slip ? `\nPayment slip: ${slip.name}` : ""}`;
+  const requestMessage = `Hello, I would like to renew my VehicleTrack Pro account.\nPlan: ${selected.label} (${selected.modules})\nDuration: 1 year\nAmount: ${price !== undefined ? `₹${price.toLocaleString("en-IN")}` : "Please confirm"}\nAccount email: ${user.email || "Please provide"}${slip ? `\nPayment slip: ${slip.name}` : ""}`;
   const whatsappDigits = settings?.supportWhatsapp.replace(/\D/g, "") ?? "";
 
   async function shareSlip() {
@@ -122,8 +119,8 @@ export default function RenewalPaymentPage() {
             <section className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-bold text-slate-900">Choose a renewal plan</h2>
               <div className="grid gap-3">
-                {plans.map((item) => {
-                  const amount = settings[item.priceKey] as number;
+                {subscriptionPlans.map((item) => {
+                  const amount = settings[item.key];
                   return (
                     <button
                       key={item.key}
@@ -132,24 +129,17 @@ export default function RenewalPaymentPage() {
                       onClick={() => setPlan(item.key)}
                       className={`flex items-center justify-between rounded-xl border p-4 text-left transition ${plan === item.key ? "border-cyan-600 bg-cyan-50 ring-1 ring-cyan-600" : "border-slate-200 hover:border-cyan-300 hover:bg-cyan-50/50"}`}
                     >
-                      <span className="font-medium">{item.label}</span>
-                      <span className="font-semibold">
-                        {amount ? `₹${amount.toLocaleString("en-IN")}` : "Contact for price"}
+                      <span>
+                        <span className="block font-medium">{item.label}</span>
+                        <span className="block text-xs text-muted-foreground">
+                          {item.modules} · 1 year
+                        </span>
                       </span>
+                      <span className="font-semibold">{`₹${amount.toLocaleString("en-IN")}`}</span>
                     </button>
                   );
                 })}
               </div>
-              <label className="block space-y-1.5 text-sm font-medium">
-                Account email
-                <input
-                  type="email"
-                  value={accountEmail || user.email || ""}
-                  onChange={(event) => setAccountEmail(event.target.value)}
-                  placeholder="Email used to sign in"
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                />
-              </label>
               {settings.supportWhatsapp && (
                 <p className="text-sm text-muted-foreground">
                   WhatsApp support:{" "}
