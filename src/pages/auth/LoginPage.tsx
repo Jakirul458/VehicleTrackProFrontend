@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Truck, CheckCircle2, Eye, EyeOff, Loader2, Mail, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { normalizeApiError, type NormalizedApiError } from "@/api/client";
+import type { LoginLocation } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,23 @@ const FEATURES = [
   "One-tap WhatsApp reminders",
 ];
 
+function getLoginLocation(): Promise<LoginLocation | undefined> {
+  if (!navigator.geolocation) return Promise.resolve(undefined);
+
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) =>
+        resolve({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          accuracy: coords.accuracy,
+        }),
+      () => resolve(undefined),
+      { enableHighAccuracy: false, maximumAge: 300_000, timeout: 5_000 },
+    );
+  });
+}
+
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -31,6 +49,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const trialExpired = new URLSearchParams(location.search).get("expired") === "1";
+  const sessionExpired = new URLSearchParams(location.search).get("sessionExpired") === "1";
   const validityExpired =
     trialExpired ||
     loginError?.code === "ACCOUNT_VALIDITY_EXPIRED" ||
@@ -44,7 +63,8 @@ export default function LoginPage() {
     setIsSubmitting(true);
     setLoginError(null);
     try {
-      await login(email, password);
+      const location = await getLoginLocation();
+      await login(email, password, location);
       toast.success("Login successful!");
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       if (user.role === "SUPER_ADMIN") {
@@ -206,6 +226,15 @@ export default function LoginPage() {
             </h1>
             <p className="mt-1.5 text-sm text-slate-500">
               Sign in to manage your vehicles and renewals
+            </p>
+            {sessionExpired && (
+              <p className="mt-2 text-sm font-medium text-amber-700">
+                You were signed out after 30 minutes of inactivity.
+              </p>
+            )}
+            <p className="mt-2 max-w-sm text-xs text-slate-500">
+              Your browser may ask to share your location for the login activity log. This is
+              optional; MAC addresses are not available to websites.
             </p>
           </div>
 

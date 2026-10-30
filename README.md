@@ -57,10 +57,11 @@ The API must allow the exact Vercel site origin through its `CLIENT_ORIGIN` sett
 ## Authentication
 
 The app uses JWT-based authentication:
-1. Login stores the JWT token in localStorage
+1. Login stores the JWT token in sessionStorage so closing the tab ends the browser session
 2. Axios interceptors automatically add the token to Authorization headers
 3. Protected routes check for valid authentication
 4. 401 responses automatically redirect to login
+5. Sessions expire after 30 minutes of inactivity and have a 12-hour maximum lifetime
 
 ## Features
 
@@ -74,7 +75,8 @@ The app uses JWT-based authentication:
 ### Admin Pages (Super Admin only)
 - Dashboard with platform statistics
 - Agent management (CRUD operations)
-- Activity log viewing
+- Activity log filters and CSV export
+- Active login sessions with remote revoke controls
 - Settings
 
 ### Agent Pages

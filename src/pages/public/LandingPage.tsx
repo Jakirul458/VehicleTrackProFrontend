@@ -70,61 +70,6 @@ function Reveal({
   );
 }
 
-// Counts a number up when it becomes visible
-function CountUp({
-  to,
-  suffix = "",
-  duration = 1600,
-}: {
-  to: number;
-  suffix?: string;
-  duration?: number;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || typeof IntersectionObserver === "undefined") {
-      setValue(to);
-      return;
-    }
-    let raf: number | undefined;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        io.disconnect();
-        const start = performance.now();
-        const tick = (now: number) => {
-          const p = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          setValue(Math.round(to * eased));
-          if (p < 1) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      if (raf !== undefined) cancelAnimationFrame(raf);
-    };
-  }, [to, duration]);
-
-  return (
-    <span ref={ref}>
-      {value.toLocaleString()}
-      {suffix}
-    </span>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
@@ -134,57 +79,57 @@ const features = [
     icon: Car,
     title: "Insurance Tracking",
     text: "Keep policy details, payment information and renewal dates together.",
-    grad: "from-indigo-500 to-blue-500",
-    glow: "hover:shadow-indigo-500/30",
-    ring: "group-hover:border-indigo-400/60",
+    grad: "from-sky-500 to-cyan-400",
+    glow: "hover:shadow-sky-500/20",
+    ring: "group-hover:border-sky-400/60",
   },
   {
     icon: Shield,
     title: "Tax and PUC Tracking",
     text: "Track road tax and PUC details with automatic expiry dates.",
-    grad: "from-emerald-500 to-teal-500",
-    glow: "hover:shadow-emerald-500/30",
-    ring: "group-hover:border-emerald-400/60",
+    grad: "from-teal-500 to-emerald-400",
+    glow: "hover:shadow-teal-500/20",
+    ring: "group-hover:border-teal-400/60",
   },
   {
     icon: Bell,
     title: "Expiry Alerts",
     text: "Get a reminder before a document expires, so no renewal deadline slips by.",
-    grad: "from-amber-500 to-orange-500",
-    glow: "hover:shadow-amber-500/30",
+    grad: "from-amber-400 to-orange-400",
+    glow: "hover:shadow-amber-500/20",
     ring: "group-hover:border-amber-400/60",
   },
   {
     icon: MessageCircle,
     title: "One-tap WhatsApp reminders",
     text: "Open a personalized, ready-to-send WhatsApp reminder when a document is due, and follow up on time.",
-    grad: "from-green-500 to-emerald-500",
-    glow: "hover:shadow-green-500/30",
-    ring: "group-hover:border-green-400/60",
+    grad: "from-emerald-500 to-teal-400",
+    glow: "hover:shadow-emerald-500/20",
+    ring: "group-hover:border-emerald-400/60",
   },
   {
     icon: BarChart3,
     title: "Expiry Overview",
     text: "See document statuses and upcoming renewals at a glance.",
-    grad: "from-fuchsia-500 to-pink-500",
-    glow: "hover:shadow-fuchsia-500/30",
-    ring: "group-hover:border-fuchsia-400/60",
+    grad: "from-blue-500 to-sky-400",
+    glow: "hover:shadow-blue-500/20",
+    ring: "group-hover:border-blue-400/60",
   },
   {
     icon: Users,
     title: "Start with a free trial",
     text: "Sign up and try all document features free for one month. Super Admins can also create agent accounts.",
-    grad: "from-cyan-500 to-sky-500",
-    glow: "hover:shadow-cyan-500/30",
+    grad: "from-cyan-500 to-sky-400",
+    glow: "hover:shadow-cyan-500/20",
     ring: "group-hover:border-cyan-400/60",
   },
   {
     icon: Lock,
     title: "Secure & Reliable",
     text: "Role-based access control and encrypted data keep your customer records safe.",
-    grad: "from-violet-500 to-purple-500",
-    glow: "hover:shadow-violet-500/30",
-    ring: "group-hover:border-violet-400/60",
+    grad: "from-blue-500 to-sky-400",
+    glow: "hover:shadow-blue-500/20",
+    ring: "group-hover:border-blue-400/60",
   },
 ];
 
@@ -193,43 +138,43 @@ const audiences = [
     icon: BadgeCheck,
     title: "Insurance Agents",
     text: "Track policy renewals and keep customer details with each record.",
-    color: "text-indigo-600 bg-indigo-100 dark:bg-indigo-500/20 dark:text-indigo-300",
-    bar: "bg-indigo-500",
+    color: "text-sky-700 bg-sky-50 dark:bg-sky-500/20 dark:text-sky-300",
+    bar: "bg-sky-500",
   },
   {
     icon: Coffee,
     title: "Cyber Cafés",
     text: "Offer vehicle document services with neat, searchable record-keeping.",
-    color: "text-amber-600 bg-amber-100 dark:bg-amber-500/20 dark:text-amber-300",
-    bar: "bg-amber-500",
+    color: "text-amber-700 bg-amber-50 dark:bg-amber-500/20 dark:text-amber-300",
+    bar: "bg-amber-400",
   },
   {
     icon: Wrench,
     title: "Vehicle Service Centers",
     text: "Monitor document compliance for every vehicle that comes in for service.",
-    color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-300",
-    bar: "bg-emerald-500",
+    color: "text-teal-700 bg-teal-50 dark:bg-teal-500/20 dark:text-teal-300",
+    bar: "bg-teal-500",
   },
   {
     icon: FileText,
     title: "Document Service Providers",
     text: "Streamline vehicle paperwork for all of your clients.",
-    color: "text-pink-600 bg-pink-100 dark:bg-pink-500/20 dark:text-pink-300",
-    bar: "bg-pink-500",
+    color: "text-cyan-700 bg-cyan-50 dark:bg-cyan-500/20 dark:text-cyan-300",
+    bar: "bg-cyan-500",
   },
   {
     icon: Store,
     title: "Small Vehicle Businesses",
     text: "Manage fleet documentation and compliance without spreadsheets.",
-    color: "text-cyan-600 bg-cyan-100 dark:bg-cyan-500/20 dark:text-cyan-300",
-    bar: "bg-cyan-500",
+    color: "text-sky-700 bg-sky-50 dark:bg-sky-500/20 dark:text-sky-300",
+    bar: "bg-sky-500",
   },
   {
     icon: Truck,
     title: "Fleet Operators",
     text: "Keep every document across your whole fleet in one view.",
-    color: "text-violet-600 bg-violet-100 dark:bg-violet-500/20 dark:text-violet-300",
-    bar: "bg-violet-500",
+    color: "text-teal-700 bg-teal-50 dark:bg-teal-500/20 dark:text-teal-300",
+    bar: "bg-teal-500",
   },
 ];
 
@@ -237,31 +182,24 @@ const steps = [
   {
     title: "Enter document details",
     text: "Keep customer and vehicle details with each document record.",
-    grad: "from-indigo-500 to-violet-500",
+    grad: "from-sky-500 to-cyan-400",
   },
   {
     title: "Record the documents",
     text: "Add insurance, road tax, and PUC dates.",
-    grad: "from-pink-500 to-rose-500",
+    grad: "from-teal-500 to-emerald-400",
   },
   {
     title: "Renew on time",
     text: "Alerts tell you what expires soon, so you can call the customer first.",
-    grad: "from-amber-500 to-orange-500",
+    grad: "from-amber-400 to-orange-400",
   },
 ];
 
 const docChips = [
-  { label: "Insurance", c: "bg-indigo-500" },
+  { label: "Insurance", c: "bg-sky-500" },
   { label: "Road Tax", c: "bg-emerald-500" },
   { label: "PUC", c: "bg-amber-500" },
-];
-
-const stats = [
-  { to: 3, suffix: "", label: "Document types tracked" },
-  { to: 30, suffix: " days", label: "Advance expiry alerts" },
-  { to: 100, suffix: "%", label: "Records in one place" },
-  { to: 24, suffix: "/7", label: "Access from any device" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -295,9 +233,9 @@ function PreviewCard() {
 
   return (
     <div className="relative mx-auto w-full max-w-md">
-      <div className="vt-float rounded-3xl border border-white/15 bg-white/10 p-5 shadow-2xl shadow-fuchsia-900/40 backdrop-blur-xl">
+      <div className="vt-float rounded-3xl border border-white/15 bg-white/10 p-5 shadow-2xl shadow-cyan-950/40 backdrop-blur-xl">
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 to-fuchsia-500 text-white">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-sky-400 to-teal-300 text-slate-950">
             <Car className="h-6 w-6" />
           </div>
           <div className="min-w-0">
@@ -339,7 +277,7 @@ function PreviewCard() {
         </span>
         <div>
           <p className="text-sm font-semibold text-slate-900">PUC expiring</p>
-          <p className="text-xs text-slate-500">Reminder sent to customer</p>
+          <p className="text-xs text-slate-500">WhatsApp reminder ready</p>
         </div>
       </div>
 
@@ -452,14 +390,14 @@ function RoadBanner() {
 
   return (
     <section
-      aria-label="Animation: a vehicle is stopped on the road and fined for an expired document"
-      className="relative isolate overflow-hidden bg-gradient-to-b from-sky-900 via-indigo-900 to-slate-950"
+      aria-label="Illustration of vehicles travelling while their document renewals are tracked"
+      className="relative isolate overflow-hidden bg-gradient-to-b from-slate-900 via-sky-950 to-slate-950"
     >
       <div className="relative mx-auto h-32 w-full">
         {/* caption */}
         <div className="absolute left-4 top-3 z-10 hidden max-w-[40%] sm:block lg:left-8">
-          <p className="text-sm font-semibold text-white">One expired document is all it takes.</p>
-          <p className="text-xs text-white/65">Track every renewal with VehicleTrack Pro.</p>
+          <p className="text-sm font-semibold text-white">Keep every renewal in view.</p>
+          <p className="text-xs text-white/65">A clearer way to follow up with VehicleTrack Pro.</p>
         </div>
 
         {/* road */}
@@ -474,10 +412,10 @@ function RoadBanner() {
         </div>
 
         {/* police car + officer */}
-        <div className="absolute bottom-2 right-2 z-10">
+        <div className="absolute bottom-2 right-2 z-10 hidden">
           <PoliceCarSvg />
         </div>
-        <div className="absolute bottom-2 right-[104px] z-10">
+        <div className="absolute bottom-2 right-[104px] z-10 hidden">
           <OfficerSvg />
         </div>
 
@@ -492,15 +430,15 @@ function RoadBanner() {
         {/* speech bubbles (shown one after another) */}
         <div className={`vt-b1 ${bubble} bg-white text-slate-900`}>
           <Siren className="h-4 w-4 text-blue-600" />
-          Stop! Show your papers
+          Renewal coming up
         </div>
         <div className={`vt-b2 ${bubble} bg-amber-300 text-amber-950`}>
           <FileSearch className="h-4 w-4" />
-          Insurance expired
+          Expiry alert is ready
         </div>
         <div className={`vt-b3 ${bubble} bg-rose-600 text-white`}>
           <Receipt className="h-4 w-4" />
-          Fine issued: ₹2,000
+          Customer reminder ready
         </div>
       </div>
     </section>
@@ -611,23 +549,21 @@ export default function LandingPage() {
         }
       `}</style>
 
-      <RoadBanner />
-
       {/* ============================ HERO ============================ */}
       <section className="relative isolate overflow-hidden bg-slate-950 px-4 pb-12 pt-8 sm:pt-10 lg:pt-12">
         {/* colour blobs */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-          <div className="vt-blob absolute -left-24 -top-24 h-80 w-80 rounded-full bg-indigo-600/50 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
+          <div className="vt-blob absolute -left-24 -top-24 h-80 w-80 rounded-full bg-sky-500/35 blur-3xl sm:h-[28rem] sm:w-[28rem]" />
           <div
-            className="vt-blob absolute right-0 top-10 h-72 w-72 rounded-full bg-fuchsia-600/40 blur-3xl sm:h-96 sm:w-96"
+            className="vt-blob absolute right-0 top-10 h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl sm:h-96 sm:w-96"
             style={{ animationDelay: "-4s" }}
           />
           <div
-            className="vt-blob absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-cyan-500/30 blur-3xl"
+            className="vt-blob absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-teal-500/20 blur-3xl"
             style={{ animationDelay: "-8s" }}
           />
           <div
-            className="vt-blob absolute bottom-10 right-1/4 h-56 w-56 rounded-full bg-amber-500/25 blur-3xl"
+            className="vt-blob absolute bottom-10 right-1/4 h-56 w-56 rounded-full bg-amber-400/15 blur-3xl"
             style={{ animationDelay: "-11s" }}
           />
           <div
@@ -651,12 +587,13 @@ export default function LandingPage() {
             </div>
 
             <h1
-              className="vt-hero-in mb-4 text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl"
+              className="vt-hero-in mb-5 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
               style={{ animationDelay: "120ms" }}
             >
-              Manage Vehicle Documents{" "}
-              <span className="vt-gradient-text bg-gradient-to-r from-amber-300 via-pink-400 to-cyan-300 bg-clip-text text-transparent">
-                Smarter
+              Manage Every Vehicle.
+              <br />
+              <span className="vt-gradient-text bg-gradient-to-r from-cyan-200 via-teal-300 to-amber-200 bg-clip-text text-transparent">
+                Never Miss a Renewal.
               </span>
             </h1>
 
@@ -664,7 +601,8 @@ export default function LandingPage() {
               className="vt-hero-in mx-auto mb-6 max-w-xl text-base text-white/75 sm:text-lg lg:mx-0"
               style={{ animationDelay: "240ms" }}
             >
-              Track insurance, road tax, and PUC expiry dates from one simple platform.
+              Keep insurance, road tax and PUC records together, spot upcoming renewals, and follow
+              up with customers at the right time.
             </p>
 
             <div
@@ -673,7 +611,7 @@ export default function LandingPage() {
             >
               <Link
                 to="/signup"
-                className="vt-gradient-bg group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-orange-400 px-7 py-3 text-base font-semibold text-white shadow-lg shadow-fuchsia-600/30 transition-transform hover:scale-[1.03] focus:outline-none focus-visible:ring-4 focus-visible:ring-fuchsia-300/60"
+                className="vt-gradient-bg group inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 via-cyan-500 to-teal-400 px-7 py-3 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition-transform hover:scale-[1.03] focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300/60"
               >
                 Start one-month free trial
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -705,6 +643,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <RoadBanner />
+
       {/* ======================= DOCUMENT MARQUEE ======================= */}
       <section className="border-y border-slate-200 bg-slate-50 py-3 dark:border-slate-800 dark:bg-slate-900">
         <div className="vt-marquee-wrap overflow-hidden">
@@ -724,25 +664,27 @@ export default function LandingPage() {
 
       {/* ========================== STATS ========================== */}
       <section className="px-4 py-10">
-        <div className="container mx-auto grid max-w-6xl grid-cols-2 gap-6 md:grid-cols-4">
-          {stats.map((s, i) => {
-            const colors = [
-              "from-indigo-500 to-violet-500",
-              "from-pink-500 to-rose-500",
-              "from-amber-500 to-orange-500",
-              "from-emerald-500 to-cyan-500",
-            ];
-            return (
-              <Reveal key={s.label} delay={i * 90} className="text-center">
-                <p
-                  className={`bg-gradient-to-r ${colors[i]} bg-clip-text text-4xl font-extrabold text-transparent sm:text-5xl`}
-                >
-                  <CountUp to={s.to} suffix={s.suffix} />
-                </p>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{s.label}</p>
-              </Reveal>
-            );
-          })}
+        <div className="container mx-auto grid max-w-6xl grid-cols-2 gap-3 md:grid-cols-4">
+          {[
+            { title: "Insurance", detail: "Policy & renewal records", icon: Shield },
+            { title: "Road Tax", detail: "Payment & expiry tracking", icon: Receipt },
+            { title: "PUC", detail: "Keep certificates up to date", icon: FileText },
+            { title: "WhatsApp", detail: "Ready-to-send reminders", icon: MessageCircle },
+          ].map((item, index) => (
+            <Reveal key={item.title} delay={index * 70}>
+              <div className="flex h-full items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-700 dark:bg-cyan-400/10 dark:text-cyan-300">
+                  <item.icon className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block font-semibold">{item.title}</span>
+                  <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
+                    {item.detail}
+                  </span>
+                </span>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
@@ -755,7 +697,7 @@ export default function LandingPage() {
           <Reveal className="mx-auto mb-9 max-w-2xl text-center">
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Powerful Features</h2>
             <p className="text-lg text-slate-600 dark:text-slate-400">
-              Everything you need to keep customer vehicles legal and renewals on schedule.
+              Keep document records organized, see upcoming renewals and follow up with customers.
             </p>
           </Reveal>
 
@@ -789,14 +731,14 @@ export default function LandingPage() {
           <Reveal className="mx-auto mb-9 max-w-2xl text-center">
             <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Up and running in three steps</h2>
             <p className="text-lg text-slate-600 dark:text-slate-400">
-              No training needed. Add your data and the reminders start working.
+              Add your records, review what is coming due and follow up with customers.
             </p>
           </Reveal>
 
           <div className="relative grid gap-8 md:grid-cols-3">
             <div
               aria-hidden="true"
-              className="absolute left-[16%] right-[16%] top-8 hidden h-0.5 bg-gradient-to-r from-indigo-400 via-pink-400 to-amber-400 md:block"
+              className="absolute left-[16%] right-[16%] top-8 hidden h-0.5 bg-gradient-to-r from-sky-400 via-teal-400 to-amber-300 md:block"
             />
             {steps.map((s, i) => (
               <Reveal key={s.title} delay={i * 150} className="relative text-center">
@@ -846,29 +788,29 @@ export default function LandingPage() {
 
       <section id="pricing" className="scroll-mt-8 bg-white px-4 py-16 dark:bg-slate-950">
         <Reveal className="mx-auto max-w-4xl">
-          <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-8 text-center shadow-xl dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 sm:p-12">
-            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-700 dark:text-indigo-300">
-              Simple annual pricing
+          <div className="rounded-3xl border border-cyan-100 bg-gradient-to-br from-sky-50 via-white to-teal-50 p-8 text-center shadow-xl dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 sm:p-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-cyan-800 dark:text-cyan-300">
+              Start with a free trial
             </p>
             <h2 className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">
-              One month free, then one year for ₹3,650
+              One month to make renewals feel simpler
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-600 dark:text-slate-300">
-              Try Insurance, Road Tax and PUC tracking free for one month. To continue after your
-              trial, contact admin to purchase the annual plan and extend your account validity.
+              Try insurance, road tax and PUC tracking free for one month. After your trial, choose
+              an available plan and get help with account renewal from our team.
             </p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 to="/signup"
-                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition hover:bg-indigo-700"
+                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-sky-600 to-teal-500 px-6 py-3 font-semibold text-white transition hover:shadow-lg hover:shadow-cyan-900/15"
               >
                 Start free trial
               </Link>
               <a
-                href="tel:6294527072"
-                className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-800 transition hover:border-indigo-500 hover:text-indigo-700 dark:border-slate-700 dark:text-white"
+                href="tel:+916294527072"
+                className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-800 transition hover:border-cyan-600 hover:text-cyan-800 dark:border-slate-700 dark:text-white"
               >
-                Contact admin: 6294527072
+                Talk to our team
               </a>
             </div>
           </div>
@@ -878,11 +820,11 @@ export default function LandingPage() {
       {/* ============================ CTA ============================ */}
       <section className="px-4 py-14">
         <Reveal>
-          <div className="vt-gradient-bg relative isolate mx-auto max-w-5xl overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-orange-500 px-6 py-12 text-center shadow-2xl shadow-fuchsia-600/30 sm:px-12">
+          <div className="vt-gradient-bg relative isolate mx-auto max-w-5xl overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600 via-cyan-600 to-teal-500 px-6 py-12 text-center shadow-2xl shadow-cyan-900/20 sm:px-12">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-              <div className="vt-blob absolute -left-10 -top-10 h-56 w-56 rounded-full bg-white/20 blur-2xl" />
+              <div className="vt-blob absolute -left-10 -top-10 h-56 w-56 rounded-full bg-white/15 blur-2xl" />
               <div
-                className="vt-blob absolute -bottom-12 right-0 h-64 w-64 rounded-full bg-cyan-300/25 blur-3xl"
+                className="vt-blob absolute -bottom-12 right-0 h-64 w-64 rounded-full bg-teal-300/25 blur-3xl"
                 style={{ animationDelay: "-6s" }}
               />
             </div>
@@ -895,7 +837,7 @@ export default function LandingPage() {
             </p>
             <Link
               to="/signup"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-base font-semibold text-fuchsia-700 shadow-lg transition-transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-base font-semibold text-cyan-800 shadow-lg transition-transform hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/60"
             >
               Start Your Free Trial
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />

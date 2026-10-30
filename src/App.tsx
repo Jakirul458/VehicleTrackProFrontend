@@ -50,9 +50,9 @@ const queryClient = new QueryClient({
 
 const PAGE_SEO: Record<string, { title: string; description: string; keywords?: string }> = {
   "/": {
-    title: "VehicleTrack Pro | Insurance, Tax & PUC Management",
+    title: "VehicleTrack Pro | Track Every Vehicle. Never Miss an Expiry.",
     description:
-      "Track insurance, road tax and PUC expiry dates, and send renewal reminders with VehicleTrack Pro.",
+      "Keep vehicle insurance, road tax and PUC records together, track upcoming renewals and prepare customer reminders with VehicleTrack Pro.",
     keywords:
       "insurance renewal reminder, road tax tracking, PUC expiry reminder, vehicle document management India",
   },

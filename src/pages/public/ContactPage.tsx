@@ -6,7 +6,7 @@ import { toast } from "sonner";
 const WEB3FORMS_ACCESS_KEY = "e960a4c6-cee5-42d6-95f7-1d7ad29cb908";
 
 // WhatsApp number: country code soho, + ba space chhara (India = 91)
-const WHATSAPP_NUMBER = "919876543210"; // <-- nijer number diye replace koro
+const WHATSAPP_NUMBER = "916294527072";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -69,17 +69,34 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen py-20 px-4">
+    <main className="relative isolate min-h-screen overflow-hidden bg-slate-50 px-4 pb-20">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] bg-[radial-gradient(ellipse_at_15%_10%,rgba(14,165,233,0.12),transparent_45%),radial-gradient(ellipse_at_85%_20%,rgba(20,184,166,0.1),transparent_42%)]"
+      />
       <div className="container mx-auto max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8 text-center">Contact VehicleTrack Pro</h1>
+        <header className="mx-auto max-w-3xl py-16 text-center sm:py-20">
+          <span className="inline-flex items-center gap-2 rounded-full border border-cyan-100 bg-white px-4 py-2 text-sm font-bold text-cyan-800 shadow-sm">
+            <MessageCircle className="h-4 w-4" /> We are here to help
+          </span>
+          <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+            Let&apos;s make renewals <span className="text-cyan-700">easier.</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-7 text-slate-600">
+            Have a question about VehicleTrack Pro? Send a note or contact our team directly.
+          </p>
+        </header>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           {/* Contact Form */}
-          <div className="bg-card p-6 border rounded-lg">
-            <h2 className="text-2xl font-semibold mb-6">Send us a Message</h2>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/[0.04] sm:p-8">
+            <h2 className="mb-2 text-2xl font-extrabold text-slate-900">Send us a message</h2>
+            <p className="mb-7 text-sm leading-6 text-slate-500">
+              Tell us what you need and we&apos;ll get back to you.
+            </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-2">
+                <label htmlFor="name" className="mb-2 block text-sm font-semibold text-slate-700">
                   Name *
                 </label>
                 <input
@@ -88,12 +105,12 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-500/10"
                   placeholder="Your full name"
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-2">
+                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-700">
                   Email *
                 </label>
                 <input
@@ -102,12 +119,12 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-500/10"
                   placeholder="your@email.com"
                 />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                <label htmlFor="phone" className="mb-2 block text-sm font-semibold text-slate-700">
                   Phone *
                 </label>
                 <input
@@ -116,12 +133,15 @@ export default function ContactPage() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-500/10"
                   placeholder="Your phone number"
                 />
               </div>
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                <label
+                  htmlFor="subject"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
+                >
                   Subject *
                 </label>
                 <input
@@ -130,12 +150,15 @@ export default function ContactPage() {
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-500/10"
                   placeholder="How can we help?"
                 />
               </div>
               <div>
-                <label htmlFor="message" className="block text-sm font-medium mb-2">
+                <label
+                  htmlFor="message"
+                  className="mb-2 block text-sm font-semibold text-slate-700"
+                >
                   Message *
                 </label>
                 <textarea
@@ -144,16 +167,16 @@ export default function ContactPage() {
                   rows={5}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white focus:ring-4 focus:ring-cyan-500/10"
                   placeholder="Tell us more about your inquiry..."
                 />
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-teal-500 px-6 py-3.5 font-bold text-white shadow-md shadow-cyan-700/15 transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Send className="h-4 w-4" />
                   {isSubmitting ? "Sending..." : "Send Message"}
@@ -162,7 +185,7 @@ export default function ContactPage() {
                 <button
                   type="button"
                   onClick={handleWhatsApp}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-3.5 font-bold text-emerald-800 transition hover:bg-emerald-100"
                 >
                   <MessageCircle className="h-4 w-4" />
                   Send via WhatsApp
@@ -172,32 +195,42 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Information */}
-          <div className="space-y-8">
+          <div className="space-y-5">
             <div>
-              <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
-              <div className="space-y-4">
+              <h2 className="mb-5 text-2xl font-extrabold text-slate-900">Contact information</h2>
+              <div className="space-y-3">
                 <div className="flex items-start gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-5 w-5 text-primary" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
+                    <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Email</h3>
-                    <p className="text-muted-foreground">jakirulsk312@gmail.com</p>
+                    <h3 className="mb-1 font-bold text-slate-900">Email</h3>
+                    <a
+                      href="mailto:jakirulsk312@gmail.com"
+                      className="text-sm text-slate-600 hover:text-cyan-800"
+                    >
+                      jakirulsk312@gmail.com
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Phone className="h-5 w-5 text-primary" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
+                    <Phone className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Phone</h3>
-                    <p className="text-muted-foreground">+91 62945 27072</p>
-                    <p className="text-muted-foreground">Mon-Fri, 9AM-6PM IST</p>
+                    <h3 className="mb-1 font-bold text-slate-900">Phone</h3>
+                    <a
+                      href="tel:+916294527072"
+                      className="text-sm text-slate-600 hover:text-cyan-800"
+                    >
+                      +91 62945 27072
+                    </a>
+                    <p className="mt-1 text-xs text-slate-500">Mon-Fri, 9AM-6PM IST</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-green-600/10 flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="h-5 w-5 text-green-600" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <MessageCircle className="h-5 w-5" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">WhatsApp</h3>
@@ -205,22 +238,23 @@ export default function ContactPage() {
                       href={`https://wa.me/${WHATSAPP_NUMBER}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-green-600 hover:underline"
+                      className="text-sm font-semibold text-emerald-700 hover:underline"
                     >
                       Chat with us on WhatsApp
                     </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="h-5 w-5 text-primary" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+                    <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">Office</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="mb-1 font-bold text-slate-900">Office</h3>
+                    <p className="text-sm leading-6 text-slate-600">
                       VehicleTrack Pro Headquarters
                       <br />
-                      Mukundabag, Kiriteswari<br />
+                      Mukundabag, Kiriteswari
+                      <br />
                       Murshidabad, West Bengal 742104
                       <br />
                       India
@@ -230,19 +264,19 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <div className="bg-muted/50 p-6 rounded-lg border">
-              <h3 className="font-semibold mb-2">Support Information</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+            <div className="rounded-2xl border border-cyan-100 bg-gradient-to-br from-sky-50 to-teal-50 p-6">
+              <h3 className="mb-2 font-bold text-slate-900">Support information</h3>
+              <p className="mb-4 text-sm leading-6 text-slate-600">
                 For technical support, account issues, or feature requests, please include your
                 account details in your message for faster assistance.
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm leading-6 text-slate-600">
                 Our team typically responds within 24-48 hours during business days.
               </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

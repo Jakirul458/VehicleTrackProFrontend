@@ -10,8 +10,8 @@ import {
   FileText,
   Users,
 } from "lucide-react";
-import { adminApi, reportApi } from "@/api";
-import type { ActivityLog, DashboardStats } from "@/types";
+import { reportApi } from "@/api";
+import type { DashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
 
 const modules = [
@@ -150,12 +150,6 @@ export default function AdminDashboard() {
   } = useQuery<DashboardStats>({
     queryKey: ["admin-document-dashboard"],
     queryFn: reportApi.adminDashboard,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-  const { data: agentActivity } = useQuery({
-    queryKey: ["admin-agent-activity-preview"],
-    queryFn: () => adminApi.activity.list({ actorRole: "AGENT", page: 1, limit: 10 }),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });

@@ -1,9 +1,10 @@
 import { apiClient, request } from "./client";
-import type { User, Agent } from "@/types";
+import type { User, Agent, LoginLocation } from "@/types";
 
 export interface LoginPayload {
   email: string;
   password: string;
+  location?: LoginLocation;
 }
 
 export interface PublicSignupPayload {

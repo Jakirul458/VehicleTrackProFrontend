@@ -15,7 +15,7 @@ export const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
       "/auth/setup-super-admin",
     ].some((path) => requestUrl.includes(path));
     if (error.response?.status === 401 && !isAuthenticationRequest) {
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       localStorage.removeItem("user");
       window.location.href = "/login";
     }
@@ -100,7 +100,7 @@ apiClient.interceptors.response.use(
   (error) => {
     const normalized = normalizeApiError(error);
     if (normalized.code === "ACCOUNT_VALIDITY_EXPIRED") {
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       localStorage.removeItem("user");
       if (!["/login", "/signup", "/register"].includes(window.location.pathname)) {
         window.location.assign("/login?expired=1");
@@ -140,6 +140,8 @@ export interface ListParams {
   actorId?: string;
   actorRole?: "SUPER_ADMIN" | "AGENT";
   entity?: string;
+  action?: "LOGIN" | "LOGIN_FAILED" | "LOGOUT";
+  ip?: string;
 }
 
 /** Standard CRUD service factory for every resource collection. */

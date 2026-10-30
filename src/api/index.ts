@@ -10,8 +10,8 @@ import type {
   RemindersResponse,
   PlatformSettings,
   AgentFinancialSummary,
-  PaymentRecord,
   PaymentRecordsResponse,
+  ActiveAuthSession,
 } from "@/types";
 
 export { apiClient, request, createResourceApi } from "./client";
@@ -55,6 +55,13 @@ export const adminApi = {
         data: ActivityLog[];
         pagination: { page: number; limit: number; total: number; pages: number };
       }>(apiClient.get("/admin/activity", { params })),
+    export: (params?: ListParams) =>
+      apiClient.get("/admin/activity/export", { params, responseType: "blob" }),
+  },
+  sessions: {
+    list: () => request<ActiveAuthSession[]>(apiClient.get("/admin/sessions")),
+    revoke: (id: string) =>
+      request<{ success: boolean }>(apiClient.delete(`/admin/sessions/${id}`)),
   },
   settings: {
     get: () => request<PlatformSettings>(apiClient.get("/admin/settings")),

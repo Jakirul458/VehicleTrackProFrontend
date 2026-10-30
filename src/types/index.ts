@@ -48,6 +48,12 @@ export interface Agent extends User {
   agentCode?: string;
 }
 
+export interface LoginLocation {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+}
+
 export interface DocumentRecord {
   id: string;
   agentId: string;
@@ -138,13 +144,34 @@ export interface RemindersResponse {
 export interface ActivityLog {
   id: string;
   actorId: string | { fullName?: string; email?: string } | null;
-  actorRole: Role;
+  actorRole: Role | "UNKNOWN";
   action: string;
   entity: string;
   entityId: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown> & {
+    location?: LoginLocation;
+    browser?: string;
+    operatingSystem?: string;
+    deviceType?: string;
+    suspiciousLogin?: boolean;
+    attemptedEmail?: string;
+    reason?: string;
+  };
   ipAddress?: string;
   createdAt: string;
+}
+
+export interface ActiveAuthSession {
+  id: string;
+  user: { id: string; fullName: string; email: string; role: Role } | null;
+  browser: string;
+  operatingSystem: string;
+  deviceType: string;
+  ipAddress?: string;
+  location?: LoginLocation;
+  createdAt: string;
+  lastActivityAt: string;
+  expiresAt: string;
 }
 
 export interface PlatformSettings {
