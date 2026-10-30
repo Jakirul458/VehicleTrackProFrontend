@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { adminApi } from "@/api";
-import type { Agent } from "@/types";
+import { normalizeApiError } from "@/api/client";
+import type { Agent, ModuleAccess } from "@/types";
 import { ArrowLeft, CalendarDays, KeyRound, Shield, ShieldAlert } from "lucide-react";
 import { DocumentModulePage } from "@/components/documents/DocumentModulePage";
 import PaymentsPage from "@/pages/agent/PaymentsPage";
@@ -15,11 +16,22 @@ const tabs = [
   { key: "payments", label: "Payments" },
 ] as const;
 
+const moduleOptions: { key: keyof ModuleAccess; label: string }[] = [
+  { key: "insurance", label: "Insurance" },
+  { key: "tax", label: "Tax" },
+  { key: "puc", label: "PUC" },
+];
+
 export default function AgentDetails() {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const [updating, setUpdating] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [moduleAccess, setModuleAccess] = useState<ModuleAccess>({
+    insurance: true,
+    tax: true,
+    puc: true,
+  });
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]["key"]>("insurance");
   const { data: agent, isLoading } = useQuery<Agent>({
     queryKey: ["agent", id],
@@ -28,6 +40,15 @@ export default function AgentDetails() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+  useEffect(() => {
+    if (agent) {
+      setModuleAccess({
+        insurance: agent.moduleAccess?.insurance ?? true,
+        tax: agent.moduleAccess?.tax ?? true,
+        puc: agent.moduleAccess?.puc ?? true,
+      });
+    }
+  }, [agent]);
 
   if (isLoading) {
     return (
@@ -90,6 +111,22 @@ export default function AgentDetails() {
       toast.success("Agent validity date updated.");
     } catch {
       return;
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function saveModuleAccess() {
+    setUpdating(true);
+    try {
+      await adminApi.agents.updateModuleAccess(currentAgent.id, moduleAccess);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["agent", id] }),
+        queryClient.invalidateQueries({ queryKey: ["agents"] }),
+      ]);
+      toast.success("Document access updated.");
+    } catch (error) {
+      toast.error(normalizeApiError(error).message);
     } finally {
       setUpdating(false);
     }
@@ -210,6 +247,40 @@ export default function AgentDetails() {
             </button>
           </div>
         </form>
+      </section>
+
+      <section className="mb-8 rounded-lg border bg-card p-6">
+        <h2 className="mb-2 font-semibold">Document access</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Only selected document modules will be available to this agent. Payments and other account
+          features remain unchanged.
+        </p>
+        <div className="mb-5 flex flex-wrap gap-x-6 gap-y-3">
+          {moduleOptions.map(({ key, label }) => (
+            <label key={key} className="inline-flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                checked={moduleAccess[key]}
+                onChange={(event) =>
+                  setModuleAccess((current) => ({
+                    ...current,
+                    [key]: event.target.checked,
+                  }))
+                }
+                className="size-4 accent-primary"
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+        <button
+          type="button"
+          disabled={updating}
+          onClick={() => void saveModuleAccess()}
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+        >
+          Save document access
+        </button>
       </section>
 
       <form

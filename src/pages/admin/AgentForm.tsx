@@ -42,6 +42,11 @@ export default function AgentForm() {
       pinCode: String(form.get("pinCode") ?? "").trim(),
       status: String(form.get("status") ?? "ACTIVE") as "ACTIVE" | "SUSPENDED",
     };
+    const moduleAccess = {
+      insurance: form.get("insurance") === "on",
+      tax: form.get("tax") === "on",
+      puc: form.get("puc") === "on",
+    };
 
     const password = String(form.get("password") ?? "");
     if (!isEdit && password.length < 6) {
@@ -59,7 +64,7 @@ export default function AgentForm() {
         await adminApi.agents.update(id!, common);
         toast.success("Agent updated successfully.");
       } else {
-        await adminApi.agents.create({ ...common, password });
+        await adminApi.agents.create({ ...common, moduleAccess, password });
         toast.success("Agent created successfully.");
       }
       await queryClient.invalidateQueries({ queryKey: ["agents"] });
@@ -216,6 +221,31 @@ export default function AgentForm() {
             <option value="SUSPENDED">Suspended</option>
           </select>
         </label>
+        {!isEdit && (
+          <fieldset className="space-y-3 sm:col-span-2">
+            <legend className="font-semibold">Document access</legend>
+            <p className="text-sm text-muted-foreground">
+              Choose the services this agent can use. All are enabled by default.
+            </p>
+            <div className="flex flex-wrap gap-5">
+              {[
+                ["insurance", "Insurance"],
+                ["tax", "Tax"],
+                ["puc", "PUC"],
+              ].map(([name, label]) => (
+                <label key={name} className="inline-flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    name={name}
+                    defaultChecked
+                    className="size-4 accent-primary"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
         <div className="flex gap-3 sm:col-span-2">
           <button
             type="submit"

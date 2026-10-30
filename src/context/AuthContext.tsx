@@ -96,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         lastServerActivityAt = Date.now();
         void authApi
           .me()
+          .then(updateUser)
           .catch((error: unknown) => console.error("Could not refresh the active session:", error));
       }
     };
@@ -132,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       activityEvents.forEach((eventName) => window.removeEventListener(eventName, resetIdleTimer));
       window.removeEventListener("pagehide", closeSession);
     };
-  }, [token, user, logout]);
+  }, [token, user, logout, updateUser]);
 
   return (
     <AuthContext.Provider

@@ -12,6 +12,7 @@ import type {
   AgentFinancialSummary,
   PaymentRecordsResponse,
   ActiveAuthSession,
+  ModuleAccess,
 } from "@/types";
 
 export { apiClient, request, createResourceApi } from "./client";
@@ -41,6 +42,8 @@ export const adminApi = {
       request<Agent>(apiClient.put(`/admin/agents/${id}`, payload)),
     updateStatus: (id: string, status: "ACTIVE" | "SUSPENDED") =>
       request<Agent>(apiClient.patch(`/admin/agents/${id}/status`, { status })),
+    updateModuleAccess: (id: string, moduleAccess: ModuleAccess) =>
+      request<Agent>(apiClient.patch(`/admin/agents/${id}/module-access`, { moduleAccess })),
     updateValidity: (id: string, trialEndDate: string) =>
       request<Agent>(apiClient.patch(`/admin/agents/${id}/validity`, { trialEndDate })),
     resetPassword: (id: string, newPassword: string) =>
@@ -82,6 +85,7 @@ export interface CreateAgentInput {
   state?: string;
   pinCode?: string;
   status: "ACTIVE" | "SUSPENDED";
+  moduleAccess?: ModuleAccess;
 }
 
 export const reportApi = {

@@ -9,6 +9,12 @@ export type ExpiryStatus = "ACTIVE" | "DUE_SOON" | "URGENT" | "EXPIRED" | "INCOM
 
 export type AgentStatus = "ACTIVE" | "SUSPENDED";
 
+export interface ModuleAccess {
+  insurance: boolean;
+  tax: boolean;
+  puc: boolean;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message?: string | undefined;
@@ -39,6 +45,7 @@ export interface User {
   state?: string;
   pinCode?: string;
   status: AgentStatus;
+  moduleAccess: ModuleAccess;
   trialEndDate?: string;
   createdAt: string;
   updatedAt: string;

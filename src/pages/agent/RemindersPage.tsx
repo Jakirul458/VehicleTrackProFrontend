@@ -176,6 +176,12 @@ function DaysLeftCell({
 
 export default function RemindersPage() {
   const { user } = useAuth();
+  const enabledTypes = (Object.keys(DOCUMENT_LABELS) as ReminderType[]).filter(
+    (type) => user?.moduleAccess?.[type] ?? true,
+  );
+  const enabledLabels = enabledTypes.map((type) =>
+    type === "tax" ? "road tax" : type === "puc" ? "PUC" : "insurance",
+  );
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["agent-reminders"],
     queryFn: remindersApi.list,
@@ -186,7 +192,11 @@ export default function RemindersPage() {
     <>
       <PageHeader
         title="Reminders"
-        description={`Customers whose insurance, road tax, or PUC expires within ${data?.warningDays ?? 7} days or has already expired.`}
+        description={
+          enabledLabels.length
+            ? `Customers whose ${enabledLabels.join(", ")} expires within ${data?.warningDays ?? 7} days or has already expired.`
+            : "No document modules are enabled for this account."
+        }
       />
       <Panel>
         {isLoading ? (
@@ -212,13 +222,13 @@ export default function RemindersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-lg border">
-            <table className="w-full min-w-[900px] text-sm">
+            <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Customer name</th>
                   <th className="px-4 py-3 font-semibold">Mobile</th>
                   <th className="px-4 py-3 font-semibold">Vehicle number</th>
-                  {(Object.keys(DOCUMENT_LABELS) as ReminderType[]).map((type) => (
+                  {enabledTypes.map((type) => (
                     <th key={type} className="px-4 py-3 font-semibold">
                       {DOCUMENT_LABELS[type]}
                     </th>
@@ -232,33 +242,17 @@ export default function RemindersPage() {
                     <td className="px-4 py-3 font-medium">{row.customerName}</td>
                     <td className="px-4 py-3">{row.mobile || "—"}</td>
                     <td className="px-4 py-3">{row.vehicleNumber || "—"}</td>
-                    <td className="px-4 py-3">
-                      <DaysLeftCell
-                        reminder={row.insurance}
-                        row={row}
-                        agentName={user?.fullName ?? ""}
-                        businessName={user?.businessName ?? ""}
-                        agentMobile={user?.mobile ?? ""}
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <DaysLeftCell
-                        reminder={row.tax}
-                        row={row}
-                        agentName={user?.fullName ?? ""}
-                        businessName={user?.businessName ?? ""}
-                        agentMobile={user?.mobile ?? ""}
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <DaysLeftCell
-                        reminder={row.puc}
-                        row={row}
-                        agentName={user?.fullName ?? ""}
-                        businessName={user?.businessName ?? ""}
-                        agentMobile={user?.mobile ?? ""}
-                      />
-                    </td>
+                    {enabledTypes.map((type) => (
+                      <td key={type} className="px-4 py-3">
+                        <DaysLeftCell
+                          reminder={row[type]}
+                          row={row}
+                          agentName={user?.fullName ?? ""}
+                          businessName={user?.businessName ?? ""}
+                          agentMobile={user?.mobile ?? ""}
+                        />
+                      </td>
+                    ))}
                     <td className="px-4 py-3 text-right">
                       {row.mobile ? (
                         <Button

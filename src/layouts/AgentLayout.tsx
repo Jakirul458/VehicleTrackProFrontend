@@ -27,9 +27,15 @@ export default function AgentLayout() {
 
   const menuItems = [
     { path: "/agent/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { path: "/agent/insurance", label: "Insurance", icon: Shield },
-    { path: "/agent/tax", label: "Tax", icon: Receipt },
-    { path: "/agent/puc", label: "PUC", icon: FileText },
+    ...((user?.moduleAccess?.insurance ?? true)
+      ? [{ path: "/agent/insurance", label: "Insurance", icon: Shield }]
+      : []),
+    ...((user?.moduleAccess?.tax ?? true)
+      ? [{ path: "/agent/tax", label: "Tax", icon: Receipt }]
+      : []),
+    ...((user?.moduleAccess?.puc ?? true)
+      ? [{ path: "/agent/puc", label: "PUC", icon: FileText }]
+      : []),
     { path: "/agent/payments", label: "Payments", icon: Wallet },
     { path: "/agent/reminders", label: "Reminders", icon: BellRing },
     { path: "/agent/profile", label: "Profile", icon: UserIcon },

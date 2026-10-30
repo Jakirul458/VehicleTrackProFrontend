@@ -206,9 +206,30 @@ function App() {
             >
               <Route index element={<AgentDashboard />} />
               <Route path="dashboard" element={<AgentDashboard />} />
-              <Route path="insurance" element={<InsuranceList />} />
-              <Route path="tax" element={<TaxList />} />
-              <Route path="puc" element={<PucList />} />
+              <Route
+                path="insurance"
+                element={
+                  <ProtectedRoute requiredModuleAccess="insurance">
+                    <InsuranceList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="tax"
+                element={
+                  <ProtectedRoute requiredModuleAccess="tax">
+                    <TaxList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="puc"
+                element={
+                  <ProtectedRoute requiredModuleAccess="puc">
+                    <PucList />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="payments" element={<PaymentsPage />} />
               <Route path="reminders" element={<RemindersPage />} />
               <Route path="reports" element={<AgentReports />} />

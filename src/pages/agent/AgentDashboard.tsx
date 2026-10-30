@@ -118,6 +118,7 @@ import {
 import { reportApi } from "@/api";
 import type { AgentDashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
+import { useAuth } from "@/context/AuthContext";
 
 const modules = [
   {
@@ -248,6 +249,7 @@ const dashboardStyles = `
 `;
 
 export default function AgentDashboard() {
+  const { user } = useAuth();
   const {
     data: stats,
     isLoading,
@@ -291,75 +293,79 @@ export default function AgentDashboard() {
       )}
 
       <div className="space-y-8">
-        {modules.map((module, moduleIndex) => {
-          const ModuleIcon = module.icon;
-          const mTheme = moduleTheme[module.key];
-          return (
-            <section
-              key={module.key}
-              className="dash-fade-up"
-              style={{ animationDelay: `${160 + moduleIndex * 120}ms` }}
-            >
-              <h2
-                className={`mb-3 flex items-center gap-2 rounded-lg bg-gradient-to-r ${mTheme} to-transparent px-3 py-2 text-lg font-semibold`}
+        {modules
+          .filter((module) => user?.moduleAccess?.[module.key] ?? true)
+          .map((module, moduleIndex) => {
+            const ModuleIcon = module.icon;
+            const mTheme = moduleTheme[module.key];
+            return (
+              <section
+                key={module.key}
+                className="dash-fade-up"
+                style={{ animationDelay: `${160 + moduleIndex * 120}ms` }}
               >
-                <ModuleIcon className="size-5" />
-                {module.title}
-              </h2>
+                <h2
+                  className={`mb-3 flex items-center gap-2 rounded-lg bg-gradient-to-r ${mTheme} to-transparent px-3 py-2 text-lg font-semibold`}
+                >
+                  <ModuleIcon className="size-5" />
+                  {module.title}
+                </h2>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                {module.records.map((record, recordIndex) => {
-                  const Icon = statusIcons[record.status];
-                  const theme = statusTheme[record.status];
-                  const count = stats?.[record.count as keyof AgentDashboardStats];
-                  const numericCount = typeof count === "number" ? count : 0;
-                  const isAlert = record.status === "EXPIRED" && numericCount > 0;
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                  {module.records.map((record, recordIndex) => {
+                    const Icon = statusIcons[record.status];
+                    const theme = statusTheme[record.status];
+                    const count = stats?.[record.count as keyof AgentDashboardStats];
+                    const numericCount = typeof count === "number" ? count : 0;
+                    const isAlert = record.status === "EXPIRED" && numericCount > 0;
 
-                  return (
-                    <Link
-                      key={record.status}
-                      to={`/agent/${module.key}?status=${record.status}`}
-                      className={`dash-fade-up group relative overflow-hidden rounded-xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${theme.card} ${isAlert ? "dash-pulse" : ""}`}
-                      style={{ animationDelay: `${260 + moduleIndex * 120 + recordIndex * 60}ms` }}
-                    >
-                      {/* Corner glow */}
-                      <span
-                        className={`pointer-events-none absolute -right-6 -top-6 size-20 rounded-full opacity-20 blur-2xl transition-opacity duration-300 group-hover:opacity-50 ${theme.glow}`}
-                      />
-                      {/* Left accent bar */}
-                      <span className={`absolute inset-y-0 left-0 w-1 ${theme.bar}`} />
-
-                      <div className="relative mb-3 flex items-center justify-between gap-2">
-                        <StatusBadge
-                          status={DASHBOARD_STATUS[record.status].status}
-                          label={record.label}
-                        />
+                    return (
+                      <Link
+                        key={record.status}
+                        to={`/agent/${module.key}?status=${record.status}`}
+                        className={`dash-fade-up group relative overflow-hidden rounded-xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${theme.card} ${isAlert ? "dash-pulse" : ""}`}
+                        style={{
+                          animationDelay: `${260 + moduleIndex * 120 + recordIndex * 60}ms`,
+                        }}
+                      >
+                        {/* Corner glow */}
                         <span
-                          className={`flex size-7 items-center justify-center rounded-full transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 ${theme.iconWrap}`}
-                        >
-                          <Icon className="size-4" />
-                        </span>
-                      </div>
+                          className={`pointer-events-none absolute -right-6 -top-6 size-20 rounded-full opacity-20 blur-2xl transition-opacity duration-300 group-hover:opacity-50 ${theme.glow}`}
+                        />
+                        {/* Left accent bar */}
+                        <span className={`absolute inset-y-0 left-0 w-1 ${theme.bar}`} />
 
-                      <p className={`relative text-3xl font-bold tabular-nums ${theme.text}`}>
-                        {isLoading ? (
-                          <span className="relative inline-block h-8 w-10 overflow-hidden rounded bg-muted">
-                            <span className="dash-shimmer absolute inset-0" />
+                        <div className="relative mb-3 flex items-center justify-between gap-2">
+                          <StatusBadge
+                            status={DASHBOARD_STATUS[record.status].status}
+                            label={record.label}
+                          />
+                          <span
+                            className={`flex size-7 items-center justify-center rounded-full transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 ${theme.iconWrap}`}
+                          >
+                            <Icon className="size-4" />
                           </span>
-                        ) : (
-                          numericCount
-                        )}
-                      </p>
-                      <span className="sr-only">
-                        Open {module.title} {record.label.toLowerCase()} records
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })}
+                        </div>
+
+                        <p className={`relative text-3xl font-bold tabular-nums ${theme.text}`}>
+                          {isLoading ? (
+                            <span className="relative inline-block h-8 w-10 overflow-hidden rounded bg-muted">
+                              <span className="dash-shimmer absolute inset-0" />
+                            </span>
+                          ) : (
+                            numericCount
+                          )}
+                        </p>
+                        <span className="sr-only">
+                          Open {module.title} {record.label.toLowerCase()} records
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
       </div>
     </div>
   );

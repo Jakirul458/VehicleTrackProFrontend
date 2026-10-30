@@ -51,8 +51,9 @@ export const authApi = {
     request<{ user: User; token: string }>(apiClient.post("/auth/superadmin", payload)),
   logout: () => request<{ success: boolean }>(apiClient.post("/auth/logout")),
   me: () => request<User>(apiClient.get("/auth/me")),
-  updateProfile: (payload: Omit<Agent, "id" | "role" | "status" | "createdAt" | "updatedAt">) =>
-    request<User>(apiClient.patch("/auth/profile", payload)),
+  updateProfile: (
+    payload: Omit<Agent, "id" | "role" | "status" | "moduleAccess" | "createdAt" | "updatedAt">,
+  ) => request<User>(apiClient.patch("/auth/profile", payload)),
   changePassword: (payload: ChangePasswordPayload) =>
     request<{ success: boolean }>(apiClient.post("/auth/change-password", payload)),
   setupSuperAdmin: (payload: SetupSuperAdminPayload) =>
