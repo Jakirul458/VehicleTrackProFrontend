@@ -232,10 +232,6 @@ export default function LoginPage() {
                 You were signed out after 30 minutes of inactivity.
               </p>
             )}
-            <p className="mt-2 max-w-sm text-xs text-slate-500">
-              Your browser may ask to share your location for the login activity log. This is
-              optional; MAC addresses are not available to websites.
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
