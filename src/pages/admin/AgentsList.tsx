@@ -75,6 +75,7 @@ export default function AgentsList() {
             <table className="w-full min-w-[1050px] text-sm">
               <thead>
                 <tr className="text-left text-xs font-semibold uppercase tracking-wide">
+                  <th className="bg-slate-700 px-4 py-3 text-white">SL No</th>
                   <th className="bg-sky-700 px-4 py-3 text-white">Agent</th>
                   <th className="bg-blue-700 px-4 py-3 text-white">Business</th>
                   <th className="bg-indigo-700 px-4 py-3 text-white">Email</th>
@@ -87,10 +88,13 @@ export default function AgentsList() {
               </thead>
               <tbody>
                 {result?.data.length ? (
-                  result.data.map((agent: Agent) => {
+                  result.data.map((agent: Agent, index: number) => {
                     const validity = validityText(agent.trialEndDate);
                     return (
                       <tr key={agent.id} className="border-b border-border/60 last:border-0">
+                        <td className="whitespace-nowrap bg-slate-500/5 px-4 py-3">
+                          {(page - 1) * limit + index + 1}
+                        </td>
                         <td className="whitespace-nowrap bg-sky-500/5 px-4 py-3 font-medium">
                           <Link
                             to={`/admin/agents/${agent.id}`}
@@ -164,7 +168,7 @@ export default function AgentsList() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
+                    <td colSpan={9} className="px-4 py-12 text-center text-muted-foreground">
                       No agents found. Create your first agent to get started.
                     </td>
                   </tr>

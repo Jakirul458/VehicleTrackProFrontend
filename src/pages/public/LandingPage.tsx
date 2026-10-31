@@ -210,24 +210,24 @@ function PreviewCard() {
   const rows = [
     {
       name: "Insurance",
-      note: "Valid till 14 Mar 2027",
-      status: "Active",
-      dot: "bg-emerald-400",
-      chip: "bg-emerald-400/15 text-emerald-300",
+      note: "Expires in 12 days",
+      status: "Due soon",
+      dot: "bg-amber-400",
+      chip: "bg-amber-400/15 text-amber-300",
     },
     {
       name: "Road Tax",
-      note: "Valid till 02 Jan 2027",
+      note: "Valid till 02 Jan 2050",
       status: "Active",
       dot: "bg-emerald-400",
       chip: "bg-emerald-400/15 text-emerald-300",
     },
     {
       name: "PUC",
-      note: "Expires in 5 days",
-      status: "Renew soon",
-      dot: "bg-amber-400",
-      chip: "bg-amber-400/15 text-amber-300",
+      note: "Expired 2 days ago",
+      status: "Expired",
+      dot: "bg-rose-500",
+      chip: "bg-rose-500/15 text-rose-400",
     },
   ];
 
@@ -239,8 +239,8 @@ function PreviewCard() {
             <Car className="h-6 w-6" />
           </div>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-white">WB 56 AB 1234</p>
-            <p className="truncate text-sm text-white/60">Maruti Swift · Rahim Sheikh</p>
+            <p className="truncate font-semibold text-white">WB 01 AB 1234</p>
+            <p className="truncate text-sm text-white/60">Rolls-Royce · Nirmala Sitharaman</p>
           </div>
         </div>
 

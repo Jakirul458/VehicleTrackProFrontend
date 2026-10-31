@@ -225,6 +225,7 @@ export default function RemindersPage() {
             <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
+                  <th className="px-4 py-3 font-semibold">SL No</th>
                   <th className="px-4 py-3 font-semibold">Customer name</th>
                   <th className="px-4 py-3 font-semibold">Mobile</th>
                   <th className="px-4 py-3 font-semibold">Vehicle number</th>
@@ -237,8 +238,9 @@ export default function RemindersPage() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
+                {rows.map((row, index) => (
                   <tr key={row.id} className="border-t transition-colors hover:bg-muted/30">
+                    <td className="px-4 py-3">{index + 1}</td>
                     <td className="px-4 py-3 font-medium">{row.customerName}</td>
                     <td className="px-4 py-3">{row.mobile || "—"}</td>
                     <td className="px-4 py-3">{row.vehicleNumber || "—"}</td>

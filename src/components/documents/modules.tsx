@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { createResourceApi } from "@/api/client";
 import { formatCurrency, formatDate } from "@/lib/expiry";
 
-export type Row = { id: string; agentId: string } & Record<string, unknown>;
+export type Row = { id: string; agentId: string; agentName?: string } & Record<string, unknown>;
 
 export interface FieldDef {
   name: string;

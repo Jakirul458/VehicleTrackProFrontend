@@ -191,6 +191,9 @@ export function DataTable<T extends { id: string }>({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+              <th className="whitespace-nowrap bg-slate-700 px-4 py-3 font-semibold text-white">
+                SL No
+              </th>
               {columns.map((c) => (
                 <th
                   key={c.key}
@@ -207,11 +210,14 @@ export function DataTable<T extends { id: string }>({
             </tr>
           </thead>
           <tbody>
-            {visibleRows.map((row) => (
+            {visibleRows.map((row, index) => (
               <tr
                 key={row.id}
                 className="border-b border-border/60 transition-colors last:border-0 hover:bg-muted/50"
               >
+                <td className="whitespace-nowrap bg-slate-500/5 px-4 py-3">
+                  {(page - 1) * limit + index + 1}
+                </td>
                 {columns.map((c) => (
                   <td key={c.key} className={cn("whitespace-nowrap px-4 py-3", c.className)}>
                     {c.render(row)}

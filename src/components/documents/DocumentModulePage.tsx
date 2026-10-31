@@ -585,7 +585,7 @@ function getInitialStatus(search: string): StatusFilter {
   return validStatus(value) ? value : "ALL";
 }
 
-function getColumns(def: ModuleDef): Column<Row>[] {
+function getColumns(def: ModuleDef, admin = false): Column<Row>[] {
   const headerPalettes: Record<ModuleDef["key"], string[]> = {
     insurance: [
       "bg-sky-700 text-white",
@@ -641,8 +641,9 @@ function getColumns(def: ModuleDef): Column<Row>[] {
   return def.columns.map((column, index) => ({
     key: column.key,
     header: column.header,
-    headerClassName: headerPalettes[def.key][index % headerPalettes[def.key].length],
-    className: cellPalette[def.key][index % cellPalette[def.key].length],
+    headerClassName:
+      headerPalettes[def.key][(index + (admin ? 1 : 0)) % headerPalettes[def.key].length],
+    className: cellPalette[def.key][(index + (admin ? 1 : 0)) % cellPalette[def.key].length],
     render: (row) => {
       const status = recordStatus(row["expiryDate"] as string | undefined);
       if (column.key === "daysLeft") {
@@ -799,19 +800,34 @@ export function DocumentModulePage({
     }
   }
 
+  const documentColumns = getColumns(def, admin);
+  const agentColumnStyle = admin ? getColumns(def)[0] : undefined;
   const columns = [
-    ...getColumns(def),
+    ...(admin
+      ? [
+          {
+            key: "agentName",
+            header: "Agent name",
+            headerClassName: agentColumnStyle?.headerClassName,
+            className: agentColumnStyle?.className,
+            render: (row: Row) => row.agentName || "Unknown agent",
+          },
+        ]
+      : []),
+    ...documentColumns,
     {
       key: "createdAt",
       header: "Created",
       render: (row: Row) => formatDateTime(row["createdAt"] as string),
     },
   ];
-  const exportRows = filtered.map((row) =>
-    Object.fromEntries(
+  const exportRows = filtered.map((row, index) => ({
+    "SL No": index + 1,
+    ...(admin ? { "Agent name": row.agentName || "Unknown agent" } : {}),
+    ...Object.fromEntries(
       def.columns.map((column) => [column.header, csvValue(def, row, column.key)]),
     ),
-  );
+  }));
 
   return (
     <>
