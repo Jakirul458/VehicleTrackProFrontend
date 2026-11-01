@@ -41,6 +41,12 @@ export default function PublicLayout() {
                   Features
                 </Link>
                 <Link
+                  to="/contact"
+                  className="text-sm font-semibold text-slate-600 transition-colors hover:text-cyan-700"
+                >
+                  Contact
+                </Link>
+                <Link
                   to="/pricing"
                   className="text-sm font-semibold text-slate-600 transition-colors hover:text-cyan-700"
                 >
@@ -90,6 +96,13 @@ export default function PublicLayout() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Features
+                </Link>
+                <Link
+                  to="/contact"
+                  className="rounded-xl px-3 py-2.5 text-sm font-semibold hover:bg-cyan-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contact
                 </Link>
                 <Link
                   to="/pricing"
