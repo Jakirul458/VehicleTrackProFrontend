@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BellRing, MessageCircle, Phone } from "lucide-react";
 import { remindersApi } from "@/api";
@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader, Panel } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
+import { WhatsAppLanguageDialog } from "@/components/common/WhatsAppLanguageDialog";
+import { normalizeWhatsAppNumber } from "@/lib/whatsapp";
 import type { ExpiryReminder, ReminderType } from "@/types";
 
 interface ReminderRow {
@@ -26,7 +29,7 @@ const DOCUMENT_LABELS: Record<ReminderType, string> = {
 
 function formatExpiryDate(value: string) {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "শীঘ্রই";
+  if (Number.isNaN(date.getTime())) return "soon";
   return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "long",
@@ -41,53 +44,90 @@ function formatDaysLeft(value: number) {
   return `${value} days left`;
 }
 
-function whatsappNumber(value: string) {
-  let digits = value.replace(/\D/g, "");
-  if (digits.startsWith("00")) digits = digits.slice(2);
-  if (digits.length === 10) digits = `91${digits}`;
-  else if (digits.length === 11 && digits.startsWith("0")) digits = `91${digits.slice(1)}`;
-  return /^\d{10,15}$/.test(digits) ? digits : null;
-}
-
 function makeMessage(
   reminder: ExpiryReminder,
   row: ReminderRow,
   agentName: string,
   businessName: string,
   agentMobile: string,
+  language: "english" | "bengali",
 ) {
-  const business = businessName || agentName || "আপনার এজেন্ট";
-  const customer = row.customerName === "Name not provided" ? "গ্রাহক" : row.customerName;
-  const vehicle = row.vehicleNumber || "আপনার গাড়ি";
-  const expiry = formatExpiryDate(reminder.expiryDate);
-  const contact = agentMobile ? `📞 যোগাযোগ: ${agentMobile}` : "";
+  const isBengali = language === "bengali";
+  const business = businessName || agentName || (isBengali ? "আপনার এজেন্ট" : "Your agent");
+  const customer =
+    row.customerName === "Name not provided"
+      ? isBengali
+        ? "গ্রাহক"
+        : "Customer"
+      : row.customerName;
+  const vehicle = row.vehicleNumber || (isBengali ? "আপনার গাড়ি" : "your vehicle");
+  const expiry = isBengali
+    ? new Intl.DateTimeFormat("bn-BD", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(reminder.expiryDate))
+    : formatExpiryDate(reminder.expiryDate);
+  const contact = agentMobile
+    ? isBengali
+      ? `📞 যোগাযোগ: ${agentMobile}`
+      : `📞 Contact: ${agentMobile}`
+    : "";
   const signature = [contact, business].filter(Boolean).join("\n");
 
   if (reminder.type === "insurance") {
+    if (isBengali) {
+      return `⚠️ INSURANCE RENEWAL ALERT
+
+নমস্কার ${customer}! 🙏
+
+আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
+
+${signature}`;
+    }
     return `⚠️ INSURANCE RENEWAL ALERT
 
 Hello ${customer}!
 
-আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
+The insurance for ${vehicle} expires on ${expiry}. Renew before it expires to avoid fines or legal issues.
 
 ${signature}`;
   }
 
   if (reminder.type === "tax") {
-    return `⚠️ TAX RENEWAL ALERT
+    if (isBengali) {
+      return `⚠️ TAX RENEWAL ALERT
 
-Hello ${customer}!
+নমস্কার ${customer}! 🙏
 
 আপনার গাড়ি ${vehicle}-এর রোড ট্যাক্স জমা দেওয়ার মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রোড ট্যাক্স জমা করুন।
 
 ${signature}`;
+    }
+    return `⚠️ TAX RENEWAL ALERT
+
+Hello ${customer}!
+
+The road tax for ${vehicle} is due by ${expiry}. Pay it before the due date to avoid fines or legal issues.
+
+${signature}`;
   }
 
+  if (isBengali) {
+    return `⚠️ PUC RENEWAL ALERT
+
+নমস্কার ${customer}! 🙏
+
+আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
+
+${signature}`;
+  }
   return `⚠️ PUC RENEWAL ALERT
 
 Hello ${customer}!
 
-আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
+The PUC certificate for ${vehicle} expires on ${expiry}. Renew it before it expires to avoid fines or legal issues.
 
 ${signature}`;
 }
@@ -130,20 +170,14 @@ function reminderRows(items: ExpiryReminder[]) {
 function DaysLeftCell({
   reminder,
   row,
-  agentName,
-  businessName,
-  agentMobile,
+  onWhatsAppClick,
 }: {
   reminder?: ExpiryReminder;
   row: ReminderRow;
-  agentName: string;
-  businessName: string;
-  agentMobile: string;
+  onWhatsAppClick: (reminder: ExpiryReminder, row: ReminderRow) => void;
 }) {
   if (!reminder) return <span className="text-muted-foreground">—</span>;
-  const phone = whatsappNumber(row.mobile);
-  const message = makeMessage(reminder, row, agentName, businessName, agentMobile);
-  const href = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}` : undefined;
+  const phone = normalizeWhatsAppNumber(row.mobile);
   const overdue = reminder.daysLeft <= 0;
 
   return (
@@ -155,20 +189,11 @@ function DaysLeftCell({
         size="sm"
         variant="outline"
         className="h-8 border-green-600/30 px-2 text-green-700 hover:bg-green-600/10 hover:text-green-700 dark:text-green-400"
-        disabled={!href}
-        asChild={Boolean(href)}
+        disabled={!phone}
+        onClick={() => onWhatsAppClick(reminder, row)}
       >
-        {href ? (
-          <a href={href} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="size-4" />
-            WhatsApp
-          </a>
-        ) : (
-          <>
-            <MessageCircle className="size-4" />
-            WhatsApp
-          </>
-        )}
+        <MessageCircle className="size-4" />
+        WhatsApp
       </Button>
     </div>
   );
@@ -176,6 +201,10 @@ function DaysLeftCell({
 
 export default function RemindersPage() {
   const { user } = useAuth();
+  const [whatsAppTarget, setWhatsAppTarget] = useState<{
+    reminder: ExpiryReminder;
+    row: ReminderRow;
+  } | null>(null);
   const enabledTypes = (Object.keys(DOCUMENT_LABELS) as ReminderType[]).filter(
     (type) => user?.moduleAccess?.[type] ?? true,
   );
@@ -200,11 +229,7 @@ export default function RemindersPage() {
       />
       <Panel>
         {isLoading ? (
-          <div className="space-y-3" aria-label="Loading reminders">
-            {[0, 1, 2, 3].map((item) => (
-              <div key={item} className="h-14 animate-pulse rounded-lg bg-muted" />
-            ))}
-          </div>
+          <VehicleLoading variant="section" />
         ) : isError ? (
           <div className="py-10 text-center">
             <p className="text-sm text-destructive">Could not load reminders. Please try again.</p>
@@ -249,9 +274,9 @@ export default function RemindersPage() {
                         <DaysLeftCell
                           reminder={row[type]}
                           row={row}
-                          agentName={user?.fullName ?? ""}
-                          businessName={user?.businessName ?? ""}
-                          agentMobile={user?.mobile ?? ""}
+                          onWhatsAppClick={(reminder, targetRow) =>
+                            setWhatsAppTarget({ reminder, row: targetRow })
+                          }
                         />
                       </td>
                     ))}
@@ -285,6 +310,37 @@ export default function RemindersPage() {
           </div>
         )}
       </Panel>
+      <WhatsAppLanguageDialog
+        open={whatsAppTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setWhatsAppTarget(null);
+        }}
+        phone={whatsAppTarget?.row.mobile ?? ""}
+        englishMessage={
+          whatsAppTarget
+            ? makeMessage(
+                whatsAppTarget.reminder,
+                whatsAppTarget.row,
+                user?.fullName ?? "",
+                user?.businessName ?? "",
+                user?.mobile ?? "",
+                "english",
+              )
+            : ""
+        }
+        bengaliMessage={
+          whatsAppTarget
+            ? makeMessage(
+                whatsAppTarget.reminder,
+                whatsAppTarget.row,
+                user?.fullName ?? "",
+                user?.businessName ?? "",
+                user?.mobile ?? "",
+                "bengali",
+              )
+            : ""
+        }
+      />
     </>
   );
 }

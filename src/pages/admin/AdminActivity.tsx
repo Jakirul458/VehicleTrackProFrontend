@@ -4,6 +4,7 @@ import { Ban, Download, Laptop, Search, ShieldAlert } from "lucide-react";
 import { adminApi, type ListParams } from "@/api";
 import type { ActivityLog, ActiveAuthSession, LoginLocation } from "@/types";
 import { TablePagination } from "@/components/common";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 type ActivityFilters = Pick<ListParams, "search" | "action" | "ip" | "from" | "to">;
 
@@ -83,11 +84,7 @@ export default function AdminActivity() {
 
   const isLoading = view === "activity" ? activityQuery.isLoading : sessionsQuery.isLoading;
   if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
-      </div>
-    );
+    return <VehicleLoading variant="section" />;
   }
 
   return (

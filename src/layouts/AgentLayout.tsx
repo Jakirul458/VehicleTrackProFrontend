@@ -71,11 +71,11 @@ export default function AgentLayout() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>আপনার subscription-এর মেয়াদ শেষ হতে চলেছে</DialogTitle>
+            <DialogTitle>Your subscription is about to expire</DialogTitle>
             <DialogDescription>
               {validityDays === 0
-                ? "আপনার access আজ শেষ হবে। কাজ চালিয়ে যেতে renewal plan বেছে নিন।"
-                : `আপনার access-এর আর ${validityDays} দিন বাকি। validity extend করতে subscription renew করুন।`}
+                ? "Your access expires today. Choose a renewal plan to continue using your account."
+                : `Your access expires in ${validityDays} ${validityDays === 1 ? "day" : "days"}. Renew your subscription to extend it.`}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -84,7 +84,7 @@ export default function AgentLayout() {
               onClick={dismissValidityPrompt}
               className="rounded-md border px-4 py-2 text-sm font-medium"
             >
-              পরে মনে করাবেন
+              Remind me later
             </button>
             <Link
               to="/renewal"

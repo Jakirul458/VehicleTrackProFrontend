@@ -5,6 +5,7 @@ import { adminApi } from "@/api";
 import { normalizeApiError } from "@/api/client";
 import type { Agent } from "@/types";
 import { toast } from "sonner";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 export default function AgentForm() {
   const { id } = useParams();
@@ -82,7 +83,7 @@ export default function AgentForm() {
   };
 
   if (isEdit && isLoading) {
-    return <p className="py-12 text-center text-muted-foreground">Loading agent…</p>;
+    return <VehicleLoading variant="section" />;
   }
   if (isEdit && (isError || !agent)) {
     return (

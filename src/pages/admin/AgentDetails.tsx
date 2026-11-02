@@ -8,6 +8,7 @@ import { ArrowLeft, CalendarDays, KeyRound, Shield, ShieldAlert } from "lucide-r
 import { DocumentModulePage } from "@/components/documents/DocumentModulePage";
 import PaymentsPage from "@/pages/agent/PaymentsPage";
 import { toast } from "sonner";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 const tabs = [
   { key: "insurance", label: "Insurance" },
@@ -51,11 +52,7 @@ export default function AgentDetails() {
   }, [agent]);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <VehicleLoading variant="section" />;
   }
 
   if (!agent) {

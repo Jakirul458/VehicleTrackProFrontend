@@ -387,6 +387,8 @@ import { DataTable, downloadCsv, PageHeader, Panel, type Column } from "@/compon
 import { daysLeft, formatCurrency, formatDate, formatDateTime, formatDaysLeft } from "@/lib/expiry";
 import { MODULES, type ModuleDef, type Row } from "./modules";
 import { useAuth } from "@/context/AuthContext";
+import { WhatsAppLanguageDialog } from "@/components/common/WhatsAppLanguageDialog";
+import { normalizeWhatsAppNumber } from "@/lib/whatsapp";
 
 type StatusFilter = "ALL" | "ACTIVE" | "DUE" | "SOON" | "URGENT" | "EXPIRED";
 type RecordStatus = Exclude<StatusFilter, "ALL"> | "INCOMPLETE";
@@ -533,9 +535,12 @@ function reminderMessage(
   agentName: string,
   agentBusiness: string,
   agentMobile: string,
+  language: "english" | "bengali",
 ) {
-  const customer = String(row["customerName"] || "গ্রাহক");
-  const vehicle = String(row["vehicleNumber"] || "আপনার গাড়ি");
+  const customer = String(row["customerName"] || (language === "english" ? "Customer" : "গ্রাহক"));
+  const vehicle = String(
+    row["vehicleNumber"] || (language === "english" ? "your vehicle" : "আপনার গাড়ি"),
+  );
   const expiry = row["expiryDate"]
     ? new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
@@ -543,27 +548,60 @@ function reminderMessage(
         year: "numeric",
         timeZone: "UTC",
       }).format(new Date(String(row["expiryDate"])))
-    : "শীঘ্রই";
-  const business = agentBusiness || agentName || "আপনার এজেন্ট";
-  const signature = [agentMobile ? `📞 যোগাযোগ: ${agentMobile}` : "", business]
-    .filter(Boolean)
-    .join("\n");
+    : language === "english"
+      ? "soon"
+      : "শীঘ্রই";
+  const business =
+    agentBusiness || agentName || (language === "english" ? "Your agent" : "আপনার এজেন্ট");
+  const contact = agentMobile
+    ? language === "english"
+      ? `📞 Contact: ${agentMobile}`
+      : `📞 যোগাযোগ: ${agentMobile}`
+    : "";
+  const signature = [contact, business].filter(Boolean).join("\n");
 
   if (moduleKey === "insurance") {
-    return `⚠️ INSURANCE RENEWAL ALERT
+    if (language === "bengali") {
+      return `⚠️ INSURANCE RENEWAL ALERT
 
-Hello ${customer}!
+নমস্কার ${customer}! 🙏
 
 আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
 
 ${signature}`;
+    }
+    return `⚠️ INSURANCE RENEWAL ALERT
+
+Hello ${customer}!
+
+The insurance for ${vehicle} expires on ${expiry}. Renew before it expires to avoid fines or legal issues.
+
+${signature}`;
   }
   if (moduleKey === "tax") {
+    if (language === "bengali") {
+      return `⚠️ TAX RENEWAL ALERT
+
+নমস্কার ${customer}! 🙏
+
+আপনার গাড়ি ${vehicle}-এর রোড ট্যাক্স জমা দেওয়ার মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রোড ট্যাক্স জমা করুন।
+
+${signature}`;
+    }
     return `⚠️ TAX RENEWAL ALERT
 
 Hello ${customer}!
 
-আপনার গাড়ি ${vehicle}-এর রোড ট্যাক্স জমা দেওয়ার মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রোড ট্যাক্স জমা করুন।
+The road tax for ${vehicle} is due by ${expiry}. Pay it before the due date to avoid fines or legal issues.
+
+${signature}`;
+  }
+  if (language === "bengali") {
+    return `⚠️ PUC RENEWAL ALERT
+
+নমস্কার ${customer}! 🙏
+
+আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
 
 ${signature}`;
   }
@@ -571,7 +609,7 @@ ${signature}`;
 
 Hello ${customer}!
 
-আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
+The PUC certificate for ${vehicle} expires on ${expiry}. Renew it before it expires to avoid fines or legal issues.
 
 ${signature}`;
 }
@@ -708,6 +746,7 @@ export function DocumentModulePage({
   const [status, setStatus] = useState<StatusFilter>(() => getInitialStatus(location.search));
   const [editing, setEditing] = useState<Row | "new" | null>(null);
   const [deleting, setDeleting] = useState<Row | null>(null);
+  const [whatsAppRow, setWhatsAppRow] = useState<Row | null>(null);
 
   useEffect(() => {
     setStatus(getInitialStatus(location.search));
@@ -943,25 +982,10 @@ export function DocumentModulePage({
                         variant="ghost"
                         className="text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-600"
                         aria-label={`WhatsApp reminder for ${String(row["customerName"] || "customer")}`}
-                        asChild
+                        disabled={!normalizeWhatsAppNumber(String(row["mobile"] ?? ""))}
+                        onClick={() => setWhatsAppRow(row)}
                       >
-                        <a
-                          href={
-                            row["mobile"]
-                              ? `https://wa.me/${String(row["mobile"])
-                                  .replace(/\D/g, "")
-                                  .replace(/^0/, "")
-                                  .replace(
-                                    /^(\d{10})$/,
-                                    "91$1",
-                                  )}?text=${encodeURIComponent(reminderMessage(moduleKey, row, user?.fullName ?? "", user?.businessName ?? "", user?.mobile ?? ""))}`
-                              : undefined
-                          }
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <MessageCircle className="size-4" />
-                        </a>
+                        <MessageCircle className="size-4" />
                       </Button>
                       <Button
                         size="sm"
@@ -1109,6 +1133,38 @@ export function DocumentModulePage({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <WhatsAppLanguageDialog
+        open={whatsAppRow !== null}
+        onOpenChange={(open) => {
+          if (!open) setWhatsAppRow(null);
+        }}
+        phone={String(whatsAppRow?.["mobile"] ?? "")}
+        englishMessage={
+          whatsAppRow
+            ? reminderMessage(
+                moduleKey,
+                whatsAppRow,
+                user?.fullName ?? "",
+                user?.businessName ?? "",
+                user?.mobile ?? "",
+                "english",
+              )
+            : ""
+        }
+        bengaliMessage={
+          whatsAppRow
+            ? reminderMessage(
+                moduleKey,
+                whatsAppRow,
+                user?.fullName ?? "",
+                user?.businessName ?? "",
+                user?.mobile ?? "",
+                "bengali",
+              )
+            : ""
+        }
+      />
     </>
   );
 }

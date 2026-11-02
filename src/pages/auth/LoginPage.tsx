@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Truck, CheckCircle2, Eye, EyeOff, Loader2, Mail, Lock, ShieldCheck } from "lucide-react";
+import { Truck, CheckCircle2, Eye, EyeOff, Mail, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { normalizeApiError, type NormalizedApiError } from "@/api/client";
 import type { LoginLocation } from "@/types";
@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 const FEATURES = [
   "Insurance, tax and PUC records in one place",
@@ -298,15 +299,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="vt-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0080c8] via-[#0ea5e9] to-[#0080c8] text-[15px] font-semibold text-white shadow-lg shadow-sky-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+              className={`vt-btn flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0080c8] via-[#0ea5e9] to-[#0080c8] text-[15px] font-semibold text-white shadow-lg shadow-sky-500/25 disabled:cursor-not-allowed disabled:opacity-60 ${isSubmitting ? "min-h-[92px]" : "h-[52px]"}`}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Signing in...
-                </>
-              ) : (
-                "Sign in"
-              )}
+              {isSubmitting ? <VehicleLoading variant="button" purpose="login" /> : "Sign in"}
             </button>
           </form>
 
@@ -347,11 +342,11 @@ export default function LoginPage() {
             </DialogTitle>
             <DialogDescription>
               {validityExpired
-                ? "আপনার account-এর validity শেষ হয়ে গেছে। নবায়নের জন্য administrator-এর সাথে যোগাযোগ করুন।"
+                ? "Your account validity has expired. Please contact your administrator to renew it."
                 : loginError?.code === "ACCOUNT_SUSPENDED"
-                  ? "আপনার account suspend করা হয়েছে। সাহায্যের জন্য administrator-এর সাথে যোগাযোগ করুন।"
+                  ? "Your account has been suspended. Please contact your administrator for help."
                   : invalidCredentials
-                    ? "আপনার email অথবা password ভুল। সঠিক email ও password দিয়ে আবার চেষ্টা করুন।"
+                    ? "Your email or password is incorrect. Check your credentials and try again."
                     : loginError?.message}
             </DialogDescription>
           </DialogHeader>
@@ -368,7 +363,7 @@ export default function LoginPage() {
                   to="/renewal"
                   className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground"
                 >
-                  Renew now · নবায়ন করুন
+                  Renew now
                 </Link>
               </>
             ) : (

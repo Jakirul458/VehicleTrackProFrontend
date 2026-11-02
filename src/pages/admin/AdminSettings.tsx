@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { adminApi } from "@/api";
 import type { PlatformSettings } from "@/types";
 import { subscriptionPlans } from "@/constants/pricing";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 const emptySettings: PlatformSettings = {
   supportWhatsapp: "",
@@ -91,7 +92,9 @@ export default function AdminSettings() {
         </p>
       </header>
       {isLoading ? (
-        <div className="rounded-lg border bg-card p-6">Loading settings…</div>
+        <div className="rounded-lg border bg-card">
+          <VehicleLoading variant="section" />
+        </div>
       ) : isError ? (
         <p
           role="alert"

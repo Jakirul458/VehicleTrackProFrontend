@@ -57,3 +57,258 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes vt-loader-road-move {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -14px;
+  }
+}
+
+@keyframes vt-loader-truck-bob {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(5px, -2px) rotate(-2deg);
+  }
+}
+
+@keyframes vt-loader-speed {
+  0% {
+    transform: translateX(8px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+}
+
+@keyframes vt-loader-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.vt-loading {
+  color: hsl(var(--primary));
+}
+
+.vt-loading--button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: inherit;
+}
+
+.vt-loading--section {
+  display: flex;
+  min-height: 16rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt-loading--page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt-loader-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.vt-loader-road {
+  position: relative;
+  display: inline-block;
+  width: 3rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.vt-loader-dashes {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background-image: repeating-linear-gradient(90deg, currentColor 0 7px, transparent 7px 14px);
+  animation: vt-loader-road-move 0.45s linear infinite;
+}
+
+.vt-loader-truck {
+  position: absolute;
+  bottom: 5px;
+  left: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  animation: vt-loader-truck-bob 0.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.vt-loader-speed-lines {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.875rem;
+}
+
+.vt-loader-speed-lines::before,
+.vt-loader-speed-lines::after {
+  position: absolute;
+  left: 6px;
+  width: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  content: "";
+  opacity: 0.7;
+  animation: vt-loader-speed 0.6s linear infinite;
+}
+
+.vt-loader-speed-lines::before {
+  top: 9px;
+}
+
+.vt-loader-speed-lines::after {
+  top: 15px;
+  width: 6px;
+  animation-delay: 0.25s;
+}
+
+.vt-loader-status {
+  animation: vt-loader-message-in 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.vt-login-loader {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.15rem 0.75rem;
+}
+
+.vt-login-loader-message {
+  min-height: 1.25rem;
+  font-size: 0.8rem;
+  line-height: 1rem;
+  animation: vt-loader-message-in 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.vt-login-route {
+  position: relative;
+  display: block;
+  height: 2rem;
+  width: 100%;
+}
+
+.vt-login-road {
+  position: absolute;
+  top: 0.65rem;
+  right: 16.666%;
+  left: 16.666%;
+  height: 2px;
+  background-image: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 10px);
+  opacity: 0.7;
+}
+
+.vt-login-truck {
+  position: absolute;
+  z-index: 1;
+  top: 0.08rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  transform: translateX(-50%);
+  transition: left 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.vt-login-stations {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.vt-login-station {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  font-size: 0.62rem;
+  font-weight: 500;
+  line-height: 0.8rem;
+  opacity: 0.65;
+}
+
+.vt-login-station > span:last-child {
+  white-space: nowrap;
+}
+
+.vt-login-station > .is-active {
+  opacity: 1;
+}
+
+.vt-login-stop {
+  display: flex;
+  width: 1.35rem;
+  height: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.vt-login-stop svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.vt-login-stop.is-complete {
+  color: hsl(var(--primary));
+  background: white;
+  transform: scale(0.92);
+}
+
+.vt-login-stop.is-current {
+  box-shadow: 0 0 0 3px hsl(var(--primary-foreground) / 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-loader-dashes,
+  .vt-loader-truck,
+  .vt-loader-speed-lines::before,
+  .vt-loader-speed-lines::after,
+  .vt-loader-status,
+  .vt-login-loader-message {
+    animation: none !important;
+  }
+
+  .vt-login-truck,
+  .vt-login-stop {
+    transition: none !important;
+  }
+}

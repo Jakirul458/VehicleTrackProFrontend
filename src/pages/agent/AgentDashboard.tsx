@@ -119,6 +119,7 @@ import { reportApi } from "@/api";
 import type { AgentDashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
 import { useAuth } from "@/context/AuthContext";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 const modules = [
   {
@@ -260,6 +261,11 @@ export default function AgentDashboard() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+
+  if (isLoading) {
+    return <VehicleLoading variant="section" />;
+  }
+
   return (
     <div className="relative isolate overflow-hidden rounded-2xl p-1">
       <style>{dashboardStyles}</style>

@@ -13,6 +13,7 @@ import {
 import { reportApi } from "@/api";
 import type { DashboardStats } from "@/types";
 import { DASHBOARD_STATUS, StatusBadge } from "@/components/common";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 const modules = [
   {
@@ -153,6 +154,11 @@ export default function AdminDashboard() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+
+  if (isLoading) {
+    return <VehicleLoading variant="section" />;
+  }
+
   return (
     <div className="relative isolate overflow-hidden rounded-2xl p-1">
       <style>{dashboardStyles}</style>

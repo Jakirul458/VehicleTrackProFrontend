@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { paymentApi } from "@/api";
 import { subscriptionPlans } from "@/constants/pricing";
 import { formatCurrency } from "@/lib/expiry";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 export default function PricingPage() {
   const {
@@ -35,9 +36,9 @@ export default function PricingPage() {
         </header>
 
         {isLoading ? (
-          <p className="rounded-2xl border bg-white p-8 text-center text-slate-600">
-            Loading current prices…
-          </p>
+          <div className="rounded-2xl border bg-white">
+            <VehicleLoading variant="section" />
+          </div>
         ) : isError || !settings ? (
           <p
             role="alert"

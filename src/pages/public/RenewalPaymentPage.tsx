@@ -6,6 +6,7 @@ import { paymentApi } from "@/api";
 import { toast } from "sonner";
 import { subscriptionPlans, isPricingKey } from "@/constants/pricing";
 import type { PricingKey } from "@/constants/pricing";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 export default function RenewalPaymentPage() {
   const [searchParams] = useSearchParams();
@@ -104,8 +105,8 @@ export default function RenewalPaymentPage() {
           </p>
         </header>
         {isLoading ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            Loading payment instructions…
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <VehicleLoading variant="section" />
           </div>
         ) : isError || !settings ? (
           <p

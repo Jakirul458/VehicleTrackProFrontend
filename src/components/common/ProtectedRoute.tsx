@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import type { ModuleAccess, Role } from "@/types";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -18,11 +19,7 @@ export function ProtectedRoute({
   const location = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <VehicleLoading variant="page" />;
   }
 
   if (!isAuthenticated) {

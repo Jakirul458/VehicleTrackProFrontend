@@ -7,6 +7,7 @@ import { Plus, Edit, Trash2, Shield, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { daysLeft, formatDateTime } from "@/lib/expiry";
 import { PageHeader, Panel, TablePagination } from "@/components/common";
+import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 function validityText(date?: string) {
   if (!date) return { label: "Not set", color: "text-muted-foreground" };
@@ -46,11 +47,7 @@ export default function AgentsList() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <VehicleLoading variant="section" />;
   }
 
   return (
