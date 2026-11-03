@@ -18,11 +18,22 @@ export default function PublicLayout() {
                 className="flex min-w-0 items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-600 to-teal-400 shadow-lg shadow-cyan-700/20">
-                  <span className="text-lg font-bold text-white">V</span>
-                </div>
-                <span className="truncate text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
-                  VehicleTrack Pro
+                <img
+                  src="/favicon.svg"
+                  alt=""
+                  className="h-12 w-12 shrink-0 rounded-2xl border border-teal-100 shadow-sm shadow-teal-900/10"
+                />
+                <span className="h-10 w-px shrink-0 bg-teal-700/40" aria-hidden="true" />
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate text-lg font-black italic leading-5 tracking-tight text-slate-900 sm:text-xl">
+                    Vehicle<span className="text-teal-600">Track</span>{" "}
+                    <span className="rounded-md bg-slate-900 px-1.5 py-0.5 text-sm not-italic text-white sm:text-base">
+                      Pro
+                    </span>
+                  </span>
+                  <span className="mt-1 truncate text-[10px] font-semibold tracking-[0.12em] text-slate-500 sm:text-xs">
+                    Insurance · Tax · PUC · More
+                  </span>
                 </span>
               </Link>
 
