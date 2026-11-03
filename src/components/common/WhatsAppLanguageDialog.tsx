@@ -15,6 +15,7 @@ interface WhatsAppLanguageDialogProps {
   phone: string;
   englishMessage: string;
   bengaliMessage: string;
+  hindiMessage: string;
 }
 
 export function WhatsAppLanguageDialog({
@@ -23,6 +24,7 @@ export function WhatsAppLanguageDialog({
   phone,
   englishMessage,
   bengaliMessage,
+  hindiMessage,
 }: WhatsAppLanguageDialogProps) {
   const sendMessage = (message: string) => {
     const number = normalizeWhatsAppNumber(phone);
@@ -51,6 +53,9 @@ export function WhatsAppLanguageDialog({
           </Button>
           <Button type="button" onClick={() => sendMessage(bengaliMessage)}>
             বাংলা
+          </Button>
+          <Button type="button" variant="outline" onClick={() => sendMessage(hindiMessage)}>
+            हिन्दी
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -407,7 +407,7 @@ export default function PaymentsPage({ agentId }: { agentId?: string }) {
           value={loading ? "…" : formatCurrency(totals.profit)}
           icon={Wallet}
           tone="active"
-          hint="Insurance: Customer paid + Commission − Portal paid · Tax/PUC: Customer paid − Portal paid"
+          hint="Insurance: (Premium × Commission % + Customer paid − Portal paid) × 98% (2% deduction) · Tax/PUC: Customer paid − Portal paid"
         />
       </div>
 

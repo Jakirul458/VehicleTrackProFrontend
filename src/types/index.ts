@@ -88,6 +88,7 @@ export interface Insurance extends DocumentRecord {
   portalPaid?: number;
   customerPaid?: number;
   commission?: number;
+  commissionPercentage?: number;
 }
 
 export interface Tax extends DocumentRecord {

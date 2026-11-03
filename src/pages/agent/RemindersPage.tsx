@@ -50,29 +50,39 @@ function makeMessage(
   agentName: string,
   businessName: string,
   agentMobile: string,
-  language: "english" | "bengali",
+  language: "english" | "bengali" | "hindi",
 ) {
   const isBengali = language === "bengali";
-  const business = businessName || agentName || (isBengali ? "আপনার এজেন্ট" : "Your agent");
+  const isHindi = language === "hindi";
+  const business =
+    businessName ||
+    agentName ||
+    (isBengali ? "আপনার এজেন্ট" : isHindi ? "आपका एजेंट" : "Your agent");
   const customer =
     row.customerName === "Name not provided"
       ? isBengali
         ? "গ্রাহক"
-        : "Customer"
+        : isHindi
+          ? "ग्राहक"
+          : "Customer"
       : row.customerName;
-  const vehicle = row.vehicleNumber || (isBengali ? "আপনার গাড়ি" : "your vehicle");
-  const expiry = isBengali
-    ? new Intl.DateTimeFormat("bn-BD", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        timeZone: "UTC",
-      }).format(new Date(reminder.expiryDate))
-    : formatExpiryDate(reminder.expiryDate);
+  const vehicle =
+    row.vehicleNumber || (isBengali ? "আপনার গাড়ি" : isHindi ? "आपका वाहन" : "your vehicle");
+  const expiry =
+    isBengali || isHindi
+      ? new Intl.DateTimeFormat(isHindi ? "hi-IN" : "bn-BD", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        }).format(new Date(reminder.expiryDate))
+      : formatExpiryDate(reminder.expiryDate);
   const contact = agentMobile
     ? isBengali
       ? `📞 যোগাযোগ: ${agentMobile}`
-      : `📞 Contact: ${agentMobile}`
+      : isHindi
+        ? `📞 संपर्क: ${agentMobile}`
+        : `📞 Contact: ${agentMobile}`
     : "";
   const signature = [contact, business].filter(Boolean).join("\n");
 
@@ -83,6 +93,15 @@ function makeMessage(
 নমস্কার ${customer}! 🙏
 
 আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
+
+${signature}`;
+    }
+    if (isHindi) {
+      return `⚠️ बीमा नवीनीकरण सूचना
+
+नमस्ते ${customer}! 🙏
+
+आपके वाहन ${vehicle} का बीमा ${expiry} को समाप्त हो रहा है। जुर्माने और कानूनी परेशानियों से बचने के लिए समय-सीमा से पहले नवीनीकरण कराएं।
 
 ${signature}`;
     }
@@ -105,6 +124,15 @@ ${signature}`;
 
 ${signature}`;
     }
+    if (isHindi) {
+      return `⚠️ रोड टैक्स सूचना
+
+नमस्ते ${customer}! 🙏
+
+आपके वाहन ${vehicle} का रोड टैक्स ${expiry} तक जमा करना है। जुर्माने और कानूनी परेशानियों से बचने के लिए समय पर भुगतान करें।
+
+${signature}`;
+    }
     return `⚠️ TAX RENEWAL ALERT
 
 Hello ${customer}!
@@ -120,6 +148,15 @@ ${signature}`;
 নমস্কার ${customer}! 🙏
 
 আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
+
+${signature}`;
+  }
+  if (isHindi) {
+    return `⚠️ PUC नवीनीकरण सूचना
+
+नमस्ते ${customer}! 🙏
+
+आपके वाहन ${vehicle} का PUC प्रमाणपत्र ${expiry} को समाप्त हो रहा है। जुर्माने और कानूनी परेशानियों से बचने के लिए समय-सीमा से पहले नवीनीकरण कराएं।
 
 ${signature}`;
   }
@@ -337,6 +374,18 @@ export default function RemindersPage() {
                 user?.businessName ?? "",
                 user?.mobile ?? "",
                 "bengali",
+              )
+            : ""
+        }
+        hindiMessage={
+          whatsAppTarget
+            ? makeMessage(
+                whatsAppTarget.reminder,
+                whatsAppTarget.row,
+                user?.fullName ?? "",
+                user?.businessName ?? "",
+                user?.mobile ?? "",
+                "hindi",
               )
             : ""
         }

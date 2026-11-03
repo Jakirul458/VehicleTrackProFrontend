@@ -8,6 +8,7 @@ export interface FieldDef {
   name: string;
   label: string;
   type: "text" | "date" | "number" | "select";
+  max?: number;
   options?: string[];
 }
 
@@ -19,6 +20,16 @@ export interface ModuleDef {
   api: ReturnType<typeof createResourceApi<Row>>;
   columns: { key: string; header: string; render?: (row: Row) => ReactNode }[];
   fields: FieldDef[];
+}
+
+export function getCommissionPercentage(row: Row): number | undefined {
+  if (typeof row["commissionPercentage"] === "number") return row["commissionPercentage"];
+  const legacyCommission = row["commission"];
+  const premium = row["premium"];
+  if (typeof legacyCommission === "number" && typeof premium === "number" && premium > 0) {
+    return (legacyCommission / premium) * 100;
+  }
+  return undefined;
 }
 
 const customerFields: FieldDef[] = [
@@ -88,9 +99,14 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
         render: (row) => formatCurrency(row["customerPaid"] as number),
       },
       {
-        key: "commission",
-        header: "Commission",
-        render: (row) => formatCurrency(row["commission"] as number),
+        key: "commissionPercentage",
+        header: "Commission (%)",
+        render: (row) => {
+          const percentage = getCommissionPercentage(row);
+          return percentage === undefined
+            ? "—"
+            : `${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(percentage)}%`;
+        },
       },
     ],
     fields: [
@@ -110,7 +126,12 @@ export const MODULES: Record<ModuleDef["key"], ModuleDef> = {
       { name: "remarks", label: "Remarks", type: "text" },
       { name: "portalPaid", label: "Portal paid (₹)", type: "number" },
       { name: "customerPaid", label: "Customer paid (₹)", type: "number" },
-      { name: "commission", label: "Commission (₹)", type: "number" },
+      {
+        name: "commissionPercentage",
+        label: "Commission rate on premium (%)",
+        type: "number",
+        max: 100,
+      },
       { name: "paymentDate", label: "Payment date", type: "date" },
     ],
   },

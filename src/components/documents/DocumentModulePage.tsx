@@ -385,7 +385,7 @@ import {
 } from "@/components/ui/dialog";
 import { DataTable, downloadCsv, PageHeader, Panel, type Column } from "@/components/common";
 import { daysLeft, formatCurrency, formatDate, formatDateTime, formatDaysLeft } from "@/lib/expiry";
-import { MODULES, type ModuleDef, type Row } from "./modules";
+import { getCommissionPercentage, MODULES, type ModuleDef, type Row } from "./modules";
 import { useAuth } from "@/context/AuthContext";
 import { WhatsAppLanguageDialog } from "@/components/common/WhatsAppLanguageDialog";
 import { normalizeWhatsAppNumber } from "@/lib/whatsapp";
@@ -535,28 +535,38 @@ function reminderMessage(
   agentName: string,
   agentBusiness: string,
   agentMobile: string,
-  language: "english" | "bengali",
+  language: "english" | "bengali" | "hindi",
 ) {
-  const customer = String(row["customerName"] || (language === "english" ? "Customer" : "গ্রাহক"));
+  const isEnglish = language === "english";
+  const isHindi = language === "hindi";
+  const customer = String(
+    row["customerName"] || (isEnglish ? "Customer" : isHindi ? "ग्राहक" : "গ্রাহক"),
+  );
   const vehicle = String(
-    row["vehicleNumber"] || (language === "english" ? "your vehicle" : "আপনার গাড়ি"),
+    row["vehicleNumber"] || (isEnglish ? "your vehicle" : isHindi ? "आपका वाहन" : "আপনার গাড়ি"),
   );
   const expiry = row["expiryDate"]
-    ? new Intl.DateTimeFormat("en-GB", {
+    ? new Intl.DateTimeFormat(isEnglish ? "en-GB" : isHindi ? "hi-IN" : "bn-BD", {
         day: "numeric",
         month: "long",
         year: "numeric",
         timeZone: "UTC",
       }).format(new Date(String(row["expiryDate"])))
-    : language === "english"
+    : isEnglish
       ? "soon"
-      : "শীঘ্রই";
+      : isHindi
+        ? "जल्द"
+        : "শীঘ্রই";
   const business =
-    agentBusiness || agentName || (language === "english" ? "Your agent" : "আপনার এজেন্ট");
+    agentBusiness ||
+    agentName ||
+    (isEnglish ? "Your agent" : isHindi ? "आपका एजेंट" : "আপনার এজেন্ট");
   const contact = agentMobile
-    ? language === "english"
+    ? isEnglish
       ? `📞 Contact: ${agentMobile}`
-      : `📞 যোগাযোগ: ${agentMobile}`
+      : isHindi
+        ? `📞 संपर्क: ${agentMobile}`
+        : `📞 যোগাযোগ: ${agentMobile}`
     : "";
   const signature = [contact, business].filter(Boolean).join("\n");
 
@@ -567,6 +577,15 @@ function reminderMessage(
 নমস্কার ${customer}! 🙏
 
 আপনার গাড়ি ${vehicle}-এর ইনস্যুরেন্সের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে রিনিউ করুন।
+
+${signature}`;
+    }
+    if (isHindi) {
+      return `⚠️ बीमा नवीनीकरण सूचना
+
+नमस्ते ${customer}! 🙏
+
+आपके वाहन ${vehicle} का बीमा ${expiry} को समाप्त हो रहा है। जुर्माने और कानूनी परेशानियों से बचने के लिए समय-सीमा से पहले नवीनीकरण कराएं।
 
 ${signature}`;
     }
@@ -588,6 +607,15 @@ ${signature}`;
 
 ${signature}`;
     }
+    if (isHindi) {
+      return `⚠️ रोड टैक्स सूचना
+
+नमस्ते ${customer}! 🙏
+
+आपके वाहन ${vehicle} का रोड टैक्स ${expiry} तक जमा करना है। जुर्माने और कानूनी परेशानियों से बचने के लिए समय पर भुगतान करें।
+
+${signature}`;
+    }
     return `⚠️ TAX RENEWAL ALERT
 
 Hello ${customer}!
@@ -602,6 +630,15 @@ ${signature}`;
 নমস্কার ${customer}! 🙏
 
 আপনার গাড়ি ${vehicle}-এর PUC সার্টিফিকেটের মেয়াদ ${expiry} তারিখে শেষ হচ্ছে। জরিমানা ও আইনি সমস্যা এড়াতে মেয়াদ শেষ হওয়ার আগেই সাশ্রয়ী মূল্যে PUC রিনিউ করুন।
+
+${signature}`;
+  }
+  if (isHindi) {
+    return `⚠️ PUC नवीनीकरण सूचना
+
+नमस्ते ${customer}! 🙏
+
+आपके वाहन ${vehicle} का PUC प्रमाणपत्र ${expiry} को समाप्त हो रहा है। जुर्माने और कानूनी परेशानियों से बचने के लिए समय-सीमा से पहले नवीनीकरण कराएं।
 
 ${signature}`;
   }
@@ -747,6 +784,12 @@ export function DocumentModulePage({
   const [editing, setEditing] = useState<Row | "new" | null>(null);
   const [deleting, setDeleting] = useState<Row | null>(null);
   const [whatsAppRow, setWhatsAppRow] = useState<Row | null>(null);
+  const [insurancePreview, setInsurancePreview] = useState({
+    premium: 0,
+    commissionPercentage: 0,
+    customerPaid: 0,
+    portalPaid: 0,
+  });
 
   useEffect(() => {
     setStatus(getInitialStatus(location.search));
@@ -805,6 +848,16 @@ export function DocumentModulePage({
 
   const current = editing && editing !== "new" ? editing : null;
 
+  useEffect(() => {
+    const row = editing && editing !== "new" ? editing : null;
+    setInsurancePreview({
+      premium: typeof row?.["premium"] === "number" ? row["premium"] : 0,
+      commissionPercentage: row ? (getCommissionPercentage(row) ?? 0) : 0,
+      customerPaid: typeof row?.["customerPaid"] === "number" ? row["customerPaid"] : 0,
+      portalPaid: typeof row?.["portalPaid"] === "number" ? row["portalPaid"] : 0,
+    });
+  }, [editing]);
+
   async function save(form: FormData) {
     const values: Record<string, unknown> = {};
     for (const field of def.fields) {
@@ -813,7 +866,11 @@ export function DocumentModulePage({
       const value = String(raw).trim();
       if (field.type === "number") {
         const number = Number(value);
-        if (!Number.isFinite(number) || number < 0) {
+        if (
+          !Number.isFinite(number) ||
+          number < 0 ||
+          (field.max !== undefined && number > field.max)
+        ) {
           toast.error(`${field.label} must be a valid non-negative number.`);
           return;
         }
@@ -1052,7 +1109,10 @@ export function DocumentModulePage({
           >
             <div className="grid gap-4 sm:grid-cols-2">
               {def.fields.map((field) => {
-                const raw = current?.[field.name];
+                const raw =
+                  field.name === "commissionPercentage" && current
+                    ? getCommissionPercentage(current)
+                    : current?.[field.name];
                 const value =
                   field.type === "date" && raw
                     ? String(raw).slice(0, 10)
@@ -1082,14 +1142,55 @@ export function DocumentModulePage({
                         name={field.name}
                         type={field.type}
                         min={field.type === "number" ? 0 : undefined}
+                        max={field.max}
                         step={field.type === "number" ? "0.01" : undefined}
                         defaultValue={value}
+                        onChange={(event) => {
+                          if (
+                            moduleKey !== "insurance" ||
+                            ![
+                              "premium",
+                              "commissionPercentage",
+                              "customerPaid",
+                              "portalPaid",
+                            ].includes(field.name)
+                          ) {
+                            return;
+                          }
+                          const amount = Number(event.currentTarget.value);
+                          if (!Number.isFinite(amount)) return;
+                          setInsurancePreview((previous) => ({
+                            ...previous,
+                            [field.name]: amount,
+                          }));
+                        }}
                       />
                     )}
                   </div>
                 );
               })}
             </div>
+            {moduleKey === "insurance" && (
+              <div className="mt-4 rounded-lg border bg-muted/40 p-3 text-sm">
+                <p className="font-medium">
+                  Commission earned:{" "}
+                  {formatCurrency(
+                    (insurancePreview.premium * insurancePreview.commissionPercentage) / 100,
+                  )}
+                  {" · "}Estimated profit:{" "}
+                  {formatCurrency(
+                    ((insurancePreview.premium * insurancePreview.commissionPercentage) / 100 +
+                      insurancePreview.customerPaid -
+                      insurancePreview.portalPaid) *
+                      0.98,
+                  )}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Profit = (Premium × Commission rate + Customer paid − Portal paid), then deduct
+                  2%.
+                </p>
+              </div>
+            )}
             <DialogFooter className="mt-6">
               <Button type="button" variant="outline" onClick={() => setEditing(null)}>
                 Cancel
@@ -1161,6 +1262,18 @@ export function DocumentModulePage({
                 user?.businessName ?? "",
                 user?.mobile ?? "",
                 "bengali",
+              )
+            : ""
+        }
+        hindiMessage={
+          whatsAppRow
+            ? reminderMessage(
+                moduleKey,
+                whatsAppRow,
+                user?.fullName ?? "",
+                user?.businessName ?? "",
+                user?.mobile ?? "",
+                "hindi",
               )
             : ""
         }

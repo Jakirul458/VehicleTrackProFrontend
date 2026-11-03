@@ -30,7 +30,7 @@ function LoginVehicleLoading({ className }: { className: string }) {
   }, []);
 
   const currentLabel = isWaiting
-    ? "Almost there... Preparing your account"
+    ? "Almost there... Verifying your account"
     : ["Checking email...", "Checking password...", "Verifying account..."][station];
   const stations = [
     { label: "Email", Icon: Mail },
@@ -48,6 +48,12 @@ function LoginVehicleLoading({ className }: { className: string }) {
       <span className="vt-login-loader-message" key={currentLabel}>
         {currentLabel}
       </span>
+      {isWaiting && (
+        <span className="vt-login-loader-hint">
+          The server is waking up after inactivity, so this may take a little longer. Please keep
+          this page open while we verify your account.
+        </span>
+      )}
       <span className="vt-login-route" aria-hidden="true">
         <span className="vt-login-road" />
         <Truck className="vt-login-truck" style={{ left: `${16.666 + station * 33.334}%` }} />
@@ -64,7 +70,9 @@ function LoginVehicleLoading({ className }: { className: string }) {
           ))}
         </span>
       </span>
-      <span className="sr-only">{isWaiting ? "Your secure sign-in is being finalized." : ""}</span>
+      <span className="sr-only">
+        {isWaiting ? "The server may be waking up. Your account is still being verified." : ""}
+      </span>
     </span>
   );
 }

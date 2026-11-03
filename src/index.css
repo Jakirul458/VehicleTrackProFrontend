@@ -212,6 +212,12 @@
   animation: vt-loader-message-in 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
+.vt-login-loader-hint {
+  font-size: 0.65rem;
+  line-height: 0.8rem;
+  opacity: 0.9;
+}
+
 .vt-login-route {
   position: relative;
   display: block;
