@@ -14,6 +14,8 @@ import AboutPage from "./pages/public/AboutPage";
 import ContactPage from "./pages/public/ContactPage";
 import PricingPage from "./pages/public/PricingPage";
 import RenewalPaymentPage from "./pages/public/RenewalPaymentPage";
+import PrivacyPolicyPage from "./pages/public/PrivacyPolicyPage";
+import TermsOfServicePage from "./pages/public/TermsOfServicePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import NotFoundPage from "./pages/errors/NotFoundPage";
@@ -73,6 +75,16 @@ const PAGE_SEO: Record<string, { title: string; description: string; keywords?: 
     description:
       "Compare annual Insurance, Road Tax and PUC subscription plans, including discounted service combinations.",
     keywords: "VehicleTrack Pro pricing, insurance tax PUC subscription plans",
+  },
+  "/privacy-policy": {
+    title: "Privacy Policy | VehicleTrack Pro",
+    description:
+      "Learn how VehicleTrack Pro collects, uses, protects and retains account, customer and vehicle information.",
+  },
+  "/terms-of-service": {
+    title: "Terms of Service | VehicleTrack Pro",
+    description:
+      "Read the terms for using VehicleTrack Pro vehicle document management and renewal reminder services.",
   },
 };
 
@@ -171,6 +183,8 @@ function App() {
               <Route path="about" element={<AboutPage />} />
               <Route path="contact" element={<ContactPage />} />
               <Route path="pricing" element={<PricingPage />} />
+              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="terms-of-service" element={<TermsOfServicePage />} />
               <Route path="renewal" element={<RenewalPaymentPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="signup" element={<SignupPage />} />

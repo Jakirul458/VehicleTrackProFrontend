@@ -199,12 +199,12 @@ export default function PublicLayout() {
                 <h3 className="mb-4 font-semibold text-white">Legal</h3>
                 <ul className="space-y-3 text-sm text-slate-400">
                   <li>
-                    <Link to="/about" className="transition-colors hover:text-teal-300">
+                    <Link to="/privacy-policy" className="transition-colors hover:text-teal-300">
                       Privacy Policy
                     </Link>
                   </li>
                   <li>
-                    <Link to="/about" className="transition-colors hover:text-teal-300">
+                    <Link to="/terms-of-service" className="transition-colors hover:text-teal-300">
                       Terms of Service
                     </Link>
                   </li>

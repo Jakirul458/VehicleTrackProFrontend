@@ -14,7 +14,7 @@ if (!configuredUrl) {
 const siteUrl = new URL(
   configuredUrl.startsWith("http") ? configuredUrl : `https://${configuredUrl}`,
 ).origin;
-const publicPaths = ["/", "/about", "/contact", "/pricing"];
+const publicPaths = ["/", "/about", "/contact", "/pricing", "/privacy-policy", "/terms-of-service"];
 const escapeXml = (value) =>
   value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 const sitemap = [
@@ -93,6 +93,22 @@ const routePages = [
     description:
       "Compare annual Insurance, Road Tax and PUC subscription plans, including discounted service combinations.",
     keywords: "VehicleTrack Pro pricing, insurance tax PUC subscription plans",
+    indexable: true,
+  },
+  {
+    path: "/privacy-policy",
+    file: "privacy-policy.html",
+    title: "Privacy Policy | VehicleTrack Pro",
+    description:
+      "Learn how VehicleTrack Pro collects, uses, protects and retains account, customer and vehicle information.",
+    indexable: true,
+  },
+  {
+    path: "/terms-of-service",
+    file: "terms-of-service.html",
+    title: "Terms of Service | VehicleTrack Pro",
+    description:
+      "Read the terms for using VehicleTrack Pro vehicle document management and renewal reminder services.",
     indexable: true,
   },
   {
