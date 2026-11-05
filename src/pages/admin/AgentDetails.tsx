@@ -1,14 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
-import { adminApi } from "@/api";
+import { adminApi, subscriptionAdminApi } from "@/api";
 import { normalizeApiError } from "@/api/client";
-import type { Agent, ModuleAccess } from "@/types";
-import { ArrowLeft, CalendarDays, KeyRound, Shield, ShieldAlert } from "lucide-react";
+import type { Agent, ModuleAccess, PlatformSettings, SubscriptionPayment } from "@/types";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Download,
+  FileText,
+  KeyRound,
+  Shield,
+  ShieldAlert,
+} from "lucide-react";
 import { DocumentModulePage } from "@/components/documents/DocumentModulePage";
 import PaymentsPage from "@/pages/agent/PaymentsPage";
 import { toast } from "sonner";
 import { VehicleLoading } from "@/components/common/VehicleLoading";
+import { formatCurrency } from "@/lib/expiry";
+import { createInvoicePdf, invoiceFilename } from "@/lib/invoice";
+import { InvoiceDraftPreview } from "@/components/subscriptions/InvoiceDraftPreview";
 
 const tabs = [
   { key: "insurance", label: "Insurance" },
@@ -28,6 +39,16 @@ export default function AgentDetails() {
   const queryClient = useQueryClient();
   const [updating, setUpdating] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [selectedPlanId, setSelectedPlanId] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState<"FREE" | "PAID">("FREE");
+  const [issuedInvoice, setIssuedInvoice] = useState<SubscriptionPayment | null>(null);
+  const [invoiceDraftDate, setInvoiceDraftDate] = useState("");
+  const [invoicePaymentDate, setInvoicePaymentDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
+  const [invoiceGstEnabled, setInvoiceGstEnabled] = useState(false);
+  const [invoiceGstRate, setInvoiceGstRate] = useState(18);
+  const [invoiceSellerGstin, setInvoiceSellerGstin] = useState("");
   const [moduleAccess, setModuleAccess] = useState<ModuleAccess>({
     insurance: true,
     tax: true,
@@ -41,8 +62,20 @@ export default function AgentDetails() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+  const plansQuery = useQuery({
+    queryKey: ["subscription-plans"],
+    queryFn: subscriptionAdminApi.plans.list,
+  });
+  const settingsQuery = useQuery<PlatformSettings>({
+    queryKey: ["platform-settings"],
+    queryFn: adminApi.settings.get,
+  });
+  const invoiceSettings = settingsQuery.data;
+  const plans = useMemo(() => plansQuery.data ?? [], [plansQuery.data]);
+  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
   useEffect(() => {
     if (agent) {
+      setSubscriptionStatus(agent.subscriptionStatus === "PAID" ? "PAID" : "FREE");
       setModuleAccess({
         insurance: agent.moduleAccess?.insurance ?? true,
         tax: agent.moduleAccess?.tax ?? true,
@@ -50,6 +83,20 @@ export default function AgentDetails() {
       });
     }
   }, [agent]);
+  useEffect(() => {
+    if (!selectedPlanId && plans.length) {
+      setSelectedPlanId(
+        plans.find((plan) => plan.name === agent?.subscriptionPlanName)?.id ?? plans[0]?.id ?? "",
+      );
+    }
+  }, [agent?.subscriptionPlanName, plans, selectedPlanId]);
+  useEffect(() => {
+    if (invoiceSettings) {
+      setInvoiceGstEnabled(invoiceSettings.invoiceGstEnabled);
+      setInvoiceGstRate(invoiceSettings.invoiceGstRate);
+      setInvoiceSellerGstin(invoiceSettings.businessGstin);
+    }
+  }, [invoiceSettings]);
 
   if (isLoading) {
     return <VehicleLoading variant="section" />;
@@ -84,8 +131,8 @@ export default function AgentDetails() {
         queryClient.invalidateQueries({ queryKey: ["agents"] }),
       ]);
       toast.success(`Agent ${nextStatus.toLowerCase()}.`);
-    } catch {
-      return;
+    } catch (error) {
+      toast.error(normalizeApiError(error).message);
     } finally {
       setUpdating(false);
     }
@@ -93,23 +140,98 @@ export default function AgentDetails() {
 
   async function saveValidity(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const trialEndDate = String(new FormData(event.currentTarget).get("trialEndDate") ?? "");
+    const formData = new FormData(event.currentTarget);
+    const trialEndDate = String(formData.get("trialEndDate") ?? "");
+    const subscriptionStatus = String(formData.get("subscriptionStatus") ?? "FREE");
+    const planId = String(formData.get("planId") ?? "");
     if (!trialEndDate) {
       toast.error("Select a validity date.");
       return;
     }
+    if (subscriptionStatus === "PAID" && !planId) {
+      toast.error("Select the paid subscription plan.");
+      return;
+    }
+    if (subscriptionStatus === "PAID") {
+      if (!invoiceSettings || settingsQuery.isError) {
+        toast.error("Invoice settings are not available. Refresh and try again.");
+        return;
+      }
+      setInvoiceDraftDate(trialEndDate);
+      setIssuedInvoice(null);
+      return;
+    }
     setUpdating(true);
     try {
-      await adminApi.agents.updateValidity(currentAgent.id, trialEndDate);
+      await adminApi.agents.updateSubscription(currentAgent.id, "FREE", trialEndDate);
+      setIssuedInvoice(null);
+      setInvoiceDraftDate("");
+      toast.success("Free plan and validity date saved.");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["agent", id] }),
         queryClient.invalidateQueries({ queryKey: ["agents"] }),
+        queryClient.invalidateQueries({ queryKey: ["agent-subscriptions"] }),
       ]);
-      toast.success("Agent validity date updated.");
-    } catch {
-      return;
+    } catch (error) {
+      toast.error(normalizeApiError(error).message);
     } finally {
       setUpdating(false);
+    }
+  }
+
+  async function confirmInvoiceIssue() {
+    if (!selectedPlan || !invoiceDraftDate) {
+      toast.error("Select a plan and validity date before generating the invoice.");
+      return;
+    }
+    if (invoiceGstEnabled && !/^[0-9A-Z]{15}$/.test(invoiceSellerGstin.trim().toUpperCase())) {
+      toast.error("Enter a valid 15-character supplier GSTIN or turn GST off.");
+      return;
+    }
+    setUpdating(true);
+    try {
+      const savedInvoice = await subscriptionAdminApi.agents.issueInvoice(
+        currentAgent.id,
+        selectedPlan.id,
+        invoiceDraftDate,
+        invoicePaymentDate,
+        {
+          gstEnabled: invoiceGstEnabled,
+          gstRate: invoiceGstRate,
+          sellerGstin: invoiceSellerGstin.trim().toUpperCase(),
+        },
+      );
+      const invoice = await subscriptionAdminApi.payments.get(savedInvoice.id);
+      setIssuedInvoice(invoice);
+      setInvoiceDraftDate("");
+      try {
+        const pdf = await createInvoicePdf(invoice);
+        pdf.save(invoiceFilename(invoice));
+        toast.success("Paid plan saved and invoice downloaded.");
+      } catch {
+        toast.success("Paid plan saved. Download the invoice using the invoice button.");
+        toast.error("Invoice PDF could not be generated automatically.");
+      }
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["agent", id] }),
+        queryClient.invalidateQueries({ queryKey: ["agents"] }),
+        queryClient.invalidateQueries({ queryKey: ["agent-subscriptions"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin-subscription-invoices"] }),
+      ]);
+    } catch (error) {
+      toast.error(normalizeApiError(error).message);
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function downloadIssuedInvoice() {
+    if (!issuedInvoice) return;
+    try {
+      const pdf = await createInvoicePdf(issuedInvoice);
+      pdf.save(invoiceFilename(issuedInvoice));
+    } catch {
+      toast.error("The invoice PDF could not be generated.");
     }
   }
 
@@ -177,6 +299,18 @@ export default function AgentDetails() {
           <dd className="font-medium">{agent.status}</dd>
         </div>
         <div>
+          <dt className="text-sm text-muted-foreground">Subscription</dt>
+          <dd className="font-medium">
+            {agent.subscriptionStatus === "PAID"
+              ? "Paid / Approved"
+              : agent.subscriptionStatus === "PENDING"
+                ? "Pending verification"
+                : agent.subscriptionStatus === "REJECTED"
+                  ? "Rejected"
+                  : "Free"}
+          </dd>
+        </div>
+        <div>
           <dt className="text-sm text-muted-foreground">Validity date</dt>
           <dd className="font-medium">
             {agent.trialEndDate
@@ -220,30 +354,174 @@ export default function AgentDetails() {
           </button>
         </div>
         <form onSubmit={(event) => void saveValidity(event)} className="space-y-3">
-          <label htmlFor="trialEndDate" className="block font-semibold">
-            Agent validity
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label htmlFor="subscriptionStatus" className="block font-semibold">
+              Subscription status
+              <select
+                id="subscriptionStatus"
+                name="subscriptionStatus"
+                value={subscriptionStatus}
+                onChange={(event) => {
+                  setSubscriptionStatus(event.target.value === "PAID" ? "PAID" : "FREE");
+                  setInvoiceDraftDate("");
+                }}
+                className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
+              >
+                <option value="FREE">Free plan</option>
+                <option value="PAID">Paid / admin verified</option>
+              </select>
+            </label>
+            <label htmlFor="trialEndDate" className="block font-semibold">
+              Agent validity
+              <input
+                id="trialEndDate"
+                name="trialEndDate"
+                type="date"
+                required
+                defaultValue={agent.trialEndDate?.slice(0, 10) ?? ""}
+                className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
+              />
+            </label>
+            {subscriptionStatus === "PAID" && (
+              <label htmlFor="invoicePaymentDate" className="block font-semibold">
+                Payment date
+                <input
+                  id="invoicePaymentDate"
+                  name="invoicePaymentDate"
+                  type="date"
+                  max={new Date().toISOString().slice(0, 10)}
+                  value={invoicePaymentDate}
+                  onChange={(event) => setInvoicePaymentDate(event.target.value)}
+                  required
+                  className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm font-normal"
+                />
+              </label>
+            )}
+          </div>
+          <label htmlFor="planId" className="block font-semibold">
+            Subscription plan
+            <select
+              id="planId"
+              name="planId"
+              value={selectedPlanId}
+              onChange={(event) => {
+                setSelectedPlanId(event.target.value);
+                setIssuedInvoice(null);
+              }}
+              required={subscriptionStatus === "PAID"}
+              disabled={plansQuery.isLoading || !plans.length}
+              className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm font-normal disabled:opacity-60"
+            >
+              {plansQuery.isLoading ? (
+                <option value="">Loading subscription plans…</option>
+              ) : plans.length ? (
+                plans.map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name} · {formatCurrency(plan.current_price)}
+                    {plan.offer_tag ? ` · ${plan.offer_tag}` : ""}
+                  </option>
+                ))
+              ) : (
+                <option value="">No subscription plans configured</option>
+              )}
+            </select>
+            {plansQuery.isError && (
+              <span role="alert" className="mt-1 block text-sm font-normal text-destructive">
+                Subscription plans could not be loaded. Refresh and try again.
+              </span>
+            )}
+            {selectedPlan && (
+              <span className="mt-1 block text-sm font-normal text-muted-foreground">
+                {selectedPlan.description} · Plan price:{" "}
+                <strong className="text-foreground">
+                  {formatCurrency(selectedPlan.current_price)}
+                </strong>
+              </span>
+            )}
+            {subscriptionStatus === "PAID" && selectedPlan && selectedPlan.current_price < 1 && (
+              <span role="alert" className="mt-1 block text-sm font-normal text-destructive">
+                This is a free plan and cannot generate a paid invoice. Choose Free plan or select a
+                paid plan.
+              </span>
+            )}
           </label>
           <p className="text-sm text-muted-foreground">
             The agent can use the system through the selected date.
           </p>
           <div className="flex flex-wrap gap-2">
-            <input
-              id="trialEndDate"
-              name="trialEndDate"
-              type="date"
-              required
-              defaultValue={agent.trialEndDate?.slice(0, 10) ?? ""}
-              className="h-10 rounded-md border border-input bg-background px-3"
-            />
             <button
               type="submit"
-              disabled={updating}
+              disabled={
+                updating ||
+                (subscriptionStatus === "PAID" && (selectedPlan?.current_price ?? 0) < 1)
+              }
               className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50"
             >
-              <CalendarDays className="size-4" /> Save date
+              <CalendarDays className="size-4" />
+              {subscriptionStatus === "PAID" ? "Preview invoice" : "Save free plan"}
             </button>
+            {issuedInvoice && (
+              <button
+                type="button"
+                onClick={() => void downloadIssuedInvoice()}
+                className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
+              >
+                <Download className="size-4" />
+                <FileText className="size-4" />
+                Download {issuedInvoice.invoiceNumber}
+              </button>
+            )}
           </div>
         </form>
+        {invoiceDraftDate && selectedPlan && (
+          <div className="space-y-4 md:col-span-2">
+            <InvoiceDraftPreview
+              planName={selectedPlan.name}
+              description={selectedPlan.description}
+              amount={selectedPlan.current_price}
+              customerName={agent.fullName}
+              customerBusiness={agent.businessName}
+              supplierName={invoiceSettings?.businessName ?? "VehicleTrack Pro"}
+              supplierAddress={invoiceSettings?.businessAddress}
+              defaultGstEnabled={invoiceSettings?.invoiceGstEnabled ?? false}
+              gstEnabled={invoiceGstEnabled}
+              onGstEnabledChange={setInvoiceGstEnabled}
+              gstRate={invoiceGstRate}
+              onGstRateChange={setInvoiceGstRate}
+              sellerGstin={invoiceSellerGstin}
+              onSellerGstinChange={setInvoiceSellerGstin}
+              authorizedSignatory={invoiceSettings?.invoiceAuthorizedSignatory}
+              signatureImage={invoiceSettings?.invoiceSignatureImage}
+              paymentDate={invoicePaymentDate}
+              periodEnd={invoiceDraftDate}
+            />
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => void confirmInvoiceIssue()}
+                disabled={
+                  updating ||
+                  (invoiceGstEnabled &&
+                    !/^[0-9A-Z]{15}$/.test(invoiceSellerGstin.trim().toUpperCase()))
+                }
+                className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50"
+              >
+                {updating ? "Generating invoice…" : "Confirm & generate invoice"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setInvoiceDraftDate("")}
+                disabled={updating}
+                className="rounded-md border px-4 py-2 text-sm font-semibold"
+              >
+                Cancel preview
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Confirm only after verifying that the payment was received for the previewed total.
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="mb-8 rounded-lg border bg-card p-6">

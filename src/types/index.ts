@@ -53,6 +53,26 @@ export interface User {
 
 export interface Agent extends User {
   agentCode?: string;
+  subscriptionStatus?: "FREE" | "PENDING" | "PAID" | "REJECTED";
+  subscriptionPlanName?: string;
+}
+
+export interface AgentSubscriptionRow extends Agent {
+  latestPayment: {
+    id: string;
+    planName: string;
+    amount: number;
+    totalAmount: number;
+    gstEnabled: boolean;
+    gstAmount: number;
+    utr: string;
+    paymentApp: string;
+    paymentDate: string;
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    invoiceNumber: string;
+    rejectReason: string;
+    createdAt: string;
+  } | null;
 }
 
 export interface LoginLocation {
@@ -185,6 +205,13 @@ export interface ActiveAuthSession {
 export interface PlatformSettings {
   supportWhatsapp: string;
   supportEmail: string;
+  businessName: string;
+  businessAddress: string;
+  businessGstin: string;
+  invoiceGstEnabled: boolean;
+  invoiceGstRate: number;
+  invoiceAuthorizedSignatory: string;
+  invoiceSignatureImage: string;
   qrCodeUrl: string;
   upiId: string;
   bankAccountName: string;
@@ -202,6 +229,59 @@ export interface PlatformSettings {
   insuranceTaxPrice: number;
   insurancePucPrice: number;
   allModulesPrice: number;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  original_price: number;
+  current_price: number;
+  offer_tag: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InvoiceParty {
+  fullName: string;
+  businessName: string;
+  email: string;
+  mobile: string;
+  address: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  gstin: string;
+  signatureImage?: string;
+}
+
+export interface SubscriptionPayment {
+  id: string;
+  agentId:
+    string | { id: string; fullName: string; email: string; mobile: string; businessName?: string };
+  planId: string;
+  planName: string;
+  planDescription: string;
+  amount: number;
+  gstEnabled?: boolean;
+  gstRate?: number;
+  gstAmount?: number;
+  totalAmount?: number;
+  authorizedSignatory?: string;
+  utr: string;
+  paymentApp: string;
+  paymentDate: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  rejectReason: string;
+  invoiceNumber: string;
+  approvedAt?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  customer: InvoiceParty;
+  seller: InvoiceParty;
+  screenshot?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface FinancialPeriodSummary {

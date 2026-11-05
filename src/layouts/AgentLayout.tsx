@@ -16,6 +16,7 @@ import {
   FileText,
   Receipt,
   Wallet,
+  FileStack,
   BellRing,
   User as UserIcon,
   LogOut,
@@ -57,6 +58,7 @@ export default function AgentLayout() {
       ? [{ path: "/agent/puc", label: "PUC", icon: FileText }]
       : []),
     { path: "/agent/payments", label: "Payments", icon: Wallet },
+    { path: "/agent/invoices", label: "Invoices", icon: FileStack },
     { path: "/agent/reminders", label: "Reminders", icon: BellRing },
     { path: "/agent/profile", label: "Profile", icon: UserIcon },
   ];

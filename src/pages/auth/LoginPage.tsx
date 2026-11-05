@@ -70,6 +70,8 @@ export default function LoginPage() {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       if (user.role === "SUPER_ADMIN") {
         navigate("/admin/dashboard", { replace: true });
+      } else if (user.trialEndDate && new Date(user.trialEndDate).getTime() <= Date.now()) {
+        navigate("/renewal", { replace: true });
       } else {
         navigate("/agent/dashboard", { replace: true });
       }
@@ -342,7 +344,7 @@ export default function LoginPage() {
             </DialogTitle>
             <DialogDescription>
               {validityExpired
-                ? "Your account validity has expired. Please contact your administrator to renew it."
+                ? "Your account validity has expired. Sign in with your account to pay for renewal; payment access remains available until an administrator verifies it."
                 : loginError?.code === "ACCOUNT_SUSPENDED"
                   ? "Your account has been suspended. Please contact your administrator for help."
                   : invalidCredentials

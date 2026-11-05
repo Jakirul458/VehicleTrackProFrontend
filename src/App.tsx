@@ -28,6 +28,9 @@ import AgentForm from "./pages/admin/AgentForm";
 import AgentDetails from "./pages/admin/AgentDetails";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminActivity from "./pages/admin/AdminActivity";
+import AdminSubscriptionPlans from "./pages/admin/AdminSubscriptionPlans";
+import AdminSubscriptionPayments from "./pages/admin/AdminSubscriptionPayments";
+import AdminSubscriptionInvoices from "./pages/admin/AdminSubscriptionInvoices";
 
 // Agent pages
 import AgentDashboard from "./pages/agent/AgentDashboard";
@@ -39,6 +42,7 @@ import AgentReports from "./pages/agent/AgentReports";
 import AgentProfile from "./pages/agent/AgentProfile";
 import { DocumentModulePage } from "./components/documents/DocumentModulePage";
 import PaymentsPage from "./pages/agent/PaymentsPage";
+import AgentInvoices from "./pages/agent/AgentInvoices";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -213,6 +217,9 @@ function App() {
               <Route path="tax" element={<DocumentModulePage moduleKey="tax" admin />} />
               <Route path="puc" element={<DocumentModulePage moduleKey="puc" admin />} />
               <Route path="payments" element={<PaymentsPage />} />
+              <Route path="subscription-plans" element={<AdminSubscriptionPlans />} />
+              <Route path="agents/subscriptions" element={<AdminSubscriptionPayments />} />
+              <Route path="subscription-invoices" element={<AdminSubscriptionInvoices />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="activity" element={<AdminActivity />} />
             </Route>
@@ -253,6 +260,7 @@ function App() {
                 }
               />
               <Route path="payments" element={<PaymentsPage />} />
+              <Route path="invoices" element={<AgentInvoices />} />
               <Route path="reminders" element={<RemindersPage />} />
               <Route path="reports" element={<AgentReports />} />
               <Route path="profile" element={<AgentProfile />} />

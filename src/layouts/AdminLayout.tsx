@@ -14,6 +14,8 @@ import {
   Menu,
   X,
   User as UserIcon,
+  Tags,
+  FileStack,
 } from "lucide-react";
 
 export default function AdminLayout() {
@@ -34,6 +36,8 @@ export default function AdminLayout() {
     { path: "/admin/tax", label: "Tax", icon: Receipt },
     { path: "/admin/puc", label: "PUC", icon: FileText },
     { path: "/admin/payments", label: "Payments", icon: Wallet },
+    { path: "/admin/subscription-plans", label: "Subscription plans", icon: Tags },
+    { path: "/admin/subscription-invoices", label: "Subscription invoices", icon: FileStack },
     { path: "/admin/activity", label: "Activity", icon: Activity },
     { path: "/admin/settings", label: "Settings", icon: Settings },
   ];

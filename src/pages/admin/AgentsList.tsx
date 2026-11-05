@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { adminApi } from "@/api";
 import type { Agent } from "@/types";
-import { Plus, Edit, Trash2, Shield, AlertCircle } from "lucide-react";
+import { Plus, Edit, Trash2, Shield, AlertCircle, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { daysLeft, formatDateTime } from "@/lib/expiry";
 import { PageHeader, Panel, TablePagination } from "@/components/common";
@@ -56,13 +56,22 @@ export default function AgentsList() {
         title="Agents"
         description="Manage agent accounts, access, and subscription validity."
         actions={
-          <Link
-            to="/admin/agents/new"
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Plus className="h-4 w-4" />
-            Create Agent
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/admin/agents/subscriptions"
+              className="flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
+            >
+              <CreditCard className="h-4 w-4" />
+              Subscriptions &amp; payments
+            </Link>
+            <Link
+              to="/admin/agents/new"
+              className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4" />
+              Create Agent
+            </Link>
+          </div>
         }
       />
 

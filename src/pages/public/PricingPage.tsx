@@ -1,19 +1,18 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react";
 import { paymentApi } from "@/api";
-import { subscriptionPlans } from "@/constants/pricing";
 import { formatCurrency } from "@/lib/expiry";
 import { VehicleLoading } from "@/components/common/VehicleLoading";
 
 export default function PricingPage() {
   const {
-    data: settings,
+    data: plans,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["payment-settings"],
-    queryFn: paymentApi.settings,
+    queryKey: ["subscription-plans"],
+    queryFn: paymentApi.plans,
+    staleTime: 0,
   });
 
   return (
@@ -39,7 +38,7 @@ export default function PricingPage() {
           <div className="rounded-2xl border bg-white">
             <VehicleLoading variant="section" />
           </div>
-        ) : isError || !settings ? (
+        ) : isError || !plans ? (
           <p
             role="alert"
             className="rounded-2xl border border-destructive/40 bg-white p-8 text-center text-destructive"
@@ -48,43 +47,44 @@ export default function PricingPage() {
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {subscriptionPlans.map((plan) => {
-              const isAllInOne = plan.key === "allModulesPrice";
+            {plans?.map((plan) => {
               return (
                 <article
-                  key={plan.key}
-                  className={`flex flex-col rounded-2xl border bg-white p-6 shadow-sm ${
-                    isAllInOne ? "border-cyan-600 ring-2 ring-cyan-600/15" : "border-slate-200"
-                  }`}
+                  key={plan.id}
+                  className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
                 >
-                  {isAllInOne && (
-                    <span className="mb-3 w-fit rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-900">
-                      Best value
-                    </span>
-                  )}
-                  <h2 className="text-xl font-bold text-slate-900">{plan.label}</h2>
-                  <p className="mt-1 text-sm text-slate-600">{plan.modules}</p>
-                  <p className="mt-5 text-3xl font-extrabold text-slate-900">
-                    {formatCurrency(settings[plan.key])}
-                    <span className="ml-1 text-sm font-medium text-slate-500">/ year</span>
+                  <h2 className="text-xl font-bold text-slate-900">{plan.name}</h2>
+                  <p className="mt-2 min-h-10 text-sm leading-5 text-slate-600">
+                    {plan.description}
                   </p>
-                  <div className="my-5 flex items-center gap-2 text-sm text-slate-600">
-                    <Check className="size-4 text-emerald-600" />
-                    Annual access to selected modules
+                  <div className="mt-5 space-y-2">
+                    <p className="text-base text-slate-500 line-through">
+                      {formatCurrency(plan.original_price)}
+                    </p>
+                    {plan.offer_tag && (
+                      <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
+                        {plan.offer_tag}
+                      </span>
+                    )}
+                    <p className="text-3xl font-extrabold text-slate-900">
+                      Now {formatCurrency(plan.current_price)}
+                    </p>
+                    <p className="text-sm font-medium text-slate-500">/ year</p>
                   </div>
                   <Link
-                    to={`/renewal?plan=${plan.key}`}
-                    className={`mt-auto inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2 text-sm font-bold transition ${
-                      isAllInOne
-                        ? "bg-gradient-to-r from-sky-600 to-teal-500 text-white hover:shadow-lg"
-                        : "border border-slate-300 text-slate-800 hover:border-cyan-600 hover:text-cyan-800"
-                    }`}
+                    to={`/renewal?plan=${plan.id}#payment-section`}
+                    className="mt-auto inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-sky-600 to-teal-500 px-4 py-2 text-sm font-bold text-white transition hover:shadow-lg"
                   >
-                    Choose this plan
+                    Choose Plan
                   </Link>
                 </article>
               );
             })}
+            {plans?.length === 0 && (
+              <p className="col-span-full rounded-xl border border-dashed p-8 text-center text-slate-600">
+                Subscription plans are not available right now.
+              </p>
+            )}
           </div>
         )}
 

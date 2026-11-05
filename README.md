@@ -24,6 +24,7 @@ npm run dev
 ```
 
 Copy `.env.example` to `.env` and configure:
+
 - `VITE_API_URL`: Backend API URL (default: http://localhost:5000/api)
 
 The frontend uses JWT tokens stored in localStorage for authentication. The token is automatically included in Authorization headers for all API requests.
@@ -57,6 +58,7 @@ The API must allow the exact Vercel site origin through its `CLIENT_ORIGIN` sett
 ## Authentication
 
 The app uses JWT-based authentication:
+
 1. Login stores the JWT token in sessionStorage so closing the tab ends the browser session
 2. Axios interceptors automatically add the token to Authorization headers
 3. Protected routes check for valid authentication
@@ -66,6 +68,7 @@ The app uses JWT-based authentication:
 ## Features
 
 ### Public Pages
+
 - Landing page with feature overview
 - About page
 - Contact page with form
@@ -73,17 +76,19 @@ The app uses JWT-based authentication:
 - Public agent signup with a one-month trial
 
 ### Admin Pages (Super Admin only)
+
 - Dashboard with platform statistics
 - Agent management (CRUD operations)
 - Activity log filters and CSV export
 - Active login sessions with remote revoke controls
-- Settings
+- Settings, dynamic subscription plan CRUD, and payment verification
 
 ### Agent Pages
+
 - Dashboard with statistics
 - Insurance, tax, and PUC record management
 - Expiry reminders with prefilled Bengali WhatsApp messages and click-to-call actions
 - Reports
 - Profile settings
 
-Agents can sign up for a one-month trial or be created by the Super Admin. Super Admins configure monthly/yearly/lifetime prices and the QR, bank/UPI, WhatsApp, and email payment instructions from `/admin/settings`. After a trial or account validity expires, the login dialog links to the renewal page; confirm the payment slip before extending validity.
+Agents can sign up for a one-month trial or be created by the Super Admin. Super Admins configure UPI, invoice supplier/GST/signature details from `/admin/settings`, maintain dynamic plan names/prices/offers at `/admin/subscription-plans`, and manage all agent subscriptions from **Agents → Subscriptions** or an agent profile. Invoice options can be previewed before issue; agent invoice history is in **Agent Panel → Invoices**, with global tracking in **Admin → Subscription invoices**. Expired agents can sign in only to submit renewal details and access invoices; regular protected features remain unavailable until an administrator verifies the UTR. See [UPI subscriptions and invoices](../UPI_SUBSCRIPTIONS_INVOICES_GUIDE.md) for the full flow.

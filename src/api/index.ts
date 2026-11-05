@@ -13,6 +13,9 @@ import type {
   PaymentRecordsResponse,
   ActiveAuthSession,
   ModuleAccess,
+  SubscriptionPlan,
+  SubscriptionPayment,
+  AgentSubscriptionRow,
 } from "@/types";
 
 export { apiClient, request, createResourceApi } from "./client";
@@ -46,6 +49,8 @@ export const adminApi = {
       request<Agent>(apiClient.patch(`/admin/agents/${id}/module-access`, { moduleAccess })),
     updateValidity: (id: string, trialEndDate: string) =>
       request<Agent>(apiClient.patch(`/admin/agents/${id}/validity`, { trialEndDate })),
+    updateSubscription: (id: string, status: "FREE", trialEndDate: string) =>
+      request<Agent>(apiClient.patch(`/admin/agents/${id}/subscription`, { status, trialEndDate })),
     resetPassword: (id: string, newPassword: string) =>
       request<{ success: boolean }>(
         apiClient.patch(`/admin/agents/${id}/password`, { newPassword }),
@@ -97,6 +102,70 @@ export const reportApi = {
 
 export const paymentApi = {
   settings: () => request<PlatformSettings>(apiClient.get("/settings/payment")),
+  plans: () => request<SubscriptionPlan[]>(apiClient.get("/plans")),
+  submit: (payload: {
+    planId: string;
+    utr: string;
+    paymentApp: string;
+    paymentDate: string;
+    screenshot?: string;
+  }) => request<SubscriptionPayment>(apiClient.post("/payments/submissions", payload)),
+  mine: () => request<SubscriptionPayment[]>(apiClient.get("/payments/submissions")),
+  invoice: (id: string) => request<SubscriptionPayment>(apiClient.get(`/payments/invoices/${id}`)),
+};
+
+export const subscriptionAdminApi = {
+  agents: {
+    list: (params?: { page?: number; limit?: number; search?: string }) =>
+      request<{
+        data: AgentSubscriptionRow[];
+        pagination: { page: number; limit: number; total: number; pages: number };
+      }>(apiClient.get("/admin/agent-subscriptions", { params })),
+    issueInvoice: (
+      agentId: string,
+      planId: string,
+      trialEndDate: string,
+      paymentDate: string,
+      invoiceOptions: { gstEnabled: boolean; gstRate: number; sellerGstin: string },
+    ) =>
+      request<SubscriptionPayment>(
+        apiClient.post(`/admin/agents/${agentId}/subscription-invoices`, {
+          planId,
+          trialEndDate,
+          paymentDate,
+          ...invoiceOptions,
+        }),
+      ),
+  },
+  plans: {
+    list: () => request<SubscriptionPlan[]>(apiClient.get("/admin/plans")),
+    create: (payload: Omit<SubscriptionPlan, "id" | "createdAt" | "updatedAt">) =>
+      request<SubscriptionPlan>(apiClient.post("/admin/plans", payload)),
+    update: (id: string, payload: Omit<SubscriptionPlan, "id" | "createdAt" | "updatedAt">) =>
+      request<SubscriptionPlan>(apiClient.put(`/admin/plans/${id}`, payload)),
+    delete: (id: string) => request<{ id: string }>(apiClient.delete(`/admin/plans/${id}`)),
+  },
+  payments: {
+    list: (params?: { page?: number; limit?: number; status?: string }) =>
+      request<{
+        data: SubscriptionPayment[];
+        pagination: { page: number; limit: number; total: number; pages: number };
+      }>(apiClient.get("/admin/subscription-payments", { params })),
+    get: (id: string) =>
+      request<SubscriptionPayment>(apiClient.get(`/admin/subscription-payments/${id}`)),
+    review: (
+      id: string,
+      payload:
+        | {
+            status: "APPROVED";
+            gstEnabled?: boolean;
+            gstRate?: number;
+            sellerGstin?: string;
+          }
+        | { status: "REJECTED"; rejectReason: string },
+    ) =>
+      request<SubscriptionPayment>(apiClient.patch(`/admin/subscription-payments/${id}`, payload)),
+  },
 };
 
 export const remindersApi = {

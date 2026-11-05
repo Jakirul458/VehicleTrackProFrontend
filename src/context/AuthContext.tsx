@@ -88,6 +88,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!token || !user) return;
 
+    const accountExpired =
+      user.role === "AGENT" &&
+      user.trialEndDate !== undefined &&
+      new Date(user.trialEndDate).getTime() <= Date.now();
     let idleTimer: number;
     let lastServerActivityAt = Date.now();
     const resetIdleTimer = () => {
@@ -95,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       idleTimer = window.setTimeout(() => {
         void logout().then(() => window.location.assign("/login?sessionExpired=1"));
       }, IDLE_TIMEOUT_MS);
-      if (Date.now() - lastServerActivityAt >= 5 * 60 * 1000) {
+      if (!accountExpired && Date.now() - lastServerActivityAt >= 5 * 60 * 1000) {
         lastServerActivityAt = Date.now();
         void authApi
           .me()
