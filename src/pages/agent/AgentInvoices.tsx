@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Download, FileText } from "lucide-react";
+import { Download, Eye, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { paymentApi } from "@/api";
 import { VehicleLoading } from "@/components/common/VehicleLoading";
-import { createInvoicePdf, invoiceFilename } from "@/lib/invoice";
+import { createInvoicePdf, invoiceFilename, previewInvoicePdf } from "@/lib/invoice";
 import { formatCurrency, formatDate } from "@/lib/expiry";
 import type { SubscriptionPayment } from "@/types";
 
@@ -21,6 +21,21 @@ export default function AgentInvoices() {
       pdf.save(invoiceFilename(detailedInvoice));
     } catch {
       toast.error("Invoice PDF could not be generated. Please try again.");
+    }
+  }
+
+  async function viewInvoice(invoice: SubscriptionPayment) {
+    try {
+      await previewInvoicePdf(async () => {
+        const detailedInvoice = await paymentApi.invoice(invoice.id);
+        return createInvoicePdf(detailedInvoice);
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error && error.message.startsWith("Allow pop-ups")
+          ? error.message
+          : "Invoice PDF could not be opened. Please try again.",
+      );
     }
   }
 
@@ -64,14 +79,24 @@ export default function AgentInvoices() {
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => void downloadInvoice(invoice)}
-                className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground"
-              >
-                <Download className="size-4" />
-                Download PDF
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => void viewInvoice(invoice)}
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border px-3 text-sm font-semibold hover:bg-accent"
+                >
+                  <Eye className="size-4" />
+                  View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void downloadInvoice(invoice)}
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground"
+                >
+                  <Download className="size-4" />
+                  Download
+                </button>
+              </div>
             </article>
           ))}
         </div>

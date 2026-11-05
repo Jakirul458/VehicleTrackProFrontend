@@ -1,21 +1,44 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { Download, FileText } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Download, Eye, FileText, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { normalizeApiError } from "@/api/client";
 import { subscriptionAdminApi } from "@/api";
 import { VehicleLoading } from "@/components/common/VehicleLoading";
-import { createInvoicePdf, invoiceFilename } from "@/lib/invoice";
+import { InvoiceEditDialog } from "@/components/subscriptions/InvoiceEditDialog";
+import { createInvoicePdf, invoiceFilename, previewInvoicePdf } from "@/lib/invoice";
 import { formatCurrency, formatDate } from "@/lib/expiry";
-import type { SubscriptionPayment } from "@/types";
+import type { SubscriptionInvoiceUpdate, SubscriptionPayment } from "@/types";
 
 export default function AdminSubscriptionInvoices() {
   const [page, setPage] = useState(1);
+  const [editingInvoice, setEditingInvoice] = useState<SubscriptionPayment | null>(null);
+  const queryClient = useQueryClient();
   const invoicesQuery = useQuery({
     queryKey: ["admin-subscription-invoices", page],
     queryFn: () => subscriptionAdminApi.payments.list({ status: "APPROVED", page, limit: 20 }),
   });
   const result = invoicesQuery.data;
+  const updateInvoice = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: SubscriptionInvoiceUpdate }) =>
+      subscriptionAdminApi.payments.updateInvoice(id, payload),
+    onSuccess: async () => {
+      setEditingInvoice(null);
+      await queryClient.invalidateQueries({ queryKey: ["admin-subscription-invoices"] });
+      toast.success("Invoice updated.");
+    },
+    onError: (error) => toast.error(normalizeApiError(error).message),
+  });
+  const deleteInvoice = useMutation({
+    mutationFn: subscriptionAdminApi.payments.deleteInvoice,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-subscription-invoices"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-subscription-payments"] });
+      toast.success("Invoice deleted.");
+    },
+    onError: (error) => toast.error(normalizeApiError(error).message),
+  });
 
   async function downloadInvoice(invoice: SubscriptionPayment) {
     try {
@@ -24,6 +47,31 @@ export default function AdminSubscriptionInvoices() {
       pdf.save(invoiceFilename(detailedInvoice));
     } catch {
       toast.error("Invoice PDF could not be generated. Please try again.");
+    }
+  }
+
+  async function viewInvoice(invoice: SubscriptionPayment) {
+    try {
+      await previewInvoicePdf(async () => {
+        const detailedInvoice = await subscriptionAdminApi.payments.get(invoice.id);
+        return createInvoicePdf(detailedInvoice);
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error && error.message.startsWith("Allow pop-ups")
+          ? error.message
+          : "Invoice PDF could not be opened. Please try again.",
+      );
+    }
+  }
+
+  function confirmDelete(invoice: SubscriptionPayment) {
+    if (
+      window.confirm(
+        "Delete this invoice from the invoice list? This voids the invoice but does not change the agent's subscription validity.",
+      )
+    ) {
+      deleteInvoice.mutate(invoice.id);
     }
   }
 
@@ -51,7 +99,7 @@ export default function AdminSubscriptionInvoices() {
                 <th className="bg-slate-700 px-4 py-3 text-white">Plan</th>
                 <th className="bg-slate-700 px-4 py-3 text-white">Amount</th>
                 <th className="bg-slate-700 px-4 py-3 text-white">Issued / validity</th>
-                <th className="bg-slate-700 px-4 py-3 text-white">PDF</th>
+                <th className="bg-slate-700 px-4 py-3 text-white">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -99,13 +147,37 @@ export default function AdminSubscriptionInvoices() {
                       </p>
                     </td>
                     <td className="px-4 py-4">
-                      <button
-                        type="button"
-                        onClick={() => void downloadInvoice(invoice)}
-                        className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold hover:bg-accent"
-                      >
-                        <Download className="size-4" /> PDF
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void viewInvoice(invoice)}
+                          className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-xs font-semibold hover:bg-accent"
+                        >
+                          <Eye className="size-4" /> View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void downloadInvoice(invoice)}
+                          className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-xs font-semibold hover:bg-accent"
+                        >
+                          <Download className="size-4" /> Download
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingInvoice(invoice)}
+                          className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-xs font-semibold hover:bg-accent"
+                        >
+                          <Pencil className="size-4" /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          disabled={deleteInvoice.isPending}
+                          onClick={() => confirmDelete(invoice)}
+                          className="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-2.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                        >
+                          <Trash2 className="size-4" /> Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -145,6 +217,14 @@ export default function AdminSubscriptionInvoices() {
           </div>
         )}
       </div>
+      {editingInvoice && (
+        <InvoiceEditDialog
+          invoice={editingInvoice}
+          saving={updateInvoice.isPending}
+          onClose={() => setEditingInvoice(null)}
+          onSave={(payload) => updateInvoice.mutate({ id: editingInvoice.id, payload })}
+        />
+      )}
     </div>
   );
 }

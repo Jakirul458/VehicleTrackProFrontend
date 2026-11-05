@@ -68,7 +68,7 @@ export interface AgentSubscriptionRow extends Agent {
     utr: string;
     paymentApp: string;
     paymentDate: string;
-    status: "PENDING" | "APPROVED" | "REJECTED";
+    status: "PENDING" | "APPROVED" | "REJECTED" | "VOIDED";
     invoiceNumber: string;
     rejectReason: string;
     createdAt: string;
@@ -271,9 +271,11 @@ export interface SubscriptionPayment {
   utr: string;
   paymentApp: string;
   paymentDate: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: "PENDING" | "APPROVED" | "REJECTED" | "VOIDED";
   rejectReason: string;
   invoiceNumber: string;
+  voidedAt?: string;
+  voidedBy?: string;
   approvedAt?: string;
   periodStart?: string;
   periodEnd?: string;
@@ -283,6 +285,16 @@ export interface SubscriptionPayment {
   createdAt: string;
   updatedAt: string;
 }
+
+export type SubscriptionInvoiceUpdate = Partial<
+  Pick<
+    SubscriptionPayment,
+    "invoiceNumber" | "planName" | "planDescription" | "paymentDate" | "authorizedSignatory"
+  >
+> & {
+  customer?: Partial<Omit<InvoiceParty, "signatureImage">>;
+  seller?: Partial<Omit<InvoiceParty, "signatureImage">>;
+};
 
 export interface FinancialPeriodSummary {
   paidToPortal: number;

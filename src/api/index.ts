@@ -15,6 +15,7 @@ import type {
   ModuleAccess,
   SubscriptionPlan,
   SubscriptionPayment,
+  SubscriptionInvoiceUpdate,
   AgentSubscriptionRow,
 } from "@/types";
 
@@ -165,6 +166,10 @@ export const subscriptionAdminApi = {
         | { status: "REJECTED"; rejectReason: string },
     ) =>
       request<SubscriptionPayment>(apiClient.patch(`/admin/subscription-payments/${id}`, payload)),
+    updateInvoice: (id: string, payload: SubscriptionInvoiceUpdate) =>
+      request<SubscriptionPayment>(apiClient.put(`/admin/subscription-payments/${id}`, payload)),
+    deleteInvoice: (id: string) =>
+      request<{ id: string }>(apiClient.delete(`/admin/subscription-payments/${id}`)),
   },
 };
 

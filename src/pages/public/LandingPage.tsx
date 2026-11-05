@@ -628,7 +628,7 @@ export default function LandingPage() {
               className="vt-hero-in mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/70 lg:justify-start"
               style={{ animationDelay: "480ms" }}
             >
-              {["Insurance, tax and PUC", "Works on mobile", "Role-based access"].map((t) => (
+              {["Your Business.", "Your Customers", "Work Smarter", "Grow Stronger"].map((t) => (
                 <li key={t} className="flex items-center gap-1.5">
                   <CheckCircle className="h-4 w-4 text-emerald-400" />
                   {t}

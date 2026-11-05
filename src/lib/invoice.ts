@@ -1,4 +1,5 @@
 import type { SubscriptionPayment } from "@/types";
+import type { jsPDF } from "jspdf";
 
 function inr(amount: number) {
   return `INR ${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(amount)}`;
@@ -222,6 +223,22 @@ export async function createInvoicePdf(payment: SubscriptionPayment) {
   });
 
   return pdf;
+}
+
+export async function previewInvoicePdf(createPdf: () => Promise<jsPDF>) {
+  const previewWindow = window.open("about:blank", "_blank");
+  if (!previewWindow) {
+    throw new Error("Allow pop-ups to preview this invoice.");
+  }
+  try {
+    const pdf = await createPdf();
+    const url = URL.createObjectURL(pdf.output("blob"));
+    previewWindow.location.assign(url);
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (error) {
+    previewWindow.close();
+    throw error;
+  }
 }
 
 export function invoiceFilename(payment: SubscriptionPayment) {
