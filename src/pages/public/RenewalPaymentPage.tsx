@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { daysLeft, formatCurrency, formatDate } from "@/lib/expiry";
 import { createInvoicePdf, invoiceFilename } from "@/lib/invoice";
 import { VehicleLoading } from "@/components/common/VehicleLoading";
+import { normalizeWhatsAppNumber } from "@/lib/whatsapp";
 import type { SubscriptionPayment } from "@/types";
 
 export default function RenewalPaymentPage() {
@@ -68,7 +69,16 @@ export default function RenewalPaymentPage() {
     });
     return `upi://pay?${params.toString()}`;
   }, [selected, settings]);
-  const whatsappDigits = settings?.supportWhatsapp.replace(/\D/g, "") ?? "";
+  const whatsappDigits = normalizeWhatsAppNumber(settings?.supportWhatsapp ?? "") ?? "";
+  const paymentSlipMessage = [
+    "Hello, I have completed a VehicleTrack Pro subscription payment.",
+    `Plan: ${selected?.name ?? ""}`,
+    `Amount: ${formatCurrency(checkoutTotal)}`,
+    "I am sharing my payment slip here. Please help verify the payment.",
+  ].join("\n");
+  const paymentSlipWhatsAppUrl = whatsappDigits
+    ? `https://wa.me/${whatsappDigits}?text=${encodeURIComponent(paymentSlipMessage)}`
+    : "";
   const pendingPayment =
     submittedPayment ?? historyQuery.data?.find((payment) => payment.status === "PENDING") ?? null;
 
@@ -393,6 +403,22 @@ export default function RenewalPaymentPage() {
                   >
                     Pay via UPI App
                   </a>
+                )}
+                {paymentSlipWhatsAppUrl && (
+                  <a
+                    href={paymentSlipWhatsAppUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 text-center font-bold text-white hover:bg-[#1fb95a]"
+                  >
+                    <MessageCircle className="size-5" />
+                    Share your payment slip via WhatsApp
+                  </a>
+                )}
+                {paymentSlipWhatsAppUrl && (
+                  <p className="-mt-3 text-center text-xs text-muted-foreground">
+                    Click to open our WhatsApp chat, then attach and send your payment slip.
+                  </p>
                 )}
                 {settings?.upiId && (
                   <p className="break-all text-sm">

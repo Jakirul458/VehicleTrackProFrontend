@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
@@ -6,6 +6,24 @@ export default function PublicLayout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAuthPage = ["/login", "/signup", "/register"].includes(location.pathname);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    if (location.pathname === "/renewal" && new URLSearchParams(location.search).has("plan")) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      if (location.hash) {
+        const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.hash, location.pathname, location.search]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">

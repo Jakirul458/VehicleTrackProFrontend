@@ -67,6 +67,8 @@ export default function AdminLayout() {
               <span className="font-bold text-lg">VehicleTrack Pro</span>
             </div>
             <button
+              type="button"
+              aria-label="Close navigation menu"
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden text-muted-foreground hover:text-foreground"
             >
@@ -83,6 +85,7 @@ export default function AdminLayout() {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={() => setSidebarOpen(false)}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
                       ? "bg-primary text-primary-foreground"
@@ -123,6 +126,9 @@ export default function AdminLayout() {
         <header className="sticky top-0 z-30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
           <div className="flex h-16 items-center justify-between px-4 lg:px-8">
             <button
+              type="button"
+              aria-label="Open navigation menu"
+              aria-expanded={sidebarOpen}
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden text-muted-foreground hover:text-foreground"
             >

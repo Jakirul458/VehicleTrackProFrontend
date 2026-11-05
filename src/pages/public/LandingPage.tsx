@@ -20,6 +20,14 @@ import {
   FileSearch,
   Receipt,
   MessageCircle,
+  UserMinus,
+  Clock3,
+  Scale,
+  UserPlus,
+  History,
+  UsersRound,
+  ChartNoAxesCombined,
+  Target,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -133,6 +141,57 @@ const features = [
   },
 ];
 
+const growthFeatures = [
+  {
+    priority: 1,
+    icon: UserMinus,
+    title: "Lost Customer Tracking",
+    text: "Spot customers who did not renew and bring missed business back into focus.",
+  },
+  {
+    priority: 2,
+    icon: Clock3,
+    title: "Automatic Follow-up",
+    text: "Save time with planned follow-ups that help you reach customers before renewals slip away.",
+  },
+  {
+    priority: 3,
+    icon: Scale,
+    title: "Commission Reconciliation",
+    text: "Compare expected and received commissions to catch mismatches sooner.",
+  },
+  {
+    priority: 4,
+    icon: UserPlus,
+    title: "Lead Management",
+    text: "Organize prospects and track opportunities as you turn enquiries into business.",
+  },
+  {
+    priority: 5,
+    icon: History,
+    title: "Customer Lifetime History",
+    text: "See a customer's past records and renewals together to build stronger relationships.",
+  },
+  {
+    priority: 6,
+    icon: UsersRound,
+    title: "Multi-user Staff Access",
+    text: "Give your team the right access to help manage customers and grow your operations.",
+  },
+  {
+    priority: 7,
+    icon: ChartNoAxesCombined,
+    title: "Profit & Loss Analytics",
+    text: "Understand earnings and business performance with a clearer financial overview.",
+  },
+  {
+    priority: 8,
+    icon: Target,
+    title: "Monthly Business Targets",
+    text: "Set monthly goals, track progress and grow your business systematically.",
+  },
+];
+
 const audiences = [
   {
     icon: BadgeCheck,
@@ -240,7 +299,7 @@ function PreviewCard() {
           </div>
           <div className="min-w-0">
             <p className="truncate font-semibold text-white">WB 01 AB 1234</p>
-            <p className="truncate text-sm text-white/60">Rolls-Royce · Nirmala Sitharaman</p>
+            <p className="truncate text-sm text-white/60">ALTO 800 · Nirmala Sitharaman</p>
           </div>
         </div>
 
@@ -695,9 +754,12 @@ export default function LandingPage() {
       >
         <div className="container mx-auto max-w-6xl">
           <Reveal className="mx-auto mb-9 max-w-2xl text-center">
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Powerful Features</h2>
+            <h2 className="mb-4 text-3xl font-bold sm:text-4xl">
+              Your Business Deserves More Than Just Records.
+            </h2>
             <p className="text-lg text-slate-600 dark:text-slate-400">
-              Keep document records organized, see upcoming renewals and follow up with customers.
+              Manage customers, recover lost business, track commissions, automate follow-ups and
+              grow your insurance business with VehicleTrack Pro.
             </p>
           </Reveal>
 
@@ -721,6 +783,42 @@ export default function LandingPage() {
                 </div>
               </Reveal>
             ))}
+          </div>
+
+          <div className="mt-16">
+            <Reveal className="mx-auto mb-8 max-w-2xl text-center">
+              <p className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
+                Product roadmap
+              </p>
+              <h3 className="text-2xl font-bold sm:text-3xl">
+                Don&apos;t Just Manage Renewals. Grow Your Business.
+              </h3>
+              <p className="mt-3 text-slate-600 dark:text-slate-400">
+                Our next planned features are designed to help you recover customers, work smarter
+                and grow with confidence.
+              </p>
+            </Reveal>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {growthFeatures.map((feature, index) => (
+                <Reveal key={feature.title} delay={(index % 4) * 70}>
+                  <article className="relative h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <span className="absolute right-4 top-4 rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-cyan-800 dark:bg-cyan-400/10 dark:text-cyan-200">
+                      Coming soon
+                    </span>
+                    <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-teal-400 text-white">
+                      <feature.icon className="h-5 w-5" />
+                    </span>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      Priority {feature.priority}
+                    </p>
+                    <h4 className="mt-1 pr-1 text-lg font-semibold">{feature.title}</h4>
+                    <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                      {feature.text}
+                    </p>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -786,7 +884,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="pricing" className="scroll-mt-8 bg-white px-4 py-16 dark:bg-slate-950">
+      <section id="pricing" className="scroll-mt-20 bg-white px-4 py-16 dark:bg-slate-950">
         <Reveal className="mx-auto max-w-4xl">
           <div className="rounded-3xl border border-cyan-100 bg-gradient-to-br from-sky-50 via-white to-teal-50 p-8 text-center shadow-xl dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 sm:p-12">
             <p className="text-sm font-semibold uppercase tracking-widest text-cyan-800 dark:text-cyan-300">
