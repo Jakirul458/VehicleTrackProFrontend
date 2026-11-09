@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Check, KeyRound, Leaf, Mail, Receipt, ShieldCheck, Truck } from "lucide-react";
+import { Leaf, Receipt, Server, ShieldCheck, Truck } from "lucide-react";
 
 const DOCUMENT_LOADING_STEPS = [
   { label: "Signing in...", Icon: Truck },
@@ -15,29 +15,6 @@ interface VehicleLoadingProps {
 }
 
 function LoginVehicleLoading({ className }: { className: string }) {
-  const [station, setStation] = useState(0);
-  const [isWaiting, setIsWaiting] = useState(false);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setStation((current) => Math.min(current + 1, 2));
-    }, 1400);
-    const waitingTimeoutId = window.setTimeout(() => setIsWaiting(true), 4400);
-    return () => {
-      window.clearInterval(intervalId);
-      window.clearTimeout(waitingTimeoutId);
-    };
-  }, []);
-
-  const currentLabel = isWaiting
-    ? "Almost there... Verifying your account"
-    : ["Checking email...", "Checking password...", "Verifying account..."][station];
-  const stations = [
-    { label: "Email", Icon: Mail },
-    { label: "Password", Icon: KeyRound },
-    { label: "Account", Icon: ShieldCheck },
-  ];
-
   return (
     <span
       className={`vt-loading vt-loading--button vt-login-loader ${className}`}
@@ -45,33 +22,19 @@ function LoginVehicleLoading({ className }: { className: string }) {
       aria-live="polite"
       aria-atomic="true"
     >
-      <span className="vt-login-loader-message" key={currentLabel}>
-        {currentLabel}
-      </span>
-      {isWaiting && (
-        <span className="vt-login-loader-hint">
-          The server is waking up after inactivity, so this may take a little longer. Please keep
-          this page open while we verify your account.
+      <span className="vt-login-connection-animation" aria-hidden="true">
+        <span className="vt-login-orbit">
+          <span className="vt-login-orbit-dot" />
         </span>
-      )}
-      <span className="vt-login-route" aria-hidden="true">
-        <span className="vt-login-road" />
-        <Truck className="vt-login-truck" style={{ left: `${16.666 + station * 33.334}%` }} />
-        <span className="vt-login-stations">
-          {stations.map(({ label, Icon }, index) => (
-            <span className="vt-login-station" key={label}>
-              <span
-                className={`vt-login-stop ${index < station ? "is-complete" : ""} ${index === station ? "is-current" : ""}`}
-              >
-                {index < station ? <Check /> : <Icon />}
-              </span>
-              <span className={index <= station ? "is-active" : ""}>{label}</span>
-            </span>
-          ))}
-        </span>
+        <Server className="vt-login-server-icon" />
       </span>
-      <span className="sr-only">
-        {isWaiting ? "The server may be waking up. Your account is still being verified." : ""}
+      <span className="vt-login-loader-message">
+        Connecting to server
+        <span className="vt-login-loader-dots" aria-hidden="true">
+          <span>.</span>
+          <span>.</span>
+          <span>.</span>
+        </span>
       </span>
     </span>
   );

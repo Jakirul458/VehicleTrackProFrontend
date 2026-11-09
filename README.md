@@ -26,6 +26,7 @@ npm run dev
 Copy `.env.example` to `.env` and configure:
 
 - `VITE_API_URL`: Backend API URL (default: http://localhost:5000/api)
+- `VITE_SITE_URL`: Optional production site origin for sitemap canonical URLs (defaults to http://localhost:5173 for local builds)
 
 The frontend uses JWT tokens stored in localStorage for authentication. The token is automatically included in Authorization headers for all API requests.
 
@@ -35,7 +36,7 @@ The frontend uses JWT tokens stored in localStorage for authentication. The toke
 2. In Vercel, import that repository. The project root is the repository root.
 3. Set the build command to `npm run build` and install command to `npm ci`.
 4. Add the environment variable `VITE_API_URL` with your Render URL, for example `https://your-api.onrender.com/api`.
-5. Add `VITE_SITE_URL` with the actual production website origin (for example, `https://your-project.vercel.app` or your custom domain, without a path). Vercel's `VERCEL_PROJECT_PRODUCTION_URL` is used if this is omitted. Builds fail rather than publishing a sitemap with an incorrect domain when neither is available.
+5. Add `VITE_SITE_URL` with the actual production website origin (for example, `https://your-project.vercel.app` or your custom domain, without a path). If it is omitted, the build falls back to `http://localhost:5173` for local development builds and uses Vercel's production URL when available.
 6. Optionally set `VITE_GOOGLE_SITE_VERIFICATION` and `VITE_BING_SITE_VERIFICATION` to the verification values provided by Google Search Console and Bing Webmaster Tools. These are public verification tokens, not secrets.
 7. Deploy. `VITE_API_URL`, `VITE_SITE_URL`, and verification values are read during the build, so redeploy after changing them.
 

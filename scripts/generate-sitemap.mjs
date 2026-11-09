@@ -5,15 +5,32 @@ const outputDir = resolve(process.cwd(), "dist");
 const configuredUrl =
   process.env.VITE_SITE_URL ||
   process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined);
-if (!configuredUrl) {
-  throw new Error(
-    "Set VITE_SITE_URL to your production website URL before building so canonical URLs and sitemap use the correct domain.",
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:5173");
+
+if (
+  !process.env.VITE_SITE_URL &&
+  !process.env.VERCEL_PROJECT_PRODUCTION_URL &&
+  !process.env.VERCEL_URL
+) {
+  console.warn(
+    "No production site URL configured; falling back to http://localhost:5173 for sitemap and canonical links.",
   );
 }
-const siteUrl = new URL(
-  configuredUrl.startsWith("http") ? configuredUrl : `https://${configuredUrl}`,
-).origin;
+let siteUrl;
+try {
+  const parsedUrl = new URL(
+    /^https?:\/\//i.test(configuredUrl) ? configuredUrl : `https://${configuredUrl}`,
+  );
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    throw new Error("URL must use HTTP or HTTPS.");
+  }
+  siteUrl = parsedUrl.origin;
+} catch (error) {
+  throw new Error(
+    `Invalid site URL "${configuredUrl}". Set VITE_SITE_URL to a valid HTTP(S) origin.`,
+    { cause: error },
+  );
+}
 const publicPaths = ["/", "/about", "/contact", "/pricing", "/privacy-policy", "/terms-of-service"];
 const escapeXml = (value) =>
   value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");

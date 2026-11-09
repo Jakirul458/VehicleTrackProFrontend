@@ -301,7 +301,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`vt-btn flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0080c8] via-[#0ea5e9] to-[#0080c8] text-[15px] font-semibold text-white shadow-lg shadow-sky-500/25 disabled:cursor-not-allowed disabled:opacity-60 ${isSubmitting ? "min-h-[92px]" : "h-[52px]"}`}
+              className="vt-btn flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#0080c8] via-[#0ea5e9] to-[#0080c8] text-[15px] font-semibold text-white shadow-lg shadow-sky-500/25 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? <VehicleLoading variant="button" purpose="login" /> : "Sign in"}
             </button>
