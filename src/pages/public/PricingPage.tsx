@@ -12,7 +12,6 @@ export default function PricingPage() {
   } = useQuery({
     queryKey: ["subscription-plans"],
     queryFn: paymentApi.plans,
-    staleTime: 0,
   });
 
   return (

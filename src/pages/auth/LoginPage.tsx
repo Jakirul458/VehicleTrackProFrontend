@@ -115,7 +115,9 @@ export default function LoginPage() {
     setLoginError(null);
     try {
       const locationPromise = getLoginLocationWithin(1_000);
-      await warmBackend(true);
+      await warmBackend(true).catch((error: unknown) => {
+        console.info("Backend warm-up failed; attempting sign-in directly.", error);
+      });
       const location = await locationPromise;
       await login(email, password, location);
       toast.success("Login successful!");

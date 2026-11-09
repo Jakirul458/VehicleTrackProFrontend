@@ -28,7 +28,6 @@ export default function RenewalPaymentPage() {
   const plansQuery = useQuery({
     queryKey: ["subscription-plans"],
     queryFn: paymentApi.plans,
-    staleTime: 0,
   });
   const settingsQuery = useQuery({
     queryKey: ["payment-settings"],

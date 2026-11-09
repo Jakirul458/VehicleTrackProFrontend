@@ -1,48 +1,47 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
-import PublicLayout from "./layouts/PublicLayout";
-import AdminLayout from "./layouts/AdminLayout";
-import AgentLayout from "./layouts/AgentLayout";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
 
-// Public pages
-import LandingPage from "./pages/public/LandingPage";
-import AboutPage from "./pages/public/AboutPage";
-import ContactPage from "./pages/public/ContactPage";
-import PricingPage from "./pages/public/PricingPage";
-import RenewalPaymentPage from "./pages/public/RenewalPaymentPage";
-import PrivacyPolicyPage from "./pages/public/PrivacyPolicyPage";
-import TermsOfServicePage from "./pages/public/TermsOfServicePage";
-import LoginPage from "./pages/auth/LoginPage";
-import SignupPage from "./pages/auth/SignupPage";
-import NotFoundPage from "./pages/errors/NotFoundPage";
-import ForbiddenPage from "./pages/errors/ForbiddenPage";
-
-// Admin pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AgentsList from "./pages/admin/AgentsList";
-import AgentForm from "./pages/admin/AgentForm";
-import AgentDetails from "./pages/admin/AgentDetails";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminActivity from "./pages/admin/AdminActivity";
-import AdminSubscriptionPlans from "./pages/admin/AdminSubscriptionPlans";
-import AdminSubscriptionPayments from "./pages/admin/AdminSubscriptionPayments";
-import AdminSubscriptionInvoices from "./pages/admin/AdminSubscriptionInvoices";
-
-// Agent pages
-import AgentDashboard from "./pages/agent/AgentDashboard";
-import InsuranceList from "./pages/agent/InsuranceList";
-import TaxList from "./pages/agent/TaxList";
-import PucList from "./pages/agent/PucList";
-import RemindersPage from "./pages/agent/RemindersPage";
-import AgentReports from "./pages/agent/AgentReports";
-import AgentProfile from "./pages/agent/AgentProfile";
-import { DocumentModulePage } from "./components/documents/DocumentModulePage";
-import PaymentsPage from "./pages/agent/PaymentsPage";
-import AgentInvoices from "./pages/agent/AgentInvoices";
+const PublicLayout = lazy(() => import("./layouts/PublicLayout"));
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const AgentLayout = lazy(() => import("./layouts/AgentLayout"));
+const LandingPage = lazy(() => import("./pages/public/LandingPage"));
+const AboutPage = lazy(() => import("./pages/public/AboutPage"));
+const ContactPage = lazy(() => import("./pages/public/ContactPage"));
+const PricingPage = lazy(() => import("./pages/public/PricingPage"));
+const RenewalPaymentPage = lazy(() => import("./pages/public/RenewalPaymentPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/public/PrivacyPolicyPage"));
+const TermsOfServicePage = lazy(() => import("./pages/public/TermsOfServicePage"));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const SignupPage = lazy(() => import("./pages/auth/SignupPage"));
+const NotFoundPage = lazy(() => import("./pages/errors/NotFoundPage"));
+const ForbiddenPage = lazy(() => import("./pages/errors/ForbiddenPage"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AgentsList = lazy(() => import("./pages/admin/AgentsList"));
+const AgentForm = lazy(() => import("./pages/admin/AgentForm"));
+const AgentDetails = lazy(() => import("./pages/admin/AgentDetails"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminActivity = lazy(() => import("./pages/admin/AdminActivity"));
+const AdminSubscriptionPlans = lazy(() => import("./pages/admin/AdminSubscriptionPlans"));
+const AdminSubscriptionPayments = lazy(() => import("./pages/admin/AdminSubscriptionPayments"));
+const AdminSubscriptionInvoices = lazy(() => import("./pages/admin/AdminSubscriptionInvoices"));
+const AgentDashboard = lazy(() => import("./pages/agent/AgentDashboard"));
+const InsuranceList = lazy(() => import("./pages/agent/InsuranceList"));
+const TaxList = lazy(() => import("./pages/agent/TaxList"));
+const PucList = lazy(() => import("./pages/agent/PucList"));
+const RemindersPage = lazy(() => import("./pages/agent/RemindersPage"));
+const AgentReports = lazy(() => import("./pages/agent/AgentReports"));
+const AgentProfile = lazy(() => import("./pages/agent/AgentProfile"));
+const DocumentModulePage = lazy(() =>
+  import("./components/documents/DocumentModulePage").then((module) => ({
+    default: module.DocumentModulePage,
+  })),
+);
+const PaymentsPage = lazy(() => import("./pages/agent/PaymentsPage"));
+const AgentInvoices = lazy(() => import("./pages/agent/AgentInvoices"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -180,96 +179,108 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <SeoManager />
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<PublicLayout />}>
-              <Route index element={<LandingPage />} />
-              <Route path="about" element={<AboutPage />} />
-              <Route path="contact" element={<ContactPage />} />
-              <Route path="pricing" element={<PricingPage />} />
-              <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="terms-of-service" element={<TermsOfServicePage />} />
-              <Route path="renewal" element={<RenewalPaymentPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<SignupPage />} />
-              <Route path="register" element={<SignupPage />} />
-            </Route>
+          <Suspense
+            fallback={
+              <div
+                className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground"
+                role="status"
+                aria-live="polite"
+              >
+                Loading page...
+              </div>
+            }
+          >
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<PublicLayout />}>
+                <Route index element={<LandingPage />} />
+                <Route path="about" element={<AboutPage />} />
+                <Route path="contact" element={<ContactPage />} />
+                <Route path="pricing" element={<PricingPage />} />
+                <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="terms-of-service" element={<TermsOfServicePage />} />
+                <Route path="renewal" element={<RenewalPaymentPage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="signup" element={<SignupPage />} />
+                <Route path="register" element={<SignupPage />} />
+              </Route>
 
-            {/* Admin routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requiredRole="SUPER_ADMIN">
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AdminDashboard />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="agents" element={<AgentsList />} />
-              <Route path="agents/new" element={<AgentForm />} />
-              <Route path="agents/:id" element={<AgentDetails />} />
-              <Route path="agents/:id/edit" element={<AgentForm />} />
+              {/* Admin routes */}
               <Route
-                path="insurance"
-                element={<DocumentModulePage moduleKey="insurance" admin />}
-              />
-              <Route path="tax" element={<DocumentModulePage moduleKey="tax" admin />} />
-              <Route path="puc" element={<DocumentModulePage moduleKey="puc" admin />} />
-              <Route path="payments" element={<PaymentsPage />} />
-              <Route path="subscription-plans" element={<AdminSubscriptionPlans />} />
-              <Route path="agents/subscriptions" element={<AdminSubscriptionPayments />} />
-              <Route path="subscription-invoices" element={<AdminSubscriptionInvoices />} />
-              <Route path="settings" element={<AdminSettings />} />
-              <Route path="activity" element={<AdminActivity />} />
-            </Route>
-
-            {/* Agent routes */}
-            <Route
-              path="/agent"
-              element={
-                <ProtectedRoute requiredRole="AGENT">
-                  <AgentLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AgentDashboard />} />
-              <Route path="dashboard" element={<AgentDashboard />} />
-              <Route
-                path="insurance"
+                path="/admin"
                 element={
-                  <ProtectedRoute requiredModuleAccess="insurance">
-                    <InsuranceList />
+                  <ProtectedRoute requiredRole="SUPER_ADMIN">
+                    <AdminLayout />
                   </ProtectedRoute>
                 }
-              />
-              <Route
-                path="tax"
-                element={
-                  <ProtectedRoute requiredModuleAccess="tax">
-                    <TaxList />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="puc"
-                element={
-                  <ProtectedRoute requiredModuleAccess="puc">
-                    <PucList />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="payments" element={<PaymentsPage />} />
-              <Route path="invoices" element={<AgentInvoices />} />
-              <Route path="reminders" element={<RemindersPage />} />
-              <Route path="reports" element={<AgentReports />} />
-              <Route path="profile" element={<AgentProfile />} />
-            </Route>
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="agents" element={<AgentsList />} />
+                <Route path="agents/new" element={<AgentForm />} />
+                <Route path="agents/:id" element={<AgentDetails />} />
+                <Route path="agents/:id/edit" element={<AgentForm />} />
+                <Route
+                  path="insurance"
+                  element={<DocumentModulePage moduleKey="insurance" admin />}
+                />
+                <Route path="tax" element={<DocumentModulePage moduleKey="tax" admin />} />
+                <Route path="puc" element={<DocumentModulePage moduleKey="puc" admin />} />
+                <Route path="payments" element={<PaymentsPage />} />
+                <Route path="subscription-plans" element={<AdminSubscriptionPlans />} />
+                <Route path="agents/subscriptions" element={<AdminSubscriptionPayments />} />
+                <Route path="subscription-invoices" element={<AdminSubscriptionInvoices />} />
+                <Route path="settings" element={<AdminSettings />} />
+                <Route path="activity" element={<AdminActivity />} />
+              </Route>
 
-            {/* Error pages */}
-            <Route path="/403" element={<ForbiddenPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+              {/* Agent routes */}
+              <Route
+                path="/agent"
+                element={
+                  <ProtectedRoute requiredRole="AGENT">
+                    <AgentLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AgentDashboard />} />
+                <Route path="dashboard" element={<AgentDashboard />} />
+                <Route
+                  path="insurance"
+                  element={
+                    <ProtectedRoute requiredModuleAccess="insurance">
+                      <InsuranceList />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="tax"
+                  element={
+                    <ProtectedRoute requiredModuleAccess="tax">
+                      <TaxList />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="puc"
+                  element={
+                    <ProtectedRoute requiredModuleAccess="puc">
+                      <PucList />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="payments" element={<PaymentsPage />} />
+                <Route path="invoices" element={<AgentInvoices />} />
+                <Route path="reminders" element={<RemindersPage />} />
+                <Route path="reports" element={<AgentReports />} />
+                <Route path="profile" element={<AgentProfile />} />
+              </Route>
+
+              {/* Error pages */}
+              <Route path="/403" element={<ForbiddenPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
         <Toaster position="top-right" richColors />
       </AuthProvider>
