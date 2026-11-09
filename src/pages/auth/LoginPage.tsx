@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { authApi } from "@/api";
 import { useAuth } from "@/context/AuthContext";
 import { Truck, CheckCircle2, Eye, EyeOff, Mail, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -38,6 +39,16 @@ function getLoginLocation(): Promise<LoginLocation | undefined> {
   });
 }
 
+function getLoginLocationWithin(maxWaitMs: number): Promise<LoginLocation | undefined> {
+  let timeoutId: number | undefined;
+  const timeout = new Promise<undefined>((resolve) => {
+    timeoutId = window.setTimeout(() => resolve(undefined), maxWaitMs);
+  });
+  return Promise.race([getLoginLocation(), timeout]).finally(() => {
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  });
+}
+
 export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -46,6 +57,11 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<NormalizedApiError | null>(null);
+  const warmupRef = useRef<{
+    promise: Promise<void>;
+    startedAt: number;
+    settled: boolean;
+  } | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,12 +75,48 @@ export default function LoginPage() {
     loginError?.code === "INVALID_CREDENTIALS" ||
     loginError?.status === 401 ||
     loginError?.status === 422;
+  const retryableLoginError =
+    loginError !== null &&
+    (loginError.status === 0 || loginError.status === 429 || loginError.status >= 500);
+
+  const warmBackend = useCallback((force = false) => {
+    const current = warmupRef.current;
+    if (current && (!current.settled || (!force && Date.now() - current.startedAt < 30_000))) {
+      return current.promise;
+    }
+
+    const entry = {
+      promise: Promise.resolve(),
+      startedAt: Date.now(),
+      settled: false,
+    };
+    entry.promise = authApi.warmup().then(
+      () => {
+        entry.settled = true;
+      },
+      (error: unknown) => {
+        entry.settled = true;
+        if (warmupRef.current === entry) warmupRef.current = null;
+        throw error;
+      },
+    );
+    warmupRef.current = entry;
+    return entry.promise;
+  }, []);
+
+  useEffect(() => {
+    void warmBackend().catch(() => {
+      console.info("Backend warm-up did not complete; it will be checked again when signing in.");
+    });
+  }, [warmBackend]);
 
   const doLogin = async (email: string, password: string) => {
     setIsSubmitting(true);
     setLoginError(null);
     try {
-      const location = await getLoginLocation();
+      const locationPromise = getLoginLocationWithin(1_000);
+      await warmBackend(true);
+      const location = await locationPromise;
       await login(email, password, location);
       toast.success("Login successful!");
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -307,6 +359,11 @@ export default function LoginPage() {
             </button>
           </form>
 
+          <p className="mt-2 text-center text-xs text-slate-500" aria-live="polite">
+            {isSubmitting
+              ? "First connection may take a little longer while the server starts. Please keep this page open."
+              : ""}
+          </p>
           <p className="mt-8 text-center text-sm text-slate-500">
             New to VehicleTrack Pro?{" "}
             <Link to="/signup" className="font-semibold text-sky-700 hover:underline">
@@ -334,26 +391,49 @@ export default function LoginPage() {
         <DialogContent className="rounded-3xl">
           <DialogHeader>
             <DialogTitle>
-              {validityExpired
-                ? "Your account validity has expired"
-                : loginError?.code === "ACCOUNT_SUSPENDED"
-                  ? "Your account is suspended"
-                  : invalidCredentials
-                    ? "Email or password is incorrect"
-                    : "We couldn't sign you in"}
+              {retryableLoginError
+                ? "The server is taking longer than usual"
+                : validityExpired
+                  ? "Your account validity has expired"
+                  : loginError?.code === "ACCOUNT_SUSPENDED"
+                    ? "Your account is suspended"
+                    : invalidCredentials
+                      ? "Email or password is incorrect"
+                      : "We couldn't sign you in"}
             </DialogTitle>
             <DialogDescription>
               {validityExpired
                 ? "Your account validity has expired. Sign in with your account to pay for renewal; payment access remains available until an administrator verifies it."
-                : loginError?.code === "ACCOUNT_SUSPENDED"
-                  ? "Your account has been suspended. Please contact your administrator for help."
-                  : invalidCredentials
-                    ? "Your email or password is incorrect. Check your credentials and try again."
-                    : loginError?.message}
+                : retryableLoginError
+                  ? loginError?.status === 429
+                    ? "There have been too many attempts. Please wait a moment, then try signing in again."
+                    : "The server did not respond in time. Your sign-in was not confirmed. Please try again; if the issue continues, contact your administrator."
+                  : loginError?.code === "ACCOUNT_SUSPENDED"
+                    ? "Your account has been suspended. Please contact your administrator for help."
+                    : invalidCredentials
+                      ? "Your email or password is incorrect. Check your credentials and try again."
+                      : loginError?.message}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            {validityExpired ? (
+            {retryableLoginError ? (
+              <>
+                <Link
+                  to="/contact"
+                  className="inline-flex h-10 items-center justify-center rounded-full border px-5 text-sm font-medium"
+                >
+                  Contact admin
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void doLogin(formData.email, formData.password)}
+                  disabled={isSubmitting}
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:opacity-60"
+                >
+                  {isSubmitting ? "Connecting..." : "Try again"}
+                </button>
+              </>
+            ) : validityExpired ? (
               <>
                 <Link
                   to="/contact"

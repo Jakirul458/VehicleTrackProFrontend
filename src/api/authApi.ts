@@ -44,7 +44,10 @@ export interface CreateAgentPayload {
 
 export const authApi = {
   login: (payload: LoginPayload) =>
-    request<{ user: User; token: string }>(apiClient.post("/auth/login", payload)),
+    request<{ user: User; token: string }>(
+      apiClient.post("/auth/login", payload, { timeout: 45_000 }),
+    ),
+  warmup: () => apiClient.get("/health", { timeout: 90_000 }).then(() => undefined),
   register: (payload: PublicSignupPayload) =>
     request<{ user: User; token: string }>(apiClient.post("/auth/register", payload)),
   superAdminLogin: (payload: LoginPayload) =>

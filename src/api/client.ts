@@ -36,6 +36,7 @@ apiClient.interceptors.response.use(
       "/auth/superadmin",
       "/auth/register",
       "/auth/setup-super-admin",
+      "/health",
     ].some((path) => requestUrl.includes(path));
     if (error.response?.status === 401 && !isAuthenticationRequest) {
       sessionStorage.removeItem("token");
@@ -82,13 +83,17 @@ export function normalizeApiError(error: unknown): NormalizedApiError {
   }>;
   if (axiosError?.isAxiosError) {
     const status = axiosError.response?.status ?? 0;
+    const code = axiosError.response?.data?.code ?? axiosError.code;
     return {
       status,
       message:
         axiosError.response?.data?.message ??
+        (code === "ECONNABORTED" || code === "ETIMEDOUT"
+          ? "The server is taking longer than expected to respond."
+          : undefined) ??
         STATUS_MESSAGE[status] ??
         (status === 0 ? "Cannot reach the server. Check your connection." : "Unexpected error."),
-      ...(axiosError.response?.data?.code ? { code: axiosError.response.data.code } : {}),
+      ...(code ? { code } : {}),
       fieldErrors: axiosError.response?.data?.errors,
     };
   }
@@ -109,7 +114,8 @@ apiClient.interceptors.response.use(
       normalized.status !== 401 &&
       !["/auth/login", "/auth/superadmin", "/auth/register", "/auth/setup-super-admin"].some(
         (path) => (error.config?.url ?? "").includes(path),
-      )
+      ) &&
+      !(error.config?.url ?? "").includes("/health")
     ) {
       toast.error(normalized.message);
     }
